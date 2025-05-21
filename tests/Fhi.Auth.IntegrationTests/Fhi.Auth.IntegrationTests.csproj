@@ -11,10 +11,13 @@
     <PackageReference Include="NUnit.Analyzers" />
     <PackageReference Include="NUnit3TestAdapter" />
 	<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+	<PackageReference Include="Refit" />
+	<PackageReference Include="Duende.AccessTokenManagement" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Fhi.Authorization.Extensions\Fhi.Authorization.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\Fhi.Authentication.Extensions\Fhi.Authentication.Extensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

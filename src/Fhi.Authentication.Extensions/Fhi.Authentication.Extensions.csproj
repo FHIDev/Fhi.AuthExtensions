@@ -10,6 +10,7 @@
 		<PackageReference Include="Microsoft.IdentityModel.Tokens" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
+		<PackageReference Include="Refit.HttpClientFactory" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="README.md" Pack="true" PackagePath="/" />

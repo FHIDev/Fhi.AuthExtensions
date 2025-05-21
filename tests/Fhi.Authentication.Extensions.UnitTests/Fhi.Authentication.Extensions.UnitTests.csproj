@@ -12,7 +12,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="NUnit3TestAdapter" />    
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Refit" />
+    <PackageReference Include="Duende.AccessTokenManagement" />
   </ItemGroup>
 
   <ItemGroup>
