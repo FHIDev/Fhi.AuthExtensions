@@ -3,19 +3,16 @@
     "Name": "AngularBFF and API",
     "Projects": [
       {
-        "Path": "samples\\WebApi\\Fhi.Samples.WebApi.csproj",
-        "Action": "Start",
-        "DebugTarget": "https"
+        "Path": "samples\\Fhi.Samples.AngularBFF\\Fhi.Samples.Angular.BFFApi\\Fhi.Samples.Angular.BFFApi.csproj",
+        "Action": "Start"
       },
       {
-        "Path": "samples\\AngularBFF\\Angular.BFFApi\\Fhi.Samples.Angular.BFFApi.csproj",
-        "Action": "Start",
-        "DebugTarget": "https"
+        "Path": "samples\\Fhi.Samples.AngularBFF\\Fhi.Samples.Angular.Client\\Fhi.Samples.Angular.Client.esproj",
+        "Action": "Start"
       },
       {
-        "Path": "samples\\AngularBFF\\Angular.Client\\Fhi.Samples.Angular.Client.esproj",
-        "Action": "Start",
-        "DebugTarget": "localhost (Chrome)"
+        "Path": "samples\\Fhi.Samples.WebApi\\Fhi.Samples.WebApi.csproj",
+        "Action": "Start"
       }
     ]
   },
@@ -23,11 +20,11 @@
     "Name": "Worker and API",
     "Projects": [
       {
-        "Path": "samples\\WebApi\\Fhi.Samples.WebApi.csproj",
+        "Path": "samples\\Fhi.Samples.WebApi\\Fhi.Samples.WebApi.csproj",
         "Action": "Start"
       },
       {
-        "Path": "samples\\WorkerService.ClientCredential\\Fhi.Samples.WorkerService.csproj",
+        "Path": "samples\\Fhi.Samples.WorkerService\\Fhi.Samples.WorkerService.csproj",
         "Action": "Start"
       }
     ]
