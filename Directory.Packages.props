@@ -21,7 +21,7 @@
     <PackageVersion Include="Microsoft.AspNetCore.Authorization" Version="9.0.4" />
     <PackageVersion Include="Refit.HttpClientFactory" Version="8.0.0" />
     <PackageVersion Include="Refit" Version="8.0.0" />
-    <PackageVersion Include="Serilog" Version="4.2.0" />
+    <PackageVersion Include="Serilog" Version="4.3.0" />
     <PackageVersion Include="Serilog.Extensions.Hosting" Version="9.0.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="8.1.1" />
