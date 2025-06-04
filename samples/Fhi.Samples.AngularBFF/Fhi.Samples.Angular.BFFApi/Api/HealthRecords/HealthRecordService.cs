@@ -13,8 +13,6 @@ namespace AngularBFF.Net8.Api.HealthRecords
     /// <summary>
     /// Calling external API to get weather forcast
     /// </summary>
-    /// <param name="httpClientFactory"></param>
-    /// <param name="tokenService"></param>
     public class HealthRecordService : IHealthRecordService
     {
         public HealthRecordService(IHttpClientFactory factory)
