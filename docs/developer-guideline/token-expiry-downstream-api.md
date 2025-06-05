@@ -7,8 +7,8 @@ If you don’t proactively validate or refresh these tokens, you risk users havi
 
 Guideline for two types of application architectures where authentication is handled on the server: 
 
-- [Angular with a BFF](./AuthenticationWithAngularBFF.md)
-- [Blazor with Interactive Server](./AuthenticationWithBlazorServer.md)
+- [Angular with a BFF](./TokenExpiration/AuthenticationWithAngularBFF.md)
+- [Blazor with Interactive Server](./TokenExpiration/AuthenticationWithBlazorServer.md)
 
 ![](TokenExpiryOverview.jpg)
 

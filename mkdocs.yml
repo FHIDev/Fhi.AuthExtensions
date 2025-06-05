@@ -1,15 +1,12 @@
-site_name: FHI Authentication and Authorization
+site_name: FHI authentication and authorization extensions
+site_description: FHI Authentication and authorization extensions for ASP.NET Core
+repo_url: https://github.com/FHIDev/Fhi.AuthExtensions
 theme:
-  name: readthedocs
+  name: material
+  logo: fhi.png
   features:
     - navigation.tabs
     - navigation.tabs.sticky
-  palette:
-    primary: white
-
-nav:
-  - Home: index.md
-  - Authentication:
-      - Getting Started: authentication/getting-started.md
-      - Handling token expiration: authentication/token-expiry-downstream-api.md
-        - 
+  custom_dir: docs/overrides
+extra_css:
+  - overrides/main.css

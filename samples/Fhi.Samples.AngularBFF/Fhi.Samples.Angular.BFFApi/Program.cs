@@ -179,8 +179,14 @@ app.MapGet("/logout", async (HttpContext context) =>
 });
 
 app.MapControllers();
+
+/************************************************************************************************
+* The code below is the fallback to the SPA. It will serve the index.html file for all requests that 
+* are not handled by the API endpoints. This is typical in a SPA application where the frontend handles 
+* routing and the backend serves the initial HTML file.
+************************************************************************************************/
 app.MapFallbackToFile("/index.html")
-    .AllowAnonymous(); // The fallback file (SPA) should be accessible without authentication
+    .AllowAnonymous(); 
 
 app.Run();
 
