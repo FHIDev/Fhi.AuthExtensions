@@ -10,4 +10,5 @@ and [Microsoft authentication libraries](https://learn.microsoft.com/en-us/aspne
 Check out guide and samples to see how to:
 
 - [Token Expiry Handling with Downstream APIs](./developer-guideline/token-expiry-downstream-api.md)
+- [Require authentication by default in .NET Core](./developer-guideline/protecting-enpoints.md)
 
