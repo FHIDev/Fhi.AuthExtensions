@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-	<Import Project="../Src.Build.props" />
-	<Import Project="../Src.NugetBuild.props" />
+  <Import Project="../Directory.Build.props" />
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <RepositoryUrl>https://github.com/FHIDev/Fhi.AuthExtensions</RepositoryUrl>
+    <Authors>Folkehelseinstituttet (FHI)</Authors>
+    <Copyright>Copyright 2022-2025 Folkehelseinstituttet (FHI)</Copyright>
+    <PackageCopyright>Copyright 2022-2025 Folkehelseinstituttet (FHI)</PackageCopyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>fhi.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Tags>oauth, oidc</Tags>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="../fhi.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
 </Project>

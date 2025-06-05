@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-	<Import Project="..\Src.Build.props" />
-	<PropertyGroup>
-		<IsTestProject>true</IsTestProject>
-		<GenerateDocumentationFile>false</GenerateDocumentationFile>
-	</PropertyGroup>
+  <Import Project="../Directory.Build.props" />
+  <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
 </Project>
