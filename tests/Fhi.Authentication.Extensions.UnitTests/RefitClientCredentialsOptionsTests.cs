@@ -21,7 +21,7 @@ public class RefitClientCredentialsOptionsTests
         Assert.That(options.ClientName, Is.EqualTo("default"));
         Assert.That(options.TokenEndpoint, Is.EqualTo(string.Empty));
         Assert.That(options.ClientId, Is.EqualTo(string.Empty));
-        Assert.That(options.ClientSecret, Is.Null);
+        Assert.That(options.ClientSecret, Is.EqualTo(string.Empty));
         Assert.That(options.Scope, Is.Null);
         Assert.That(options.ApiBaseUrl, Is.Null);
     }
