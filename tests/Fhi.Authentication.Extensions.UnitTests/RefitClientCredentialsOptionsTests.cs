@@ -36,9 +36,10 @@ public class RefitClientCredentialsOptionsTests
         var isValid = Validator.TryValidateObject(options, context, results, true);
 
         Assert.That(isValid, Is.False);
-        Assert.That(results, Has.Count.EqualTo(2)); // TokenEndpoint and ClientId are required
+        Assert.That(results, Has.Count.EqualTo(3)); // TokenEndpoint, ClientId, and ClientSecret are required
         Assert.That(results.Any(r => r.MemberNames.Contains("TokenEndpoint")), Is.True);
         Assert.That(results.Any(r => r.MemberNames.Contains("ClientId")), Is.True);
+        Assert.That(results.Any(r => r.MemberNames.Contains("ClientSecret")), Is.True);
     }
 
     [Test]
