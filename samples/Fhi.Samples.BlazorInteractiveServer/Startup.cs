@@ -49,7 +49,8 @@ internal static partial class Startup
             options.Scope.Add("openid");
             options.Scope.Add("profile");
             options.Scope.Add("offline_access");
-            options.Scope.Add("fhi:webapi/access");
+            //options.Scope.Add("fhi:webapi/access");
+            options.Scope.Add("api");
         });
 
         /*****************************************************************************************************************************
