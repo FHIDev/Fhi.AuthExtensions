@@ -6,7 +6,6 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
-    standalone: true,
     imports: [NavMenuComponent, RouterOutlet, RouterLink, RouterLinkActive]
 })
 export class AppComponent {

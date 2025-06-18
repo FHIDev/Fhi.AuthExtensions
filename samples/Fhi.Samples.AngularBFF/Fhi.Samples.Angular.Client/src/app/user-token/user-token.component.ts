@@ -18,10 +18,9 @@ type TokenInformation = {
 
 
 @Component({
-  selector: 'app-user-session',
-  templateUrl: './user-token.component.html',
-  standalone: true,
-  imports:[NgIf]
+    selector: 'app-user-session',
+    templateUrl: './user-token.component.html',
+    imports: [NgIf]
 })
 
 

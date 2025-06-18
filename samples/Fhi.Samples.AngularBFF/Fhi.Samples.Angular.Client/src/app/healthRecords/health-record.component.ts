@@ -12,7 +12,6 @@ interface Record {
 @Component({
     selector: 'healthrecord-component',
     templateUrl: 'health-record.component.html',
-    standalone: true,
     imports: [NgIf, NgFor]
 })
 
