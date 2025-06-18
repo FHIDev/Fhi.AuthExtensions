@@ -11,3 +11,9 @@
 [Duende Free and Open Source Software](https://github.com/DuendeSoftware/foss)
 
 ## Microsoft Packages
+
+|Package|Purpose|
+|---|---|
+|[Microsoft.AspNetCore.Authentication.OpenIdConnect](https://www.nuget.org/packages/Microsoft.AspNetCore.Authentication.OpenIdConnect)|Library for authenticationg end-user with OpenID Connect|[Releases](https://github.com/FHIDev/Fhi.AuthExtensions/releases)|
+|[Microsoft.AspNetCore.Authentication.JwtBearer](https://www.nuget.org/packages/Microsoft.AspNetCore.Authentication.JwtBearer)|Library for validating a Jwt Bearer token|
+
