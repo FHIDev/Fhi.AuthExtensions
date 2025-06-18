@@ -7,7 +7,7 @@ and [Microsoft authentication libraries](https://learn.microsoft.com/en-us/aspne
 
 ## Documentation
 
-For detailed documentation and implementation guides, see the [docs](./docs) directory.
+For detailed documentation and implementation guides, see the [documentation](https://fhidev.github.io/Fhi.AuthExtensions/) or [docs](./docs) directory.
 
 ## Contributing
 

@@ -11,16 +11,8 @@ As a result:
 - You lose access to cookies during the lifetime of the SignalR connection.
 - HubCallerContext.User is not updated when the authentication cookie is renewed.
 
-[Blazor state management](https://learn.microsoft.com/en-us/aspnet/core/blazor/state-management?view=aspnetcore-9.0&pivots=server)
+See [Blazor state management](https://learn.microsoft.com/en-us/aspnet/core/blazor/state-management?view=aspnetcore-9.0&pivots=server)
 [Blazor Server side authentication](https://learn.microsoft.com/en-us/aspnet/core/blazor/security/?view=aspnetcore-9.0&tabs=visual-studio#server-side-blazor-authentication)
-
-|Scenario | Available in Blazor Server? | Recommendation|
-|-----|------------------|------------------|---------|
-|HttpContext.Request.Cookies | No | Can be used in a API Controller|
-|AuthenticationStateProvider / User | Yes | Reads the claimssprincipal from HubCallerContext|
-|ProtectedSessionStorage |  Only after OnAfterRender | Unngå for auth-flow
-|HttpContext.GetTokenAsync(...) |No | Use in middleware or controllers|
-|Controller + HttpClient | Yes | Best solution to get tokens|
 
 
 ## Alternative solution
