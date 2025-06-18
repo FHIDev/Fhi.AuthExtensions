@@ -54,7 +54,10 @@ namespace WebApi
                 {
                     policy.AuthenticationSchemes.Add("bearer.me");
                     policy.RequireClaim(JwtClaimTypes.Subject);
-                    policy.RequireClaim(JwtClaimTypes.Scope, "fhi:authextensions.samples/access");
+                    /***************************
+                     * Sample of require a scope
+                     * *************************/
+                    // policy.RequireClaim(JwtClaimTypes.Scope, "fhi:authextensions.samples/access");
                     policy.RequireAuthenticatedUser();
                 })
                  .AddPolicy("Integration", policy =>
@@ -73,14 +76,10 @@ namespace WebApi
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
             app.UseHttpsRedirection();
-
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllers();
-
 
             return app;
         }

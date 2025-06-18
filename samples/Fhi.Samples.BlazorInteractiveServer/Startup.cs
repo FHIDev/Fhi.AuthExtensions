@@ -46,11 +46,13 @@ internal static partial class Startup
             options.EventsType = typeof(BlazorOpenIdConnectEvents);
 
             options.Scope.Clear();
-            options.Scope.Add("openid");
-            options.Scope.Add("profile");
-            options.Scope.Add("offline_access");
-            //options.Scope.Add("fhi:webapi/access");
-            options.Scope.Add("api");
+            if (!string.IsNullOrWhiteSpace(authenticationSettings?.Scopes))
+            {
+                foreach (var scope in authenticationSettings.Scopes.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    options.Scope.Add(scope);
+                }
+            }
         });
 
         /*****************************************************************************************************************************
