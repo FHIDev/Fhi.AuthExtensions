@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { catchError, map, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { NgIf } from '@angular/common';
 import { jwtDecode } from "jwt-decode";
 
 type UserSessionDto = {
@@ -18,10 +17,9 @@ type TokenInformation = {
 
 
 @Component({
-  selector: 'app-user-session',
-  templateUrl: './user-token.component.html',
-  standalone: true,
-  imports:[NgIf]
+    selector: 'app-user-session',
+    templateUrl: './user-token.component.html',
+    imports: []
 })
 
 
@@ -31,7 +29,7 @@ export class UserSessionComponent implements OnInit  {
     idToken: '',
     accessTokenJwt: '',
     idTokenJwt: ''
-  }; 
+  };
 
   constructor(private http: HttpClient) {
   }

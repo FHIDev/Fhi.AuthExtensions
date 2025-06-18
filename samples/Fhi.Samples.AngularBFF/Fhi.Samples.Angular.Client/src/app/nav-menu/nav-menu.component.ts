@@ -2,10 +2,9 @@ import { Component, Input } from '@angular/core';
 import { FhiPopoverMenuComponent } from '@folkehelseinstituttet/angular-components';
 
 @Component({
-  selector: 'app-nav-menu',
-  templateUrl: './nav-menu.component.html',
-  standalone: true,
-  imports: [FhiPopoverMenuComponent]
+    selector: 'app-nav-menu',
+    templateUrl: './nav-menu.component.html',
+    imports: [FhiPopoverMenuComponent]
 })
 
 export class NavMenuComponent {
