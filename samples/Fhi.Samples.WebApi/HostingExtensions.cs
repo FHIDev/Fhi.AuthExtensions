@@ -57,7 +57,7 @@ namespace WebApi
                     /***************************
                      * Sample of require a scope
                      * *************************/
-                    // policy.RequireClaim(JwtClaimTypes.Scope, "fhi:authextensions.samples/access");
+                    //// policy.RequireClaim(JwtClaimTypes.Scope, "fhi:authextensions.samples/access");
                     policy.RequireAuthenticatedUser();
                 })
                  .AddPolicy("Integration", policy =>
