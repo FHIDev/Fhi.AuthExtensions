@@ -1,5 +1,5 @@
 # Token Expiry Handling with Downstream APIs
-For applications that handle authentication on the server using cookies and OpenID Connect (OIDC), and that need to call downstream APIs requiring an access_token or DPoP token, it's important to understand that authentication **cookies and tokens have separate lifetimes**.
+Applications that handle authentication on the server using cookies and OpenID Connect (OIDC), and that need to call downstream APIs with `access_token` must be aware of that **cookies and tokens have separate lifetimes**.
 
 This means that even if the authentication cookie is still valid, the `access_token` and `refresh_token` may expire. In such cases, the user will appear authenticated in the UI, but API calls to downstream services will begin to fail with `401 Unauthorized` errors.
 
