@@ -8,4 +8,4 @@ Check out guide and samples to see how to:
 - [Token Expiry Handling with Downstream APIs](./developer-guideline/token-expiry-downstream-api.md)
 - [Require authentication by default in .NET Core](./developer-guideline/protecting-endpoints.md)
 
-Alos checkout learning and samples from [Duende](https://docs.duendesoftware.com/). 
+Also checkout learning and samples from [Duende](https://docs.duendesoftware.com/). 
