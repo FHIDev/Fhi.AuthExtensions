@@ -12,7 +12,7 @@ theme:
 nav:
   - Home: index.md
   - Overview packages: packages.md
-  - Consepts and terminology: concepts.md
+  - Concepts and terminology: concepts.md
   - Developer guideline:
       - Require authentication by default: developer-guideline/protecting-endpoints.md
       - Handling token expiration: developer-guideline/token-expiry-downstream-api.md

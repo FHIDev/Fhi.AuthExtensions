@@ -25,7 +25,7 @@ Do the following steps:
 
 #### Step 1: Change Cookie expiration time 
 
-ExpireTimeSpan should be must be set out from access_token and refresh_token lifetime. This is to ensure that the cookie is not expired after the refresh token is expired. 
+ExpireTimeSpan should be set out from access_token and refresh_token lifetime. This is to ensure that the cookie is not expired after the refresh token is expired. 
 
 Sample code
 ```
