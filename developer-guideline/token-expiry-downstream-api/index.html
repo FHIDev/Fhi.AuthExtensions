@@ -14,15 +14,13 @@
         <link rel="prev" href="../protecting-endpoints/">
       
       
-        <link rel="next" href="../TokenExpiration/AuthenticationWithAngularBFF/">
-      
       
       <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
-        <title>Token Expiry Handling with Downstream APIs - FHI authentication and authorization extensions</title>
+        <title>Handling token expiration - FHI authentication and authorization extensions</title>
       
     
     
@@ -101,7 +99,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Token Expiry Handling with Downstream APIs
+              Handling token expiration
             
           </span>
         </div>
@@ -205,7 +203,7 @@
   
     
   
-  Overview of packages
+  Overview packages
 
       </a>
     </li>
@@ -217,18 +215,17 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../consepts/HelseId/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../../concepts/" class="md-tabs__link">
+        
   
   
-  Consepts
+    
+  
+  Concepts and terminology
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -338,7 +335,7 @@
   
   
   <span class="md-ellipsis">
-    Overview of packages
+    Overview packages
     
   </span>
   
@@ -350,71 +347,22 @@
     
       
       
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    Consepts
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            Consepts
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../../consepts/HelseId/" class="md-nav__link">
+      <a href="../../concepts/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    HelseId
+    Concepts and terminology
     
   </span>
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -477,7 +425,7 @@
   
   
   <span class="md-ellipsis">
-    Require authentication by default in .NET Core
+    Require authentication by default
     
   </span>
   
@@ -509,107 +457,12 @@
   
   
   <span class="md-ellipsis">
-    Token Expiry Handling with Downstream APIs
+    Handling token expiration
     
   </span>
   
 
       </a>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    TokenExpiration
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_3">
-            <span class="md-nav__icon md-icon"></span>
-            TokenExpiration
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../TokenExpiration/AuthenticationWithAngularBFF/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Token Expiry Handling with Angular BFF Client and Downstream APIs
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../TokenExpiration/AuthenticationWithBlazorServer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Token Expiry Handling with Blazor server client and Downstream APIs
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -661,7 +514,7 @@
 
 
 <h1 id="token-expiry-handling-with-downstream-apis">Token Expiry Handling with Downstream APIs</h1>
-<p>For applications that handle authentication on the server using cookies and OpenID Connect (OIDC), and that need to call downstream APIs requiring an access_token or DPoP token, it's important to understand that authentication <strong>cookies and tokens have separate lifetimes</strong>.</p>
+<p>Applications that handle authentication on the server using cookies and OpenID Connect (OIDC), and that need to call downstream APIs with <code>access_token</code> must be aware of that <strong>cookies and tokens have separate lifetimes</strong>.</p>
 <p>This means that even if the authentication cookie is still valid, the <code>access_token</code> and <code>refresh_token</code> may expire. In such cases, the user will appear authenticated in the UI, but API calls to downstream services will begin to fail with <code>401 Unauthorized</code> errors.</p>
 <p>If you don’t proactively validate or refresh these tokens, you risk users having an active session in the UI but losing access to key functionality that depends on secured API calls.</p>
 <p>Guideline for two types of application architectures where authentication is handled on the server: </p>
