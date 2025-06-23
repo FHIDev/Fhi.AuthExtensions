@@ -1,9 +1,8 @@
-# Token Expiry Handling with Angular BFF Client and Downstream APIs
-
+# Token expiration handling with Angular BFF Client and Downstream APIs
 
 ## Problem
 
-When the `access_token` and `refresh_token` expire, but the **authentication cookie is still valid**, the user will **appear authenticated**, yet calls to downstream APIs will start to fail with `401 Unauthorized`.
+When the `access_token` and `refresh_token` expire, but the **authentication cookie is still valid**, the user will **appear authenticated**, yet calls to downstream APIs will start to fail with `401 Unauthorized`. See [React to back-end changes](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view=aspnetcore-9.0#react-to-back-end-changes)
 
 
 ## Alternative solutions
@@ -14,78 +13,47 @@ To avoid this mismatch there are several possible solutions:
 - **Implement a global exception handler for downstream API errors:** Set up a global exception handler to capture exceptions from downstream APIs. Specifically, handle 401 responses by throwing a 401 exception, which can then be handled appropriately by the client.
 - **Create custom middleware for token management:** Develop middleware that checks the token’s expiration before forwarding requests to downstream APIs. If the token has expired, refresh it automatically before proceeding.
  
-### Solution - Use CookieEvent to validate the refresh token
+### Use CookieEvent to validate the refresh token
 
-Override the `ValidatePrincipal` method and check the status of both the `access_token` and `refresh_token`. If the `access_token` is expired, attempt to use the `refresh_token` to obtain a new one. If that fails, reject the principal.
+Override the `ValidatePrincipal` method on the CookieEvent and check the status of both the `access_token` and `refresh_token`. If the `access_token` is expired, attempt to use the `refresh_token` to obtain a new one. If that fails, reject the principal.
 
 > 🔒 This logic must be combined with proper cookie expiration settings using `ExpireTimeSpan` to manage session longevity consistently.
 
-```mermaid
-flowchart TD
-    A[User makes request] --> B[Cookie is valid?]
-    B -- No --> X[Reject request]
-    B -- Yes --> C[Is user authenticated?]
-    C -- No --> X
-    C -- Yes --> D[Get access_token and refresh_token from cookie]
-    D --> E[Are tokens missing or empty?]
-    E -- Yes --> R1[RejectPrincipal and Renew]
-    E -- No --> F[Check if access_token is expired]
-    F -- No --> Z[Proceed with request]
-    F -- Yes --> G[Attempt to refresh access_token using refresh_token]
-    G --> H[Was refresh successful?]
-    H -- No --> R2[RejectPrincipal & Renew]
-    H -- Yes --> Z
+ See sample code in[ Angular](https://github.com/FHIDev/Fhi.AuthExtensions/tree/main/samples/Fhi.Samples.AngularBFF) and [Blazor](https://github.com/FHIDev/Fhi.AuthExtensions/tree/main/samples/Fhi.Samples.BlazorInteractiveServer)
 
+Do the following steps:
+
+#### Step 1: Change Cookie expiration time 
+
+ExpireTimeSpan should be set out from access_token and refresh_token lifetime. This is to ensure that the cookie is not expired after the refresh token is expired. 
+
+Sample code
+```
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+}).AddCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromSeconds(90);
+})
+...
 ```
 
-#### Example Implementation
+#### Step 2: Add AddOpenIdConnectCookieOptions to the pipeline
+You can use [`Fhi.Authentication.Extensions` package](https://www.nuget.org/packages/Fhi.Authentication.Extensions/) to validate the token expiration.
+
+The `AddOpenIdConnectCookieOptions` will add `ValidatePrincipal` event that checks if token is expired, see implementation and handle `SignOut` [OpenIdConnectCookieEventsForApi](https://github.com/FHIDev/Fhi.AuthExtensions/blob/main/src/Fhi.Authentication.Extensions/OpenIdConnect/OpenIdConnectCookieEventsForApi.cs#L11)
+
+```
+builder.Services.AddOpenIdConnectCookieOptions();
+```
+
+### Create custom middleware for token management
+
+The sample below uses [Duende accesstoken management `GetUserAccessTokenAsync` extension](https://docs.duendesoftware.com/accesstokenmanagement/web-apps/)
 
 ```csharp
-public override async Task ValidatePrincipal(CookieValidatePrincipalContext context)
-{
-    if (context.Principal?.Identity is not null && context.Principal.Identity.IsAuthenticated)
-    {
-        var tokens = context.Properties.GetTokens();
-        var accessToken = tokens.SingleOrDefault(t => t.Name == OpenIdConnectParameterNames.AccessToken);
-        var refreshToken = tokens.SingleOrDefault(t => t.Name == OpenIdConnectParameterNames.RefreshToken);
-
-        if (accessToken == null || string.IsNullOrEmpty(accessToken.Value) ||
-            refreshToken == null || string.IsNullOrEmpty(refreshToken.Value))
-        {
-            context.RejectPrincipal();
-            context.ShouldRenew = true;
-            return;
-        }
-
-        var expiresAt = DateTimeOffset.Parse(
-            tokens.SingleOrDefault(t => t.Name == "expires_at")?.Value ?? string.Empty,
-            CultureInfo.InvariantCulture);
-
-        if (expiresAt <= DateTimeOffset.UtcNow)
-        {
-            var refreshedTokens = await _userTokenEndpointService.RefreshAccessTokenAsync(
-                new UserToken
-                {
-                    RefreshToken = refreshToken.Value
-                },
-                new UserTokenRequestParameters());
-
-            if (refreshedTokens.IsError)
-            {
-                context.RejectPrincipal();
-                context.ShouldRenew = true;
-                return;
-            }
-        }
-    }
-
-    await base.ValidatePrincipal(context);
-}
-```
-
-### Solution - Implement a global exception handler for downstream API errors
-
-```
 public class TokenExpirationMiddleware
 {
     private readonly RequestDelegate _next;
@@ -109,5 +77,4 @@ public class TokenExpirationMiddleware
     }
 }
 
-
-```csharp
+```

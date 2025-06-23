@@ -8,5 +8,20 @@ theme:
     - navigation.tabs
     - navigation.tabs.sticky
   custom_dir: docs/overrides
+
+nav:
+  - Home: index.md
+  - Overview packages: packages.md
+  - Concepts and terminology: concepts.md
+  - Developer guideline:
+      - Require authentication by default: developer-guideline/protecting-endpoints.md
+      - Handling token expiration: developer-guideline/token-expiry-downstream-api.md
+
 extra_css:
   - overrides/main.css
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
