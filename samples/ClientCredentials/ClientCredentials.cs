@@ -9,21 +9,24 @@ namespace Test
 
         /// <summary>
         /// See demo clients in https://demo.duendesoftware.com/
-        /// 1. Goto https://demo.duendesoftware.com/ and find m2m client in Machine-to-Machine
-        /// 2. Update GetAccessTokenWithSharedSecret values
-        /// 3. Run API: dotnet run --project .\WebApi\WebApi.csproj and run the test
+        /// 
+        /// 1. Goto https://demo.duendesoftware.com/
+        /// 2. Add token endpoint from the discovery document
+        /// 3. In Machine-to-Machine find the m2m client and add clientId and clientSecret values
+        /// 4. Run API: dotnet run --project .\samples\Fhi.Samples.WebApi\Fhi.Samples.WebApi.csproj and run the test
+        /// 
+        /// What happens?
         /// </summary>
         [Test]
         public async Task ClientCredential_WithSharedSecret()
         {
-
             var token = await GetAccessTokenWithSharedSecret(
                 "https://demo.duendesoftware.com/connect/token",
-                 "m2m",
+                "m2m",
                 "secret",
                 "resource1.scope1 api");
 
-            var apiUrl = "https://localhost:7150/api/v1/integration/weatherforcasts";
+            var apiUrl = "https://localhost:7150/api/v1/me/health-records";
             var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
