@@ -21,9 +21,9 @@ namespace Test
         public async Task ClientCredential_WithSharedSecret()
         {
             var token = await GetAccessTokenWithSharedSecret(
-                "https://demo.duendesoftware.com/connect/token",
-                "m2m",
-                "secret",
+                "<token endpoint>",
+                "<client id>",
+                "<secret>",
                 "resource1.scope1 api");
 
             var apiUrl = "https://localhost:7150/api/v1/me/health-records";
