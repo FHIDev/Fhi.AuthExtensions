@@ -3,6 +3,7 @@ using Duende.IdentityModel;
 using Duende.IdentityModel.Client;
 using Fhi.Authentication.Tokens;
 using Microsoft.Extensions.Options;
+using WorkerService.Api;
 
 namespace WorkerService.Workers
 {
@@ -12,17 +13,20 @@ namespace WorkerService.Workers
         private readonly IHttpClientFactory _factory;
         private readonly IDPoPProofService _dPoPProofService;
         private readonly ClientConfiguration _clientConfiguration;
+        private readonly IHealthRecordApi _healthRecordApi;
 
         public ClientCredentialDPoPTokenWorker(
             ILogger<ClientCredentialDPoPTokenWorker> logger,
             IHttpClientFactory factory,
             IOptions<ClientConfiguration> clientConfigurations,
-            IDPoPProofService dPoPProofService)
+            IDPoPProofService dPoPProofService,
+            IHealthRecordApi healthRecordApi)
         {
             _logger = logger;
             _factory = factory;
             _dPoPProofService = dPoPProofService;
             _clientConfiguration = clientConfigurations.Value;
+            _healthRecordApi = healthRecordApi;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -112,6 +116,11 @@ namespace WorkerService.Workers
             _logger.LogInformation("Dpop weather response: " + await dpopResponse.Content.ReadAsStringAsync());
 
 
+            /************************************************************************************************
+            * Sample of using Refit with Duende Http Delegation handler to access API with DPoP token 
+            * **********************************************************************************************/
+            var refitHealthRecords = await _healthRecordApi.GetHealthRecordsAsync();
+            _logger.LogInformation("Refit health records count: {Count}", refitHealthRecords.Count());
 
             while (!stoppingToken.IsCancellationRequested)
             {
