@@ -16,7 +16,8 @@ jobs:
           python-version: '3.x'
       - name: Install dependencies
         run: |
-          pip install mkdocs-material
+          pip install mkdocs-jupyter
+          pip install mkdocs-mermaid2-plugin
       - name: Build MkDocs site
         run: mkdocs build
       - name: Deploy to GitHub Pages
