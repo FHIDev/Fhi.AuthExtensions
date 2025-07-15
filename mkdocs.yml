@@ -2,26 +2,41 @@ site_name: FHI authentication and authorization extensions
 site_description: FHI Authentication and authorization extensions for ASP.NET Core
 repo_url: https://github.com/FHIDev/Fhi.AuthExtensions
 theme:
-  name: material
-  logo: fhi.png
+  name: readthedocs
+  logo: logo_small.webp
   features:
-    - navigation.tabs
-    - navigation.tabs.sticky
   custom_dir: docs/overrides
 
-nav:
-  - Home: index.md
-  - Overview packages: packages.md
-  - Concepts and terminology: concepts.md
-  - Developer guideline:
-      - Require authentication by default: developer-guideline/protecting-endpoints.md
-      - Handling token expiration: developer-guideline/token-expiry-downstream-api.md
+nav: 
+- Home: index.md
+- Overview packages: packages.md
+- Concepts and terminology: concepts.md
+- Tutorials:
+    - Require authentication by default: tutorials/protecting-endpoints.md
+    - Handling token expiration: tutorials/token-expiry-downstream-api.md
+    - Server to server communication: 
+      - Overview: tutorials/server-to-server/server-to-server.md
+      - Calling an API from a Web host: tutorials/server-to-server/web-server-host.md
+      - Manual token request: tutorials/server-to-server/manual-token-request.md
+- Code lab:
+    - Client credentials flow (server to server):
+        - Using IHttpClientFactory and Duende AccessToken Management: code-lab/client-credentials/webserver-host-sample.ipynb
+        - Manual bearer token request: code-lab/client-credentials/manual-bearertoken-request.ipynb
+        - Manual bearer token request with ClientAssertion: code-lab/client-credentials/manual-bearertoken-request-withclientassertion.ipynb
+        - Manual DPoP token request: code-lab/client-credentials/manual-dpoptoken-request.ipynb
+        - Manual token request with Duende IdentityModel: code-lab/client-credentials/manual-tokenrequest-with-duendeidentitymodel.ipynb
 
+plugins:
+    - mkdocs-jupyter
+    - search
+    - mermaid2
 extra_css:
-  - overrides/main.css
-markdown_extensions:
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
+#  - overrides/material.css
+   - overrides/readthedocs.css
+   - overrides/cards.css
+# markdown_extensions:
+#   - pymdownx.superfences:
+#       custom_fences:
+#         - name: mermaid
+#           class: mermaid
+#           format: !!python/name:pymdownx.superfences.fence_code_format
