@@ -3,15 +3,15 @@ using Microsoft.Extensions.Options;
 
 namespace WorkerService.Workers
 {
-    public class ClientCredentialDPoPTokenWorker : BackgroundService
+    public class ClientCredentialDPoPTokenWorkerSample : BackgroundService
     {
-        private readonly ILogger<ClientCredentialDPoPTokenWorker> _logger;
+        private readonly ILogger<ClientCredentialDPoPTokenWorkerSample> _logger;
         private readonly IHttpClientFactory _factory;
         private readonly IDPoPProofService _dPoPProofService;
         private readonly ClientConfiguration _clientConfiguration;
 
-        public ClientCredentialDPoPTokenWorker(
-            ILogger<ClientCredentialDPoPTokenWorker> logger,
+        public ClientCredentialDPoPTokenWorkerSample(
+            ILogger<ClientCredentialDPoPTokenWorkerSample> logger,
             IHttpClientFactory factory,
             IOptions<ClientConfiguration> clientConfigurations,
             IDPoPProofService dPoPProofService)
@@ -32,7 +32,6 @@ namespace WorkerService.Workers
             var healthRecordApiDPoPClient = _factory.CreateClient(_clientConfiguration.ClientName + ".dpop");
             var dpopResponse = await healthRecordApiDPoPClient.GetAsync("api/v1/integration/health-records");
             _logger.LogInformation("Dpop weather response: " + await dpopResponse.Content.ReadAsStringAsync());
-
 
 
             while (!stoppingToken.IsCancellationRequested)

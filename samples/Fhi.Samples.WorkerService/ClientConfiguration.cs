@@ -16,6 +16,6 @@ namespace WorkerService
         /// <summary>
         /// Must be set for duende HttpClient extensions
         /// </summary>
-        public string TokenEndpoint { get; set; } = string.Empty;
+        [Required] public string TokenEndpoint { get; set; } = string.Empty;
     }
 }

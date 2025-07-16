@@ -3,8 +3,8 @@ using WorkerService;
 using WorkerService.Workers;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddHostedService<ClientCredentialDPoPTokenWorker>();
-builder.Services.AddHostedService<ClientCredentialBearerTokenDuendeHttpDelegationHandlerSample>();
+builder.Services.AddHostedService<ClientCredentialDPoPTokenWorkerSample>();
+builder.Services.AddHostedService<ClientCredentialBearerTokenWorkerSample>();
 
 /***************************************************************************************** 
  * Step 0: Register ClientConfiguration to read client settings from appsettings.json. 
@@ -43,7 +43,7 @@ builder.Services
         options.TokenEndpoint = clientConfiguration.TokenEndpoint;
         options.ClientId = clientConfiguration.ClientId;
         options.Scope = clientConfiguration.Scope;
-        //Can use client assertion key or generate a new
+        //Can use existing secret as key or generate a new key for DPoP proof
         options.DPoPJsonWebKey = clientConfiguration.Secret;
     });
 
