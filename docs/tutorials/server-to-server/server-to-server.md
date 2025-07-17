@@ -9,8 +9,8 @@ For guidance, see the [Duende documentation on machine-to-machine communication]
 | Tutorial                              | Description                                                                 | Link                                               |
 |----------------------------------------|----------------------------------------------------------------------|-----------------------------------------------------------|
         |
-| Calling the API from a Web Host |Describes the flow with code sample of using `IHttpClientFactory` together with Duende's `AccessTokenRequestHandler`| [Web server host](web-server-host.md)|  
-| Manual token request| |[](manual-token-request.md)|  
+| Calling the API from a Web Host |Describes the flow with code sample of using `IHttpClientFactory` together with Duende's `AccessTokenRequestHandler`| [Client credential in a Web server host](web-server-host.md)|  
+| Manual token request| Describes the Bearer and DPoP token flow with manual token request samples |[Client credential token request flow](manual-token-request.md)|  
 
 
 

@@ -1,4 +1,4 @@
-# Calling the API from a Web Host
+# Client credentials token request from a Web host
 
 In ASP.NET Core applications, you can securely call downstream APIs using `IHttpClientFactory` together with Duende's `AccessTokenRequestHandler`. This approach ensures that access tokens are automatically managed and refreshed when needed.
 

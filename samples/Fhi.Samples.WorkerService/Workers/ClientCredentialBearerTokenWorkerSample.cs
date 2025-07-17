@@ -29,7 +29,6 @@ namespace WorkerService.Workers
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             var healthApiClient = _factory.CreateClient(_clientConfiguration.ClientName);
-
             /*****************************************************************************
              * Request to the integration endpoint API using HttpClient extension from Duende
              *****************************************************************************/

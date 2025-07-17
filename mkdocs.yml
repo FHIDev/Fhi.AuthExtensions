@@ -16,8 +16,8 @@ nav:
     - Handling token expiration: tutorials/token-expiry-downstream-api.md
     - Server to server communication: 
       - Overview: tutorials/server-to-server/server-to-server.md
-      - Calling an API from a Web host: tutorials/server-to-server/web-server-host.md
-      - Manual token request: tutorials/server-to-server/manual-token-request.md
+      - Client credentials token request from a Web host: tutorials/server-to-server/web-server-host.md
+      - Manual client credential token request: tutorials/server-to-server/manual-token-request.md
 - Code lab:
     - Client credentials flow (server to server):
         - Using IHttpClientFactory and Duende AccessToken Management: code-lab/client-credentials/webserver-host-sample.ipynb

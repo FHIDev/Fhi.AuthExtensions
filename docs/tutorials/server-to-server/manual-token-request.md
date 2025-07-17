@@ -1,4 +1,4 @@
-# Manual token request 
+# Manual client credential token request 
 
 ## Bearer token request flow
 
@@ -7,7 +7,9 @@ Below is sample of client credential request for bearer token. It sends a POST r
 ![ClientCredential_BearerRequest.jpg](./images/ClientCredential_BearerRequest.jpg)
 
 ### Code Sample
-See the code lab for a working example [Bearer token request](../../code-lab/client-credentials/manual-bearertoken-request.ipynb)
+
+- [Bearer token request](../../code-lab/client-credentials/manual-bearertoken-request.ipynb)
+- [Bearer token request with client assertion](../../code-lab/client-credentials/manual-bearertoken-request-withclientassertion.ipynb)
 
 ## DPoP request flow
 
@@ -15,4 +17,5 @@ Sample of DPoP request below
 ![ClientCredentialDpopRequest.jpg](./images/ClientCredentialDpopRequest.jpg)
 
 ### Code Sample
-See the code lab for a working example [DPoP token request](../../code-lab/client-credentials/manual-dpoptoken-request.ipynb)
+
+- [DPoP token request](../../code-lab/client-credentials/manual-dpoptoken-request.ipynb)
