@@ -29,10 +29,10 @@ namespace WorkerService.Workers
         /// <returns></returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            // NB! This will give 401. API does not yet support DPoP.
             var healthRecordApiDPoPClient = _factory.CreateClient(_clientConfiguration.ClientName + ".dpop");
             var dpopResponse = await healthRecordApiDPoPClient.GetAsync("api/v1/integration/health-records");
             _logger.LogInformation("Dpop weather response: " + await dpopResponse.Content.ReadAsStringAsync());
-
 
             while (!stoppingToken.IsCancellationRequested)
             {
