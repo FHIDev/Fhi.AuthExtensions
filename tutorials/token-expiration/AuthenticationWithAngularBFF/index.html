@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Token expiration handling with Angular BFF Client and Downstream APIs - FHI authentication and authorization extensions</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../../overrides/readthedocs.css" rel="stylesheet" />
+        <link href="../../../overrides/cards.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Token expiration handling with Angular BFF Client and Downstream APIs";
+        var mkdocs_page_input_path = "tutorials/token-expiration/AuthenticationWithAngularBFF.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../..">
+          <img src="../../../logo_small.webp" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../packages/">Overview packages</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../concepts/">Concepts and terminology</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../protecting-endpoints/">Require authentication by default</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../token-expiry-downstream-api/">Handling token expiration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Server to server communication</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../server-to-server/server-to-server/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../server-to-server/web-server-host/">Client credentials token request from a Web host</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../server-to-server/manual-token-request/">Manual client credential token request</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Code lab</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" >Client credentials flow (server to server)</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../code-lab/client-credentials/webserver-host-sample/">Using IHttpClientFactory and Duende AccessToken Management</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../code-lab/client-credentials/manual-bearertoken-request/">Bearer token request using shared secret</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../code-lab/client-credentials/manual-bearertoken-request-withclientassertion/">Bearer token request using client assertion</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../code-lab/client-credentials/manual-dpoptoken-request/">DPoP token request</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../code-lab/client-credentials/manual-tokenrequest-with-duendeidentitymodel/">Manual token request with Duende IdentityModel</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">FHI authentication and authorization extensions</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Token expiration handling with Angular BFF Client and Downstream APIs</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/FHIDev/Fhi.AuthExtensions/edit/master/docs/tutorials/token-expiration/AuthenticationWithAngularBFF.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="token-expiration-handling-with-angular-bff-client-and-downstream-apis">Token expiration handling with Angular BFF Client and Downstream APIs</h1>
+<h2 id="problem">Problem</h2>
+<p>When the <code>access_token</code> and <code>refresh_token</code> expire, but the <strong>authentication cookie is still valid</strong>, the user will <strong>appear authenticated</strong>, yet calls to downstream APIs will start to fail with <code>401 Unauthorized</code>. See <a href="https://learn.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view=aspnetcore-9.0#react-to-back-end-changes">React to back-end changes</a></p>
+<h2 id="alternative-solutions">Alternative solutions</h2>
+<p>To avoid this mismatch there are several possible solutions: </p>
+<ul>
+<li><strong>Use CookieEvent to validate the refresh token:</strong> To ensure the session remains valid from the API’s perspective, proactively validate the refresh_token.</li>
+<li><strong>Implement a global exception handler for downstream API errors:</strong> Set up a global exception handler to capture exceptions from downstream APIs. Specifically, handle 401 responses by throwing a 401 exception, which can then be handled appropriately by the client.</li>
+<li><strong>Create custom middleware for token management:</strong> Develop middleware that checks the token’s expiration before forwarding requests to downstream APIs. If the token has expired, refresh it automatically before proceeding.</li>
+</ul>
+<h3 id="use-cookieevent-to-validate-the-refresh-token">Use CookieEvent to validate the refresh token</h3>
+<p>Override the <code>ValidatePrincipal</code> method on the CookieEvent and check the status of both the <code>access_token</code> and <code>refresh_token</code>. If the <code>access_token</code> is expired, attempt to use the <code>refresh_token</code> to obtain a new one. If that fails, reject the principal.</p>
+<blockquote>
+<p>🔒 This logic must be combined with proper cookie expiration settings using <code>ExpireTimeSpan</code> to manage session longevity consistently.</p>
+</blockquote>
+<p>See sample code in<a href="https://github.com/FHIDev/Fhi.AuthExtensions/tree/main/samples/Fhi.Samples.AngularBFF"> Angular</a> and <a href="https://github.com/FHIDev/Fhi.AuthExtensions/tree/main/samples/Fhi.Samples.BlazorInteractiveServer">Blazor</a></p>
+<p>Do the following steps:</p>
+<h4 id="step-1-change-cookie-expiration-time">Step 1: Change Cookie expiration time</h4>
+<p>ExpireTimeSpan should be set out from access_token and refresh_token lifetime. This is to ensure that the cookie is not expired after the refresh token is expired. </p>
+<p>Sample code</p>
+<pre><code>builder.Services.AddAuthentication(options =&gt;
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+}).AddCookie(options =&gt;
+{
+    options.ExpireTimeSpan = TimeSpan.FromSeconds(90);
+})
+...
+</code></pre>
+<h4 id="step-2-add-addopenidconnectcookieoptions-to-the-pipeline">Step 2: Add AddOpenIdConnectCookieOptions to the pipeline</h4>
+<p>You can use <a href="https://www.nuget.org/packages/Fhi.Authentication.Extensions/"><code>Fhi.Authentication.Extensions</code> package</a> to validate the token expiration.</p>
+<p>The <code>AddOpenIdConnectCookieOptions</code> will add <code>ValidatePrincipal</code> event that checks if token is expired, see implementation and handle <code>SignOut</code> <a href="https://github.com/FHIDev/Fhi.AuthExtensions/blob/main/src/Fhi.Authentication.Extensions/OpenIdConnect/OpenIdConnectCookieEventsForApi.cs#L11">OpenIdConnectCookieEventsForApi</a></p>
+<pre><code>builder.Services.AddOpenIdConnectCookieOptions();
+</code></pre>
+<h3 id="create-custom-middleware-for-token-management">Create custom middleware for token management</h3>
+<p>The sample below uses <a href="https://docs.duendesoftware.com/accesstokenmanagement/web-apps/">Duende accesstoken management <code>GetUserAccessTokenAsync</code> extension</a></p>
+<pre><code class="language-csharp">public class TokenExpirationMiddleware
+{
+    private readonly RequestDelegate _next;
+
+    public TokenExpirationMiddleware(RequestDelegate next) =&gt; _next = next;
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        var user = context.User;
+        if (user.Identity is not null &amp;&amp; user.Identity.IsAuthenticated)
+        {
+            var userToken = await context.GetUserAccessTokenAsync();
+            if (userToken.IsError)
+            {
+                //Handle token expiration in your application in your preffered way
+                //await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
+        }
+
+        await _next(context);
+    }
+}
+
+</code></pre>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/FHIDev/Fhi.AuthExtensions" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
