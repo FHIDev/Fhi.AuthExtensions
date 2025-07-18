@@ -14,7 +14,6 @@ namespace BlazorInteractiveServer.Hosting.Authentication
         IOptionsSnapshot<AuthenticationSettings> Options,
         IDiscoveryCache DiscoveryCache) : IClientAssertionService
     {
-
         public async Task<ClientAssertion?> GetClientAssertionAsync(string? clientName = null, TokenRequestParameters? parameters = null)
         {
             //Method to get different downstream http clients

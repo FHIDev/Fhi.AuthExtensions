@@ -9,8 +9,8 @@ namespace WebApi.Api.HealthRecord.Integration.v1
 
     [ApiController]
     [Route("api/v1/integration/health-records")]
-    [Authorize(AuthenticationSchemes = "bearer.integration")]
-    [Scope("fhi:webapi/health-records.read")]
+    [Authorize(AuthenticationSchemes = "bearer.integration", Policy = "IntegrationPolicy")]
+    [Scope("api")]
     public class HealthRecordController(IHealthRecordService healthRecordService) : ControllerBase
     {
         private readonly IHealthRecordService _healthRecordService = healthRecordService;

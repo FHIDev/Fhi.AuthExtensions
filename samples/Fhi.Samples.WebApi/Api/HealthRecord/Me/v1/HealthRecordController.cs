@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebApi.Services;
 
 namespace WebApi.Api.HealthRecord.Me.v1
@@ -8,6 +9,7 @@ namespace WebApi.Api.HealthRecord.Me.v1
 
     [ApiController]
     [Route("api/v1/me/health-records")]
+    [Authorize(AuthenticationSchemes = "bearer.me", Policy = "EndUserPolicy")]
     public class HealthRecordController(IHealthRecordService healthRecordService) : ControllerBase
     {
         private readonly IHealthRecordService _healthRecordService = healthRecordService;

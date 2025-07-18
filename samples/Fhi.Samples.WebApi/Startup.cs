@@ -6,7 +6,7 @@ using WebApi.Services;
 
 namespace WebApi
 {
-    public static class HostingExtensions
+    public static class Startup
     {
         public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
         {
@@ -54,16 +54,19 @@ namespace WebApi
                 {
                     policy.AuthenticationSchemes.Add("bearer.me");
                     policy.RequireClaim(JwtClaimTypes.Subject);
-                    /***************************
-                     * Sample of require a scope
-                     * *************************/
-                    //// policy.RequireClaim(JwtClaimTypes.Scope, "fhi:authextensions.samples/access");
+                    //Ensure the end-user "sub" claim is present
+                    policy.RequireClaim(JwtClaimTypes.Subject);
                     policy.RequireAuthenticatedUser();
                 })
-                 .AddPolicy("Integration", policy =>
+                .AddPolicy("IntegrationPolicy", policy =>
                  {
                      policy.AuthenticationSchemes.Add("bearer.integration");
                      policy.RequireAuthenticatedUser();
+                     policy.RequireAssertion(context =>
+                     {
+                         // Ensure the end-user "sub" claim is not present
+                         return !context.User.HasClaim(c => c.Type == "sub");
+                     });
                  });
 
             return builder.Build();

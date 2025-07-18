@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Jupyter Notebook files
+.ipynb_checkpoints/
+
 # MK docs specific files
 site/
 # User-specific files
