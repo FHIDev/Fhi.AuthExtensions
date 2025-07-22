@@ -10,6 +10,8 @@
     <PackageReference Include="Duende.AccessTokenManagement" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
+	<PackageReference Include="Refit" />
+	<PackageReference Include="Refit.HttpClientFactory" />
   </ItemGroup>
 
   <ItemGroup>
