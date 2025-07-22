@@ -1,10 +1,13 @@
 using Duende.AccessTokenManagement;
+using Fhi.Samples.WorkerService.Workers;
+using Refit;
 using WorkerService;
 using WorkerService.Workers;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddHostedService<ClientCredentialDPoPTokenWorkerSample>();
 builder.Services.AddHostedService<ClientCredentialBearerTokenWorkerSample>();
+builder.Services.AddHostedService<ClientCredentialsRefitWorkerSample>();
 
 /***************************************************************************************** 
  * Step 0: Register ClientConfiguration to read client settings from appsettings.json. 
@@ -52,6 +55,21 @@ builder.Services.AddClientCredentialsHttpClient(clientConfiguration.ClientName +
     client.BaseAddress = new Uri("https://localhost:7150");
 });
 
+//Sample 3: Client with Refit
+builder.Services
+    .AddClientCredentialsTokenManagement()
+    .AddClient(clientConfiguration.ClientName + ".refit", options =>
+    {
+        options.TokenEndpoint = clientConfiguration.TokenEndpoint;
+        options.ClientId = clientConfiguration.ClientId;
+        options.Scope = clientConfiguration.Scope;
+    });
+
+builder.Services.AddClientCredentialsHttpClient(clientConfiguration.ClientName + ".refit", clientConfiguration.ClientName + ".refit", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7150");
+})
+.AddTypedClient(RestService.For<IHealthRecordApi>);
 
 /***************************************************************************************** 
  * Step 2: In order to use asymetric JWK key secret, ClientAssertion, for client credentials flow, we 
