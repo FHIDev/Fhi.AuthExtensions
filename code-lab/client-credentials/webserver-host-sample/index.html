@@ -75,6 +75,10 @@
 <ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="#steps">Steps</a>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#sample-using-httpclient">Sample using HttpClient</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#sample-using-refit">Sample using Refit</a>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../manual-bearertoken-request/">Bearer token request using shared secret</a>
@@ -557,8 +561,23 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <p>For a detailed explanation of the code flow, see the <a href="../../../tutorials/server-to-server/web-server-host">Web server host tutorial</a>.</p>
 <h2 id="steps">Steps<a class="anchor-link" href="#steps">¶</a></h2><ol>
 <li>Start the API using the <a href="https://github.com/FHIDev/Fhi.AuthExtensions/tree/main/samples/Fhi.Samples.WebApi">WebAPI sample</a>.</li>
-<li>Run the code below with .NET Interactive in VS Code or Jupyter Lab.</li>
+<li>Run the code below with .NET Interactive in VS Code or Jupyter Lab. You have the following options:<ol>
+<li>Sample using HttpClient</li>
+<li>Sample using Refit</li>
 </ol>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c7443216">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="sample-using-httpclient">Sample using HttpClient<a class="anchor-link" href="#sample-using-httpclient">¶</a></h2>
 </div>
 </div>
 </div>
@@ -629,7 +648,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="n">Task</span><span class="w"> </span><span class="nf">Get</span><span class="p">();</span>
 <span class="p">}</span>
 
-<span class="c1">// &lt;summary&gt;</span>
 <span class="c1">// A service that uses the registerd HttpClient with HttpClientFactory to make requests.</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TestService</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ITestService</span>
 <span class="p">{</span>
@@ -642,8 +660,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="n">Task</span><span class="w"> </span><span class="nf">Get</span><span class="p">()</span>
 <span class="w">    </span><span class="p">{</span>
 <span class="w">        </span><span class="kt">var</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_factory</span><span class="p">.</span><span class="n">CreateClient</span><span class="p">(</span><span class="s">"m2m"</span><span class="p">);</span>
-<span class="w">        </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">"Base address: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">BaseAddress</span><span class="p">);</span>
-<span class="w">         </span><span class="kt">var</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">GetAsync</span><span class="p">(</span><span class="s">"api/v1/integration/health-records"</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">var</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">GetAsync</span><span class="p">(</span><span class="s">"api/v1/integration/health-records"</span><span class="p">);</span>
 <span class="w">        </span><span class="k">await</span><span class="w"> </span><span class="n">HttpLogger</span><span class="p">.</span><span class="n">LogRequest</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">RequestMessage</span><span class="p">);</span>
 <span class="w">        </span><span class="k">await</span><span class="w"> </span><span class="n">HttpLogger</span><span class="p">.</span><span class="n">LogResponse</span><span class="p">(</span><span class="n">response</span><span class="p">);</span>
 <span class="w">    </span><span class="p">}</span>
@@ -699,7 +716,6 @@ interface ITestService
     public Task Get();
 }
 
-// <summary>
 // A service that uses the registerd HttpClient with HttpClientFactory to make requests.
 class TestService : ITestService
 {
@@ -712,14 +728,211 @@ class TestService : ITestService
     public async Task Get()
     {
         var client = _factory.CreateClient("m2m");
-        Console.WriteLine("Base address: " + client.BaseAddress);
-         var response = await client.GetAsync("api/v1/integration/health-records");
+        var response = await client.GetAsync("api/v1/integration/health-records");
         await HttpLogger.LogRequest(response.RequestMessage);
         await HttpLogger.LogResponse(response);
     }
 }
 
-await RunAsync();</summary></itestservice></itestservice,></div>
+await RunAsync();</itestservice></itestservice,></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f604fe8e">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="sample-using-refit">Sample using Refit<a class="anchor-link" href="#sample-using-refit">¶</a></h2><blockquote>
+<p><strong>Note!</strong> This sample is not running due to a Refit. Refit uses C# source generators to generate the client code at compile-time — and source generators do not run in .NET Interactive (Jupyter)</p>
+</blockquote>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d9819cae">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-C#"><pre><span></span><span class="err">#</span><span class="o">!</span><span class="n">csharp</span>
+<span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Duende.AccessTokenManagement, 3.2.0"</span>
+<span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Microsoft.Extensions.Hosting, 9.0.5"</span>
+<span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Microsoft.Extensions.Caching.Memory, 9.0.0"</span>
+<span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Refit, 8.0.0"</span>
+<span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Refit.HttpClientFactory, 8.0.0"</span>
+
+<span class="k">using</span><span class="w"> </span><span class="nn">Microsoft.Extensions.Hosting</span><span class="p">;</span>
+<span class="k">using</span><span class="w"> </span><span class="nn">Duende.AccessTokenManagement</span><span class="p">;</span>
+<span class="k">using</span><span class="w"> </span><span class="nn">Microsoft.Extensions.DependencyInjection</span><span class="p">;</span>
+<span class="k">using</span><span class="w"> </span><span class="nn">Refit</span><span class="p">;</span>
+<span class="k">using</span><span class="w"> </span><span class="nn">System.Net.Http</span><span class="p">;</span>
+
+<span class="k">async</span><span class="w"> </span><span class="n">Task</span><span class="w"> </span><span class="nf">RunAsync</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Host</span><span class="p">.</span><span class="n">CreateDefaultBuilder</span><span class="p">();</span>
+
+<span class="w">    </span><span class="n">builder</span><span class="p">.</span><span class="n">ConfigureServices</span><span class="p">(</span><span class="n">services</span><span class="w"> </span><span class="o">=&gt;</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">services</span>
+<span class="w">            </span><span class="p">.</span><span class="n">AddClientCredentialsTokenManagement</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="n">AddClient</span><span class="p">(</span><span class="s">"m2m"</span><span class="p">,</span><span class="w"> </span><span class="n">options</span><span class="w"> </span><span class="o">=&gt;</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">                </span><span class="n">options</span><span class="p">.</span><span class="n">TokenEndpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"https://demo.duendesoftware.com/connect/token"</span><span class="p">;</span>
+<span class="w">                </span><span class="n">options</span><span class="p">.</span><span class="n">ClientId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"m2m"</span><span class="p">;</span>
+<span class="w">                </span><span class="n">options</span><span class="p">.</span><span class="n">ClientSecret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"secret"</span><span class="p">;</span>
+<span class="w">                </span><span class="n">options</span><span class="p">.</span><span class="n">Scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"api"</span><span class="p">;</span>
+<span class="w">            </span><span class="p">});</span>
+
+<span class="w">        </span><span class="n">services</span><span class="p">.</span><span class="n">AddClientCredentialsHttpClient</span><span class="p">(</span><span class="s">"m2m"</span><span class="p">,</span><span class="w"> </span><span class="s">"m2m"</span><span class="p">,</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=&gt;</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">client</span><span class="p">.</span><span class="n">BaseAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Uri</span><span class="p">(</span><span class="s">"https://localhost:7150"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">})</span>
+<span class="w">        </span><span class="p">.</span><span class="n">AddTypedClient</span><span class="p">(</span><span class="n">RestService</span><span class="p">.</span><span class="n">For</span><span class="o">&lt;</span><span class="n">IHealthRecordApi</span><span class="o">&gt;</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">services</span><span class="p">.</span><span class="n">AddDistributedMemoryCache</span><span class="p">();</span>
+<span class="w">        </span><span class="n">services</span><span class="p">.</span><span class="n">AddTransient</span><span class="o">&lt;</span><span class="n">ITestService</span><span class="p">,</span><span class="w"> </span><span class="n">TestService</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="n">Build</span><span class="p">();</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="nn">var</span><span class="w"> </span><span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">host</span><span class="p">.</span><span class="n">Services</span><span class="p">.</span><span class="n">CreateScope</span><span class="p">();</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">testService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scope</span><span class="p">.</span><span class="n">ServiceProvider</span><span class="p">.</span><span class="n">GetRequiredService</span><span class="o">&lt;</span><span class="n">ITestService</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="n">testService</span><span class="p">.</span><span class="n">Get</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">interface</span><span class="w"> </span><span class="n">ITestService</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="n">Task</span><span class="w"> </span><span class="nf">Get</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// Using Refit to define the API contract</span>
+<span class="k">public</span><span class="w"> </span><span class="k">record</span><span class="w"> </span><span class="nf">HealthRecordDto</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">Name</span><span class="p">,</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="n">Description</span><span class="p">,</span><span class="w"> </span><span class="n">DateTime</span><span class="w"> </span><span class="n">CreatedAt</span><span class="p">);</span>
+<span class="k">public</span><span class="w"> </span><span class="k">interface</span><span class="w"> </span><span class="n">IHealthRecordApi</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="na">[Refit.Get("/api/v1/integration/health-records")]</span>
+<span class="w">    </span><span class="n">Task</span><span class="o">&lt;</span><span class="n">IEnumerable</span><span class="o">&lt;</span><span class="n">HealthRecordDto</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">GetHealthRecordsAsync</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// A service that uses the registerd RefitClient to make requests.</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestService</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ITestService</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">private</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="n">IHealthRecordApi</span><span class="w"> </span><span class="n">_healthRecordApi</span><span class="p">;</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="nf">TestService</span><span class="p">(</span><span class="n">IHealthRecordApi</span><span class="w"> </span><span class="n">healthRecordApi</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">_healthRecordApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">healthRecordApi</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="n">Task</span><span class="w"> </span><span class="nf">Get</span><span class="p">()</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">var</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">_healthRecordApi</span><span class="p">.</span><span class="n">GetHealthRecordsAsync</span><span class="p">();</span>
+<span class="w">        </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$"Health Records: {response}"</span><span class="p">);</span>
+<span class="w">        </span><span class="k">foreach</span><span class="w"> </span><span class="p">(</span><span class="kt">var</span><span class="w"> </span><span class="k">record</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">response</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$"- {record.Name}: {record.Description} (Created at: {record.CreatedAt})"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">await</span><span class="w"> </span><span class="nf">RunAsync</span><span class="p">();</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-2">#!csharp
+#r "nuget: Duende.AccessTokenManagement, 3.2.0"
+#r "nuget: Microsoft.Extensions.Hosting, 9.0.5"
+#r "nuget: Microsoft.Extensions.Caching.Memory, 9.0.0"
+#r "nuget: Refit, 8.0.0"
+#r "nuget: Refit.HttpClientFactory, 8.0.0"
+
+using Microsoft.Extensions.Hosting;
+using Duende.AccessTokenManagement;
+using Microsoft.Extensions.DependencyInjection;
+using Refit;
+using System.Net.Http;
+
+async Task RunAsync()
+{
+    var builder = Host.CreateDefaultBuilder();
+
+    builder.ConfigureServices(services =&gt;
+    {
+        services
+            .AddClientCredentialsTokenManagement()
+            .AddClient("m2m", options =&gt;
+            {
+                options.TokenEndpoint = "https://demo.duendesoftware.com/connect/token";
+                options.ClientId = "m2m";
+                options.ClientSecret = "secret";
+                options.Scope = "api";
+            });
+
+        services.AddClientCredentialsHttpClient("m2m", "m2m", client =&gt;
+        {
+            client.BaseAddress = new Uri("https://localhost:7150");
+        })
+        .AddTypedClient(RestService.For<ihealthrecordapi>);
+
+        services.AddDistributedMemoryCache();
+        services.AddTransient<itestservice, testservice="">();
+    });
+
+    var host = builder.Build();
+    
+    using var scope = host.Services.CreateScope();
+    var testService = scope.ServiceProvider.GetRequiredService<itestservice>();
+    await testService.Get();
+}
+
+interface ITestService
+{
+    public Task Get();
+}
+
+// Using Refit to define the API contract
+public record HealthRecordDto(string Name, string Description, DateTime CreatedAt);
+public interface IHealthRecordApi
+{
+    [Refit.Get("/api/v1/integration/health-records")]
+    Task<ienumerable<healthrecorddto>&gt; GetHealthRecordsAsync();
+}
+
+// A service that uses the registerd RefitClient to make requests.
+class TestService : ITestService
+{
+    private readonly IHealthRecordApi _healthRecordApi;
+    public TestService(IHealthRecordApi healthRecordApi)
+    {
+        _healthRecordApi = healthRecordApi;
+    }
+    
+    public async Task Get()
+    {
+        var response = await _healthRecordApi.GetHealthRecordsAsync();
+        Console.WriteLine($"Health Records: {response}");
+        foreach (var record in response)
+        {
+            Console.WriteLine($"- {record.Name}: {record.Description} (Created at: {record.CreatedAt})");
+        }
+    }
+}
+
+await RunAsync();</ienumerable<healthrecorddto></itestservice></itestservice,></ihealthrecordapi></div>
 </div>
 </div>
 </div>
