@@ -1,0 +1,65 @@
+name: Release Fhi.Authentication.Extensions
+description: |
+  This workflow tags, packs and publish the NuGet package and creates a draft release for the Fhi.Authentication.Extension project.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g. 1.0.0 or 1.0.0-beta1)'
+        required: true
+
+jobs:
+
+  publish-nuget:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          8.0.x
+          9.0.x
+
+    - name: Set version and tag variables
+      run: |
+        echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+        echo "TAG=authentication-${{ github.event.inputs.version }}" >> $GITHUB_ENV
+
+    - name: Create git tag
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git tag ${{ env.TAG }}
+        git push origin ${{ env.TAG }}
+
+    - name: Pack Fhi.Authentication.Extensions NuGet package
+      run: |
+        dotnet pack ./src/Fhi.Authentication.Extensions/Fhi.Authentication.Extensions.csproj \
+        --configuration Release \
+        -p:PackageVersion=${{ env.VERSION }} \
+        --output nuget-packages
+
+    # - name: Publish Fhi.Authentication.Extensions NuGet package
+    #   run: dotnet nuget push ./nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_ORG_FHI_PUBLISH }} --source https://api.nuget.org/v3/index.json
+
+    # - name: Upload Fhi.Authentication.Extensions NuGet Package Artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: nuget-package
+    #     path: nuget-packages/*.nupkg
+    #     retention-days: 7
+
+    - name: Create GitHub draft release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.TAG }}
+        name: Release ${{ env.VERSION }}
+        draft: true
+        files: nuget-packages/*.nupkg
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
