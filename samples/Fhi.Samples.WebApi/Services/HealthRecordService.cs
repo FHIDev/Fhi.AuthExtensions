@@ -1,6 +1,7 @@
-﻿namespace WebApi.Services
+﻿using Fhi.Samples.WebApi.Services.Models;
+
+namespace WebApi.Services
 {
-    public record HealthRecordModel(string Pid, string Name, string Description, DateTime CreatedAt);
     public interface IHealthRecordService
     {
         public HealthRecordModel[] GetHealthRecords();
