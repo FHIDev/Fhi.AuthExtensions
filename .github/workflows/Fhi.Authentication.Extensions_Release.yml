@@ -8,6 +8,9 @@ on:
       version:
         description: 'Version to release (e.g. 1.0.0 or 1.0.0-beta1)'
         required: true
+  push:
+    branches:
+      - 125-nuget-release-for-new-libraries
 
 jobs:
 
