@@ -1,12 +1,12 @@
-name: Release Fhi.Authentication.Extensions
+name: Release Fhi.Authorization.Extensions
 description: |
-  This workflow tags, packs and publish the NuGet package and creates a draft release for the Fhi.Authentication.Extension project.
+  This workflow tags, packs and publish the NuGet package and creates a draft release for the Fhi.Authorization.Extension project.
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version in format X.Y.Z and for prerelease  X.Y.Z-alfaN, X.Y.Z-betaN or X.Y.Z-rcN'
+        description: 'Version to release (e.g. 1.0.0 or 1.0.0-beta1)'
         required: true
         default: '0.0.0'
         type: string
@@ -15,11 +15,8 @@ on:
         required: false
         default: true
         type: boolean
-
 jobs:
   publish-nuget:
-
-  release-authentication-extensions:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -43,12 +40,22 @@ jobs:
         git tag ${{ env.TAG }}
         git push origin ${{ env.TAG }}
 
-    - name: Pack Fhi.Authentication.Extensions
+    - name: Pack Fhi.Authorization.Extensions NuGet package
       run: |
-        dotnet pack ./src/Fhi.Authentication.Extensions/Fhi.Authentication.Extensions.csproj \
+        dotnet pack ./src/Fhi.Authorization.Extensions/Fhi.Authorization.Extensions.csproj \
         --configuration Release \
         -p:PackageVersion=${{ env.VERSION }} \
         --output nuget-packages
+
+    # - name: Publish Fhi.Authorization.Extensions NuGet package
+    #   run: dotnet nuget push ./nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_ORG_FHI_PUBLISH }} --source https://api.nuget.org/v3/index.json
+
+    # - name: Upload Fhi.Authorization.Extensions NuGet Package Artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: nuget-package
+    #     path: nuget-packages/*.nupkg
+    #     retention-days: 7
 
     - name: Create GitHub draft release
       uses: softprops/action-gh-release@v2
