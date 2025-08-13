@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g. 1.0.0 or 1.0.0-beta1)'
+        description: 'Version in format X.Y.Z and for prerelease  X.Y.Z-alfaN, X.Y.Z-betaN'
         required: true
         default: '0.0.0'
         type: string
@@ -61,7 +61,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ env.TAG }}
-        name: Release ${{ env.VERSION }}
+        name: Release Fhi.Authorization.Extensions ${{ env.VERSION }}
         draft: true
         prerelease: github.event.inputs.prerelease
         files: nuget-packages/*.nupkg

@@ -1,4 +1,4 @@
-name: Fhi.AuthExtensions.CI
+name: CI
 
 on: [push, pull_request]
 

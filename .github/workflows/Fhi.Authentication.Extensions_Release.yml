@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version in format X.Y.Z and for prerelease  X.Y.Z-alfaN, X.Y.Z-betaN or X.Y.Z-rcN'
+        description: 'Version in format X.Y.Z and for prerelease  X.Y.Z-alfaN, X.Y.Z-betaN'
         required: true
         default: '0.0.0'
         type: string
@@ -48,11 +48,21 @@ jobs:
         -p:PackageVersion=${{ env.VERSION }} \
         --output nuget-packages
 
+    # - name: Publish Fhi.Authentication.Extensions NuGet package
+    #   run: dotnet nuget push ./nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_ORG_FHI_PUBLISH }} --source https://api.nuget.org/v3/index.json
+
+    # - name: Upload Fhi.Authentication.Extensions NuGet Package Artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: nuget-package
+    #     path: nuget-packages/*.nupkg
+    #     retention-days: 7
+
     - name: Create GitHub draft release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ env.TAG }}
-        name: Release ${{ env.VERSION }}
+        name: Release Fhi.Authentication.Extensions ${{ env.VERSION }}
         draft: true
         prerelease: github.event.inputs.prerelease
         files: nuget-packages/*.nupkg
