@@ -8,13 +8,10 @@ on:
       version:
         description: 'Version to release (e.g. 1.0.0 or 1.0.0-beta1)'
         required: true
-  push:
-    branches:
-      - 125-nuget-release-for-new-libraries
-
+        
 jobs:
 
-  publish-nuget:
+  release-authentication-extensions:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -38,22 +35,12 @@ jobs:
         git tag ${{ env.TAG }}
         git push origin ${{ env.TAG }}
 
-    - name: Pack Fhi.Authentication.Extensions NuGet package
+    - name: Pack Fhi.Authentication.Extensions
       run: |
         dotnet pack ./src/Fhi.Authentication.Extensions/Fhi.Authentication.Extensions.csproj \
         --configuration Release \
         -p:PackageVersion=${{ env.VERSION }} \
         --output nuget-packages
-
-    # - name: Publish Fhi.Authentication.Extensions NuGet package
-    #   run: dotnet nuget push ./nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_ORG_FHI_PUBLISH }} --source https://api.nuget.org/v3/index.json
-
-    # - name: Upload Fhi.Authentication.Extensions NuGet Package Artifact
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: nuget-package
-    #     path: nuget-packages/*.nupkg
-    #     retention-days: 7
 
     - name: Create GitHub draft release
       uses: softprops/action-gh-release@v2
