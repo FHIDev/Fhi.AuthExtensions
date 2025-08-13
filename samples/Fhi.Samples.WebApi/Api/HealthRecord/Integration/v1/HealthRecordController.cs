@@ -5,7 +5,6 @@ using WebApi.Services;
 
 namespace WebApi.Api.HealthRecord.Integration.v1
 {
-    public record HealthRecordDto(string Name, string Description, DateTime CreatedAt);
 
     [ApiController]
     [Route("api/v1/integration/health-records")]
