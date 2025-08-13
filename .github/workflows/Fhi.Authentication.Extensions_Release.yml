@@ -48,15 +48,15 @@ jobs:
         -p:PackageVersion=${{ env.VERSION }} \
         --output nuget-packages
 
-    # - name: Publish Fhi.Authentication.Extensions NuGet package
-    #   run: dotnet nuget push ./nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_ORG_FHI_PUBLISH }} --source https://api.nuget.org/v3/index.json
+    - name: Publish Fhi.Authentication.Extensions NuGet package
+      run: dotnet nuget push ./nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_ORG_FHI_PUBLISH }} --source https://api.nuget.org/v3/index.json
 
-    # - name: Upload Fhi.Authentication.Extensions NuGet Package Artifact
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: nuget-package
-    #     path: nuget-packages/*.nupkg
-    #     retention-days: 7
+    - name: Upload Fhi.Authentication.Extensions NuGet Package Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-package
+        path: nuget-packages/*.nupkg
+        retention-days: 7
 
     - name: Create GitHub draft release
       uses: softprops/action-gh-release@v2
@@ -66,6 +66,9 @@ jobs:
         draft: true
         prerelease: github.event.inputs.prerelease
         files: nuget-packages/*.nupkg
+        body: |
+          **NuGet Package**: [Fhi.Authentication.Extensions](https://www.nuget.org/packages/Fhi.Authentication.Extensions/${{ env.VERSION }})
+
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
