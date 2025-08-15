@@ -1,3 +1,13 @@
 ﻿# Fhi.Authorization.Extensions
-This library provides a set of extensions Authorization, enhancing its functionality and usability. It includes features such as:
-- **Scope authorization handler**: 
+
+Fhi.Authorization.Extensions provides reusable authorization helpers for .NET applications. For more information, refer to the official documentation. Contributions are welcome, and licensing details are available in the repository.
+## Documentation
+
+For official documentation, please see the [documentation site](https://fhidev.github.io/Fhi.AuthExtensions/)
+
+## Contributing
+
+See [CONTRIBUTING.md](https://github.com/FHIDev/Fhi.AuthExtensions/blob/main/CONTRIBUTING.md)
+
+## License
+See [License.md](https://github.com/FHIDev/Fhi.AuthExtensions/blob/main/License.md)

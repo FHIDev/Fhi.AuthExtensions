@@ -1,4 +1,4 @@
-name: Fhi.AuthExtensions.Documentation
+name: Documentation
 on:
   push:
       branches:

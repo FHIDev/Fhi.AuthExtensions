@@ -1,0 +1,74 @@
+name: Release Fhi.Authorization.Extensions
+description: |
+  This workflow tags, packs and publish the NuGet package and creates a draft release for the Fhi.Authorization.Extension project.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version in format X.Y.Z and for prerelease  X.Y.Z-alfaN, X.Y.Z-betaN'
+        required: true
+        default: '0.0.0'
+        type: string
+      prerelease:
+        description: 'Create a prerelease?'
+        required: false
+        default: true
+        type: boolean
+jobs:
+  release-authorization-extensions:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          8.0.x
+          9.0.x
+
+    - name: Set version and tag variables
+      run: |
+        echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+        echo "TAG=authentication-${{ github.event.inputs.version }}" >> $GITHUB_ENV
+
+    - name: Create git tag
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git tag ${{ env.TAG }}
+        git push origin ${{ env.TAG }}
+
+    - name: Pack Fhi.Authorization.Extensions NuGet package
+      run: |
+        dotnet pack ./src/Fhi.Authorization.Extensions/Fhi.Authorization.Extensions.csproj \
+        --configuration Release \
+        -p:PackageVersion=${{ env.VERSION }} \
+        --output nuget-packages
+
+    - name: Publish Fhi.Authorization.Extensions NuGet package
+      run: dotnet nuget push ./nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_ORG_FHI_PUBLISH }} --source https://api.nuget.org/v3/index.json
+
+    - name: Upload Fhi.Authorization.Extensions NuGet Package Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-package
+        path: nuget-packages/*.nupkg
+        retention-days: 7
+
+    - name: Create GitHub draft release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.TAG }}
+        name: Release Fhi.Authorization.Extensions ${{ env.VERSION }}
+        draft: true
+        prerelease: github.event.inputs.prerelease
+        files: nuget-packages/*.nupkg
+        body: |
+          **NuGet Package**: [Fhi.Authorization.Extensions](https://www.nuget.org/packages/Fhi.Authorization.Extensions/${{ env.VERSION }})
+
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+

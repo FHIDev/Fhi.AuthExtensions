@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Fhi.Samples.WebApi.Api.HealthRecord.Me.v1.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Services;
 
 namespace WebApi.Api.HealthRecord.Me.v1
 {
-
-    public record HealthRecordPersonDto(string Pid, string Name, string Description, DateTime CreatedAt);
 
     [ApiController]
     [Route("api/v1/me/health-records")]

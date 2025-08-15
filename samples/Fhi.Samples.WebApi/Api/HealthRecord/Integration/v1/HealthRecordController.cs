@@ -1,12 +1,11 @@
 ﻿using Fhi.Authorization;
+using Fhi.Samples.WebApi.Api.HealthRecord.Integration.v1.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Services;
 
 namespace WebApi.Api.HealthRecord.Integration.v1
 {
-    public record HealthRecordDto(string Name, string Description, DateTime CreatedAt);
-
     [ApiController]
     [Route("api/v1/integration/health-records")]
     [Authorize(AuthenticationSchemes = "bearer.integration", Policy = "IntegrationPolicy")]

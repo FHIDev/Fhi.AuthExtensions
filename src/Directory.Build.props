@@ -15,6 +15,6 @@
     <Tags>oauth, oidc</Tags>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="../fhi.png" Pack="true" PackagePath="/" />
+    <None Include="../../fhi.png" Pack="true" PackagePath="/" />
   </ItemGroup>
 </Project>
