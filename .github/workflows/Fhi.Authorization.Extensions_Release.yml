@@ -31,7 +31,7 @@ jobs:
     - name: Set version and tag variables
       run: |
         echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-        echo "TAG=authentication-${{ github.event.inputs.version }}" >> $GITHUB_ENV
+        echo "TAG=authorization-${{ github.event.inputs.version }}" >> $GITHUB_ENV
 
     - name: Create git tag
       run: |
