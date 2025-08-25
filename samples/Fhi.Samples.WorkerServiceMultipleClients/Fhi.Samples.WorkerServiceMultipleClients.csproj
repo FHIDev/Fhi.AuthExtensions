@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Fhi.Samples.WorkerServiceMultipleClients-0c66f010-7d56-4527-aab6-5edad08f0861</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Duende.AccessTokenManagement" />
+	<PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+  </ItemGroup>
+</Project>
