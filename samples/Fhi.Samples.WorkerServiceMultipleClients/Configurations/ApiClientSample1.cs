@@ -14,12 +14,3 @@ namespace Fhi.Samples.WorkerServiceMultipleClients.Configurations
     }
 }
 
-
-//public class ClientAuthentication
-//{
-//    [Required] public string Authority { get; set; } = string.Empty;
-//    [Required] public string ClientId { get; set; } = string.Empty;
-//    public string Scopes { get; set; } = string.Empty;
-//    [Required] public string Secret { get; set; } = string.Empty;
-//    public string SecretType { get; set; } = string.Empty;
-//}
