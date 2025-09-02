@@ -3,7 +3,6 @@ using Duende.IdentityModel;
 using Duende.IdentityModel.Client;
 using Fhi.Authentication.Tokens;
 using Fhi.Samples.WorkerService.Workers;
-using Microsoft.Extensions.Options;
 using Refit;
 using WorkerService;
 using WorkerService.Workers;
@@ -26,7 +25,6 @@ builder.Services.AddOptions<ClientConfiguration>()
 var clientConfiguration = clientSection.Get<ClientConfiguration>() ?? new ClientConfiguration();
 
 builder.Services.AddSingleton(new DiscoveryCache(clientConfiguration.Authority));
-builder.Services.AddSingleton<IConfigureOptions<ClientCredentialsClient>, ClientCredentialsClientConfigureOptions>();
 
 
 /***************************************************************************************** 

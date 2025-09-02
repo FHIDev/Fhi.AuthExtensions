@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
   <PropertyGroup>
-	  <TargetFramework>net9.0</TargetFramework>
+	<TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>dotnet-WorkerService.ClientCredential-f1c0faa6-986f-490d-a9b7-23c8f86a51f0</UserSecretsId>
