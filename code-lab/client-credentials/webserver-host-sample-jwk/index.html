@@ -6,7 +6,7 @@
 <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="../../../img/favicon.ico" rel="shortcut icon"/>
-<title>Manual token request with Duende IdentityModel - FHI authentication and authorization extensions</title>
+<title>Using Private Key JWT Secret - FHI authentication and authorization extensions</title>
 <link href="../../../css/theme.css" rel="stylesheet"/>
 <link href="../../../css/theme_extra.css" rel="stylesheet"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
@@ -14,8 +14,8 @@
 <link href="../../../overrides/cards.css" rel="stylesheet"/>
 <script>
         // Current page data
-        var mkdocs_page_name = "Manual token request with Duende IdentityModel";
-        var mkdocs_page_input_path = "code-lab/client-credentials/manual-tokenrequest-with-duendeidentitymodel.ipynb";
+        var mkdocs_page_name = "Using Private Key JWT Secret";
+        var mkdocs_page_input_path = "code-lab/client-credentials/webserver-host-sample-jwk.ipynb";
         var mkdocs_page_url = null;
       </script>
 <!--[if lt IE 9]>
@@ -72,9 +72,9 @@
 </li>
 </ul>
 <p class="caption"><span class="caption-text">Code lab</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal current">Client credentials flow (server to server)</a>
-<ul class="current">
+<ul>
+<li class="toctree-l1"><a class="reference internal">Client credentials flow (server to server)</a>
+<ul>
 <li class="toctree-l2"><a class="reference internal" href="../webserver-host-sample/">Using IHttpClientFactory and Duende AccessToken Management</a>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../manual-bearertoken-request-withclientassertion/">Bearer token request using client assertion</a>
@@ -83,9 +83,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../manual-dpoptoken-request/">DPoP token request</a>
 </li>
-<li class="toctree-l2 current"><a class="reference internal current" href="#">Manual token request with Duende IdentityModel</a>
-<ul class="current">
-</ul>
+<li class="toctree-l2"><a class="reference internal" href="../manual-tokenrequest-with-duendeidentitymodel/">Manual token request with Duende IdentityModel</a>
 </li>
 </ul>
 </li>
@@ -102,11 +100,9 @@
 <div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation">
 <ul class="wy-breadcrumbs">
 <li><a aria-label="Docs" class="icon icon-home" href="../../.."></a></li>
-<li class="breadcrumb-item">Code lab</li>
-<li class="breadcrumb-item">Client credentials flow (server to server)</li>
-<li class="breadcrumb-item active">Manual token request with Duende IdentityModel</li>
+<li class="breadcrumb-item active">Using Private Key JWT Secret</li>
 <li class="wy-breadcrumbs-aside">
-<a class="icon icon-github" href="https://github.com/FHIDev/Fhi.AuthExtensions/edit/master/docs/code-lab/client-credentials/manual-tokenrequest-with-duendeidentitymodel.ipynb"> Edit on GitHub</a>
+<a class="icon icon-github" href="https://github.com/FHIDev/Fhi.AuthExtensions/edit/master/docs/code-lab/client-credentials/webserver-host-sample-jwk.ipynb"> Edit on GitHub</a>
 </li>
 </ul>
 <hr/>
@@ -549,23 +545,45 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=00d08206">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3b7dd40e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="bearer-token-request-using-duendeidentitymodelclient">Bearer token request using Duende.IdentityModel.Client<a class="anchor-link" href="#bearer-token-request-using-duendeidentitymodelclient">¶</a></h2>
+<h1 id="using-private-key-jwt-secret">Using Private Key JWT Secret<a class="anchor-link" href="#using-private-key-jwt-secret">¶</a></h1><p>There are two ways of setting up a Private Key Jwt secret</p>
+<ul>
+<li>Configure ClientCredentials asserion as parameters to AddClient</li>
+<li>Using a ClientAssertionService</li>
+</ul>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b112cff5">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d2c5f22f">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="configure-clientcredentials-asserion-as-parameters-to-addclient">Configure ClientCredentials asserion as parameters to AddClient<a class="anchor-link" href="#configure-clientcredentials-asserion-as-parameters-to-addclient">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_parameters">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_parameters" id="cell-id=3807571f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="celltoolbar">
+<div class="button_container tags_button_container">
+<span class="tag-container">
+<span class="cell-tag">parameters</span>
+</span>
+</div>
+</div>
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -579,70 +597,225 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-C#"><pre><span></span><span class="err">#</span><span class="o">!</span><span class="n">csharp</span>
-<span class="err">#</span><span class="n">load</span><span class="w"> </span><span class="s">"../HttpLoggerHelper.csx"</span>
-<span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Fhi.Authentication.Extensions, 1.0.0-beta"</span>
-<span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Duende.IdentityModel, 7.1.0"</span>
-
-<span class="k">using</span><span class="w"> </span><span class="nn">System.Net.Http</span><span class="p">;</span>
-<span class="k">using</span><span class="w"> </span><span class="nn">System.Net.Http.Headers</span><span class="p">;</span>
-<span class="k">using</span><span class="w"> </span><span class="nn">Duende.IdentityModel.Client</span><span class="p">;</span>
-<span class="k">using</span><span class="w"> </span><span class="nn">Duende.IdentityModel</span><span class="p">;</span>
-
-<span class="kt">var</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HttpClient</span><span class="p">();</span>
-<span class="kt">var</span><span class="w"> </span><span class="n">discovery</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">GetDiscoveryDocumentAsync</span><span class="p">(</span><span class="s">"https://demo.duendesoftware.com"</span><span class="p">);</span>
-<span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$"Discovery Document: {discovery.IsError}"</span><span class="p">);</span>
-<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">discovery</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">discovery</span><span class="p">.</span><span class="n">IsError</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">discovery</span><span class="p">.</span><span class="n">Issuer</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">discovery</span><span class="p">.</span><span class="n">TokenEndpoint</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">)</span>
+<span class="kt">var</span><span class="w"> </span><span class="n">authority</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"https://demo.duendesoftware.com"</span><span class="p">;</span><span class="w"> </span><span class="c1">// Set your authority URL here"</span>
+<span class="kt">var</span><span class="w"> </span><span class="n">clientId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"m2m.jwt"</span><span class="p">;</span>
+<span class="kt">var</span><span class="w"> </span><span class="n">jwk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"""</span>
 <span class="p">{</span>
-<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">tokenRequest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ClientCredentialsTokenRequest</span><span class="p">()</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">        </span><span class="n">ClientId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"m2m"</span><span class="p">,</span>
-<span class="w">        </span><span class="n">Address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">discovery</span><span class="p">.</span><span class="n">TokenEndpoint</span><span class="p">,</span>
-<span class="w">        </span><span class="n">GrantType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OidcConstants</span><span class="p">.</span><span class="n">GrantTypes</span><span class="p">.</span><span class="n">ClientCredentials</span><span class="p">,</span>
-<span class="w">        </span><span class="n">ClientCredentialStyle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClientCredentialStyle</span><span class="p">.</span><span class="n">PostBody</span><span class="p">,</span>
-<span class="w">        </span><span class="n">ClientSecret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"secret"</span><span class="p">,</span><span class="w"> </span><span class="c1">// This is used for shared secrets, not needed when using client assertion</span>
-<span class="w">        </span><span class="c1">////ClientAssertion = new ClientAssertion()</span>
-<span class="w">        </span><span class="c1">////{</span>
-<span class="w">        </span><span class="c1">////    Type = OidcConstants.ClientAssertionTypes.JwtBearer,</span>
-<span class="w">        </span><span class="c1">////    Value = ClientAssertionTokenHandler.CreateJwtToken(discovery.Issuer, ""m2m.jwt, "jwk...")</span>
-<span class="w">        </span><span class="c1">////},</span>
-<span class="w">        </span><span class="n">Scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"api"</span>
-<span class="w">    </span><span class="p">};</span>
-<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">tokenResponse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">RequestClientCredentialsTokenAsync</span><span class="p">(</span><span class="n">tokenRequest</span><span class="p">);</span>
-<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="n">HttpLogger</span><span class="p">.</span><span class="n">LogResponse</span><span class="p">(</span><span class="n">tokenResponse</span><span class="p">.</span><span class="n">HttpResponse</span><span class="p">);</span>
+<span class="w">    </span><span class="s">"d"</span><span class="p">:</span><span class="s">"GmiaucNIzdvsEzGjZjd43SDToy1pz-Ph-shsOUXXh-dsYNGftITGerp8bO1iryXh_zUEo8oDK3r1y4klTonQ6bLsWw4ogjLPmL3yiqsoSjJa1G2Ymh_RY_sFZLLXAcrmpbzdWIAkgkHSZTaliL6g57vA7gxvd8L4s82wgGer_JmURI0ECbaCg98JVS0Srtf9GeTRHoX4foLWKc1Vq6NHthzqRMLZe-aRBNU9IMvXNd7kCcIbHCM3GTD_8cFj135nBPP2HOgC_ZXI1txsEf-djqJj8W5vaM7ViKU28IDv1gZGH3CatoysYx6jv1XJVvb2PH8RbFKbJmeyUm3Wvo-rgQ"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"dp"</span><span class="p">:</span><span class="s">"YNjVBTCIwZD65WCht5ve06vnBLP_Po1NtL_4lkholmPzJ5jbLYBU8f5foNp8DVJBdFQW7wcLmx85-NC5Pl1ZeyA-Ecbw4fDraa5Z4wUKlF0LT6VV79rfOF19y8kwf6MigyrDqMLcH_CRnRGg5NfDsijlZXffINGuxg6wWzhiqqE"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"dq"</span><span class="p">:</span><span class="s">"LfMDQbvTFNngkZjKkN2CBh5_MBG6Yrmfy4kWA8IC2HQqID5FtreiY2MTAwoDcoINfh3S5CItpuq94tlB2t-VUv8wunhbngHiB5xUprwGAAnwJ3DL39D2m43i_3YP-UO1TgZQUAOh7Jrd4foatpatTvBtY3F1DrCrUKE5Kkn770M"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"e"</span><span class="p">:</span><span class="s">"AQAB"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"kid"</span><span class="p">:</span><span class="s">"ZzAjSnraU3bkWGnnAqLapYGpTyNfLbjbzgAPbbW2GEA"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"kty"</span><span class="p">:</span><span class="s">"RSA"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"n"</span><span class="p">:</span><span class="s">"wWwQFtSzeRjjerpEM5Rmqz_DsNaZ9S1Bw6UbZkDLowuuTCjBWUax0vBMMxdy6XjEEK4Oq9lKMvx9JzjmeJf1knoqSNrox3Ka0rnxXpNAz6sATvme8p9mTXyp0cX4lF4U2J54xa2_S9NF5QWvpXvBeC4GAJx7QaSw4zrUkrc6XyaAiFnLhQEwKJCwUw4NOqIuYvYp_IXhw-5Ti_icDlZS-282PcccnBeOcX7vc21pozibIdmZJKqXNsL1Ibx5Nkx1F1jLnekJAmdaACDjYRLL_6n3W4wUp19UvzB1lGtXcJKLLkqB6YDiZNu16OSiSprfmrRXvYmvD8m6Fnl5aetgKw"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"p"</span><span class="p">:</span><span class="s">"7enorp9Pm9XSHaCvQyENcvdU99WCPbnp8vc0KnY_0g9UdX4ZDH07JwKu6DQEwfmUA1qspC-e_KFWTl3x0-I2eJRnHjLOoLrTjrVSBRhBMGEH5PvtZTTThnIY2LReH-6EhceGvcsJ_MhNDUEZLykiH1OnKhmRuvSdhi8oiETqtPE"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"q"</span><span class="p">:</span><span class="s">"0CBLGi_kRPLqI8yfVkpBbA9zkCAshgrWWn9hsq6a7Zl2LcLaLBRUxH0q1jWnXgeJh9o5v8sYGXwhbrmuypw7kJ0uA3OgEzSsNvX5Ay3R9sNel-3Mqm8Me5OfWWvmTEBOci8RwHstdR-7b9ZT13jk-dsZI7OlV_uBja1ny9Nz9ts"</span><span class="p">,</span>
+<span class="w">    </span><span class="s">"qi"</span><span class="p">:</span><span class="s">"pG6J4dcUDrDndMxa-ee1yG4KjZqqyCQcmPAfqklI2LmnpRIjcK78scclvpboI3JQyg6RCEKVMwAhVtQM6cBcIO3JrHgqeYDblp5wXHjto70HVW6Z8kBruNx1AH9E8LzNvSRL-JVTFzBkJuNgzKQfD0G77tQRgJ-Ri7qu3_9o1M4"</span>
 <span class="p">}</span>
+<span class="s">""";</span>
+<span class="kt">var</span><span class="w"> </span><span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"api"</span><span class="p">;</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">#!csharp
-#load "../HttpLoggerHelper.csx"
-#r "nuget: Fhi.Authentication.Extensions, 1.0.0-beta"
-#r "nuget: Duende.IdentityModel, 7.1.0"
-
-using System.Net.Http;
-using System.Net.Http.Headers;
-using Duende.IdentityModel.Client;
-using Duende.IdentityModel;
-
-var client = new HttpClient();
-var discovery = await client.GetDiscoveryDocumentAsync("https://demo.duendesoftware.com");
-Console.WriteLine($"Discovery Document: {discovery.IsError}");
-if (discovery is not null &amp;&amp; !discovery.IsError &amp;&amp; discovery.Issuer is not null &amp;&amp; discovery.TokenEndpoint is not null)
+var authority = "https://demo.duendesoftware.com"; // Set your authority URL here"
+var clientId = "m2m.jwt";
+var jwk = """
 {
-    var tokenRequest = new ClientCredentialsTokenRequest()
+    "d":"GmiaucNIzdvsEzGjZjd43SDToy1pz-Ph-shsOUXXh-dsYNGftITGerp8bO1iryXh_zUEo8oDK3r1y4klTonQ6bLsWw4ogjLPmL3yiqsoSjJa1G2Ymh_RY_sFZLLXAcrmpbzdWIAkgkHSZTaliL6g57vA7gxvd8L4s82wgGer_JmURI0ECbaCg98JVS0Srtf9GeTRHoX4foLWKc1Vq6NHthzqRMLZe-aRBNU9IMvXNd7kCcIbHCM3GTD_8cFj135nBPP2HOgC_ZXI1txsEf-djqJj8W5vaM7ViKU28IDv1gZGH3CatoysYx6jv1XJVvb2PH8RbFKbJmeyUm3Wvo-rgQ",
+    "dp":"YNjVBTCIwZD65WCht5ve06vnBLP_Po1NtL_4lkholmPzJ5jbLYBU8f5foNp8DVJBdFQW7wcLmx85-NC5Pl1ZeyA-Ecbw4fDraa5Z4wUKlF0LT6VV79rfOF19y8kwf6MigyrDqMLcH_CRnRGg5NfDsijlZXffINGuxg6wWzhiqqE",
+    "dq":"LfMDQbvTFNngkZjKkN2CBh5_MBG6Yrmfy4kWA8IC2HQqID5FtreiY2MTAwoDcoINfh3S5CItpuq94tlB2t-VUv8wunhbngHiB5xUprwGAAnwJ3DL39D2m43i_3YP-UO1TgZQUAOh7Jrd4foatpatTvBtY3F1DrCrUKE5Kkn770M",
+    "e":"AQAB",
+    "kid":"ZzAjSnraU3bkWGnnAqLapYGpTyNfLbjbzgAPbbW2GEA",
+    "kty":"RSA",
+    "n":"wWwQFtSzeRjjerpEM5Rmqz_DsNaZ9S1Bw6UbZkDLowuuTCjBWUax0vBMMxdy6XjEEK4Oq9lKMvx9JzjmeJf1knoqSNrox3Ka0rnxXpNAz6sATvme8p9mTXyp0cX4lF4U2J54xa2_S9NF5QWvpXvBeC4GAJx7QaSw4zrUkrc6XyaAiFnLhQEwKJCwUw4NOqIuYvYp_IXhw-5Ti_icDlZS-282PcccnBeOcX7vc21pozibIdmZJKqXNsL1Ibx5Nkx1F1jLnekJAmdaACDjYRLL_6n3W4wUp19UvzB1lGtXcJKLLkqB6YDiZNu16OSiSprfmrRXvYmvD8m6Fnl5aetgKw",
+    "p":"7enorp9Pm9XSHaCvQyENcvdU99WCPbnp8vc0KnY_0g9UdX4ZDH07JwKu6DQEwfmUA1qspC-e_KFWTl3x0-I2eJRnHjLOoLrTjrVSBRhBMGEH5PvtZTTThnIY2LReH-6EhceGvcsJ_MhNDUEZLykiH1OnKhmRuvSdhi8oiETqtPE",
+    "q":"0CBLGi_kRPLqI8yfVkpBbA9zkCAshgrWWn9hsq6a7Zl2LcLaLBRUxH0q1jWnXgeJh9o5v8sYGXwhbrmuypw7kJ0uA3OgEzSsNvX5Ay3R9sNel-3Mqm8Me5OfWWvmTEBOci8RwHstdR-7b9ZT13jk-dsZI7OlV_uBja1ny9Nz9ts",
+    "qi":"pG6J4dcUDrDndMxa-ee1yG4KjZqqyCQcmPAfqklI2LmnpRIjcK78scclvpboI3JQyg6RCEKVMwAhVtQM6cBcIO3JrHgqeYDblp5wXHjto70HVW6Z8kBruNx1AH9E8LzNvSRL-JVTFzBkJuNgzKQfD0G77tQRgJ-Ri7qu3_9o1M4"
+}
+""";
+var scope = "api";</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0f1c0fd6">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-C#"><pre><span></span><span class="err">#</span><span class="o">!</span><span class="n">csharp</span>
+<span class="err">#</span><span class="n">load</span><span class="w"> </span><span class="s">"../HttpLoggerHelper.csx"</span>
+<span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Duende.AccessTokenManagement, 3.2.0"</span>
+<span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Microsoft.Extensions.Hosting, 9.0.5"</span>
+<span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Microsoft.Extensions.Caching.Memory, 9.0.0"</span>
+<span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Fhi.Authentication.Extensions, 1.0.0"</span>
+
+<span class="k">using</span><span class="w"> </span><span class="nn">Microsoft.Extensions.Hosting</span><span class="p">;</span>
+<span class="k">using</span><span class="w"> </span><span class="nn">Duende.AccessTokenManagement</span><span class="p">;</span>
+<span class="k">using</span><span class="w"> </span><span class="nn">Duende.IdentityModel</span><span class="p">;</span>
+<span class="k">using</span><span class="w"> </span><span class="nn">Duende.IdentityModel.Client</span><span class="p">;</span>
+<span class="k">using</span><span class="w"> </span><span class="nn">Fhi.Authentication.Tokens</span><span class="p">;</span>
+<span class="k">using</span><span class="w"> </span><span class="nn">Microsoft.Extensions.DependencyInjection</span><span class="p">;</span>
+<span class="k">using</span><span class="w"> </span><span class="nn">System.Net.Http</span><span class="p">;</span>
+
+<span class="k">async</span><span class="w"> </span><span class="n">Task</span><span class="w"> </span><span class="nf">RunAsync</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Host</span><span class="p">.</span><span class="n">CreateDefaultBuilder</span><span class="p">();</span>
+
+<span class="w">    </span><span class="n">builder</span><span class="p">.</span><span class="n">ConfigureServices</span><span class="p">(</span><span class="n">services</span><span class="w"> </span><span class="o">=&gt;</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">services</span>
+<span class="w">            </span><span class="p">.</span><span class="n">AddClientCredentialsTokenManagement</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="n">AddClient</span><span class="p">(</span><span class="n">clientId</span><span class="p">,</span><span class="w"> </span><span class="n">options</span><span class="w"> </span><span class="o">=&gt;</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">                </span><span class="n">options</span><span class="p">.</span><span class="n">TokenEndpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"https://demo.duendesoftware.com/connect/token"</span><span class="p">;</span>
+<span class="w">                </span><span class="n">options</span><span class="p">.</span><span class="n">ClientId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">clientId</span><span class="p">;</span>
+<span class="w">                </span><span class="n">options</span><span class="p">.</span><span class="n">Parameters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Duende</span><span class="p">.</span><span class="n">IdentityModel</span><span class="p">.</span><span class="n">Client</span><span class="p">.</span><span class="n">Parameters</span><span class="p">()</span>
+<span class="w">                </span><span class="p">{</span>
+<span class="w">                    </span><span class="p">{</span><span class="w"> </span><span class="n">OidcConstants</span><span class="p">.</span><span class="n">TokenRequest</span><span class="p">.</span><span class="n">ClientAssertionType</span><span class="p">,</span><span class="w"> </span><span class="n">OidcConstants</span><span class="p">.</span><span class="n">ClientAssertionTypes</span><span class="p">.</span><span class="n">JwtBearer</span><span class="w"> </span><span class="p">},</span>
+<span class="w">                    </span><span class="p">{</span><span class="w"> </span><span class="n">OidcConstants</span><span class="p">.</span><span class="n">TokenRequest</span><span class="p">.</span><span class="n">ClientAssertion</span><span class="p">,</span><span class="w"> </span><span class="n">ClientAssertionTokenHandler</span><span class="p">.</span><span class="n">CreateJwtToken</span><span class="p">(</span>
+<span class="w">                        </span><span class="n">issuer</span><span class="p">:</span><span class="w"> </span><span class="n">authority</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                        </span><span class="n">clientId</span><span class="p">,</span>
+<span class="w">                        </span><span class="n">jwk</span><span class="p">)</span><span class="w"> </span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">};</span>
+<span class="w">                </span><span class="n">options</span><span class="p">.</span><span class="n">Scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scope</span><span class="p">;</span>
+<span class="w">            </span><span class="p">});</span>
+
+<span class="w">        </span><span class="n">services</span><span class="p">.</span><span class="n">AddClientCredentialsHttpClient</span><span class="p">(</span><span class="n">clientId</span><span class="p">,</span><span class="w"> </span><span class="n">clientId</span><span class="p">,</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=&gt;</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="n">client</span><span class="p">.</span><span class="n">BaseAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Uri</span><span class="p">(</span><span class="s">"https://localhost:7150"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">});</span>
+
+<span class="w">        </span><span class="n">services</span><span class="p">.</span><span class="n">AddDistributedMemoryCache</span><span class="p">();</span>
+<span class="w">        </span><span class="n">services</span><span class="p">.</span><span class="n">AddTransient</span><span class="o">&lt;</span><span class="n">ITestService</span><span class="p">,</span><span class="w"> </span><span class="n">TestService</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="n">Build</span><span class="p">();</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="nn">var</span><span class="w"> </span><span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">host</span><span class="p">.</span><span class="n">Services</span><span class="p">.</span><span class="n">CreateScope</span><span class="p">();</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">testService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scope</span><span class="p">.</span><span class="n">ServiceProvider</span><span class="p">.</span><span class="n">GetRequiredService</span><span class="o">&lt;</span><span class="n">ITestService</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="n">testService</span><span class="p">.</span><span class="n">Get</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">interface</span><span class="w"> </span><span class="n">ITestService</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="n">Task</span><span class="w"> </span><span class="nf">Get</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// A service that uses the registerd HttpClient with HttpClientFactory to make requests.</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestService</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ITestService</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">private</span><span class="w"> </span><span class="k">readonly</span><span class="w"> </span><span class="n">IHttpClientFactory</span><span class="w"> </span><span class="n">_factory</span><span class="p">;</span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="nf">TestService</span><span class="p">(</span><span class="n">IHttpClientFactory</span><span class="w"> </span><span class="n">factory</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">_factory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">factory</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="n">Task</span><span class="w"> </span><span class="nf">Get</span><span class="p">()</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">var</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_factory</span><span class="p">.</span><span class="n">CreateClient</span><span class="p">(</span><span class="s">"m2m.jwt"</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">var</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">GetAsync</span><span class="p">(</span><span class="s">"api/v1/integration/health-records"</span><span class="p">);</span>
+<span class="w">        </span><span class="k">await</span><span class="w"> </span><span class="n">HttpLogger</span><span class="p">.</span><span class="n">LogRequest</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">RequestMessage</span><span class="p">);</span>
+<span class="w">        </span><span class="k">await</span><span class="w"> </span><span class="n">HttpLogger</span><span class="p">.</span><span class="n">LogResponse</span><span class="p">(</span><span class="n">response</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">await</span><span class="w"> </span><span class="nf">RunAsync</span><span class="p">();</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-2">#!csharp
+#load "../HttpLoggerHelper.csx"
+#r "nuget: Duende.AccessTokenManagement, 3.2.0"
+#r "nuget: Microsoft.Extensions.Hosting, 9.0.5"
+#r "nuget: Microsoft.Extensions.Caching.Memory, 9.0.0"
+#r "nuget: Fhi.Authentication.Extensions, 1.0.0"
+
+using Microsoft.Extensions.Hosting;
+using Duende.AccessTokenManagement;
+using Duende.IdentityModel;
+using Duende.IdentityModel.Client;
+using Fhi.Authentication.Tokens;
+using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
+
+async Task RunAsync()
+{
+    var builder = Host.CreateDefaultBuilder();
+
+    builder.ConfigureServices(services =&gt;
     {
-        ClientId = "m2m",
-        Address = discovery.TokenEndpoint,
-        GrantType = OidcConstants.GrantTypes.ClientCredentials,
-        ClientCredentialStyle = ClientCredentialStyle.PostBody,
-        ClientSecret = "secret", // This is used for shared secrets, not needed when using client assertion
-        ////ClientAssertion = new ClientAssertion()
-        ////{
-        ////    Type = OidcConstants.ClientAssertionTypes.JwtBearer,
-        ////    Value = ClientAssertionTokenHandler.CreateJwtToken(discovery.Issuer, ""m2m.jwt, "jwk...")
-        ////},
-        Scope = "api"
-    };
-    var tokenResponse = await client.RequestClientCredentialsTokenAsync(tokenRequest);
-    await HttpLogger.LogResponse(tokenResponse.HttpResponse);
-}</div>
+        services
+            .AddClientCredentialsTokenManagement()
+            .AddClient(clientId, options =&gt;
+            {
+                options.TokenEndpoint = "https://demo.duendesoftware.com/connect/token";
+                options.ClientId = clientId;
+                options.Parameters = new Duende.IdentityModel.Client.Parameters()
+                {
+                    { OidcConstants.TokenRequest.ClientAssertionType, OidcConstants.ClientAssertionTypes.JwtBearer },
+                    { OidcConstants.TokenRequest.ClientAssertion, ClientAssertionTokenHandler.CreateJwtToken(
+                        issuer: authority, 
+                        clientId,
+                        jwk) 
+                    }
+                };
+                options.Scope = scope;
+            });
+
+        services.AddClientCredentialsHttpClient(clientId, clientId, client =&gt;
+        {
+            client.BaseAddress = new Uri("https://localhost:7150");
+        });
+
+        services.AddDistributedMemoryCache();
+        services.AddTransient<itestservice, testservice="">();
+    });
+
+    var host = builder.Build();
+    
+    using var scope = host.Services.CreateScope();
+    var testService = scope.ServiceProvider.GetRequiredService<itestservice>();
+    await testService.Get();
+}
+
+interface ITestService
+{
+    public Task Get();
+}
+
+// A service that uses the registerd HttpClient with HttpClientFactory to make requests.
+class TestService : ITestService
+{
+    private readonly IHttpClientFactory _factory;
+    public TestService(IHttpClientFactory factory)
+    {
+        _factory = factory;
+    }
+    
+    public async Task Get()
+    {
+        var client = _factory.CreateClient("m2m.jwt");
+        var response = await client.GetAsync("api/v1/integration/health-records");
+        await HttpLogger.LogRequest(response.RequestMessage);
+        await HttpLogger.LogResponse(response);
+    }
+}
+
+await RunAsync();</itestservice></itestservice,></div>
 </div>
 </div>
 </div>
@@ -656,9 +829,6 @@ if (discovery is not null &amp;&amp; !discovery.IsError &amp;&amp; discovery.Iss
         </style>
 </div>
 </div><footer>
-<div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
-<a class="btn btn-neutral float-left" href="../manual-dpoptoken-request/" title="DPoP token request"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-</div>
 <hr/>
 <div role="contentinfo">
 <!-- Copyright etc -->
@@ -675,7 +845,6 @@ if (discovery is not null &amp;&amp; !discovery.IsError &amp;&amp; discovery.Iss
 <span>
 <a class="fa fa-github" href="https://github.com/FHIDev/Fhi.AuthExtensions" style="color: #fcfcfc"> GitHub</a>
 </span>
-<span><a href="../manual-dpoptoken-request/" style="color: #fcfcfc">« Previous</a></span>
 </span>
 </div>
 <script src="../../../js/jquery-3.6.0.min.js"></script>

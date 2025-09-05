@@ -56,6 +56,8 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/token-expiry-downstream-api/">Handling token expiration</a>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/security-middlewares/">Security middlewares overview</a>
+</li>
 <li class="toctree-l1"><a class="reference internal">Server to server communication</a>
 <ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/server-to-server/server-to-server/">Overview</a>
@@ -63,6 +65,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/server-to-server/web-server-host/">Client credentials token request from a Web host</a>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/server-to-server/manual-token-request/">Manual client credential token request</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/server-to-server/multiple-client-configurations/">Service calling multiple external APIs</a>
 </li>
 </ul>
 </li>
@@ -73,9 +77,9 @@
 <ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../webserver-host-sample/">Using IHttpClientFactory and Duende AccessToken Management</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../manual-bearertoken-request/">Bearer token request using shared secret</a>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="../manual-bearertoken-request-withclientassertion/">Bearer token request using client assertion</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../manual-bearertoken-request/">Bearer token request using shared secret</a>
 </li>
 <li class="toctree-l2 current"><a class="reference internal current" href="#">DPoP token request</a>
 <ul class="current">
@@ -578,7 +582,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-C#"><pre><span></span><span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Fhi.Authentication.Extensions, 1.0.0-beta"</span>
+<div class="highlight-ipynb hl-C#"><pre><span></span><span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Fhi.Authentication.Extensions, 1.0.0"</span>
 <span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Duende.IdentityModel, 7.0.0"</span>
 <span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Microsoft.IdentityModel.Tokens, 8.9.0"</span>
 
@@ -677,7 +681,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">#r "nuget: Fhi.Authentication.Extensions, 1.0.0-beta"
+<div class="clipboard-copy-txt" id="cell-1">#r "nuget: Fhi.Authentication.Extensions, 1.0.0"
 #r "nuget: Duende.IdentityModel, 7.0.0"
 #r "nuget: Microsoft.IdentityModel.Tokens, 8.9.0"
 
@@ -789,7 +793,7 @@ public static class TokenHandlers
 </div>
 </div><footer>
 <div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
-<a class="btn btn-neutral float-left" href="../manual-bearertoken-request-withclientassertion/" title="Bearer token request using client assertion"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+<a class="btn btn-neutral float-left" href="../manual-bearertoken-request/" title="Bearer token request using shared secret"><span class="icon icon-circle-arrow-left"></span> Previous</a>
 <a class="btn btn-neutral float-right" href="../manual-tokenrequest-with-duendeidentitymodel/" title="Manual token request with Duende IdentityModel">Next <span class="icon icon-circle-arrow-right"></span></a>
 </div>
 <hr/>
@@ -808,7 +812,7 @@ public static class TokenHandlers
 <span>
 <a class="fa fa-github" href="https://github.com/FHIDev/Fhi.AuthExtensions" style="color: #fcfcfc"> GitHub</a>
 </span>
-<span><a href="../manual-bearertoken-request-withclientassertion/" style="color: #fcfcfc">« Previous</a></span>
+<span><a href="../manual-bearertoken-request/" style="color: #fcfcfc">« Previous</a></span>
 <span><a href="../manual-tokenrequest-with-duendeidentitymodel/" style="color: #fcfcfc">Next »</a></span>
 </span>
 </div>

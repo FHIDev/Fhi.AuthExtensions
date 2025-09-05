@@ -56,6 +56,8 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/token-expiry-downstream-api/">Handling token expiration</a>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/security-middlewares/">Security middlewares overview</a>
+</li>
 <li class="toctree-l1"><a class="reference internal">Server to server communication</a>
 <ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/server-to-server/server-to-server/">Overview</a>
@@ -63,6 +65,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/server-to-server/web-server-host/">Client credentials token request from a Web host</a>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/server-to-server/manual-token-request/">Manual client credential token request</a>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/server-to-server/multiple-client-configurations/">Service calling multiple external APIs</a>
 </li>
 </ul>
 </li>
@@ -73,11 +77,11 @@
 <ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../webserver-host-sample/">Using IHttpClientFactory and Duende AccessToken Management</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../manual-bearertoken-request/">Bearer token request using shared secret</a>
-</li>
 <li class="toctree-l2 current"><a class="reference internal current" href="#">Bearer token request using client assertion</a>
 <ul class="current">
 </ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../manual-bearertoken-request/">Bearer token request using shared secret</a>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../manual-dpoptoken-request/">DPoP token request</a>
 </li>
@@ -560,12 +564,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_parameters">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_parameters" id="cell-id=eaff18d4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_parameters" id="cell-id=e39847af">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="celltoolbar">
 <div class="button_container tags_button_container">
 <span class="tag-container">
@@ -650,7 +654,7 @@ var tokenEndpoint = "https://demo.duendesoftware.com/connect/token";</div>
 </div>
 <div class="highlight-ipynb hl-C#"><pre><span></span><span class="err">#</span><span class="o">!</span><span class="n">csharp</span>
 <span class="err">#</span><span class="n">load</span><span class="w"> </span><span class="s">"../HttpLoggerHelper.csx"</span>
-<span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Fhi.Authentication.Extensions, 1.0.0-beta"</span>
+<span class="err">#</span><span class="n">r</span><span class="w"> </span><span class="s">"nuget: Fhi.Authentication.Extensions, 1.0.0"</span>
 
 <span class="k">using</span><span class="w"> </span><span class="nn">System.Net.Http</span><span class="p">;</span>
 <span class="k">using</span><span class="w"> </span><span class="nn">System.Net.Http.Headers</span><span class="p">;</span>
@@ -681,7 +685,7 @@ var tokenEndpoint = "https://demo.duendesoftware.com/connect/token";</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">#!csharp
 #load "../HttpLoggerHelper.csx"
-#r "nuget: Fhi.Authentication.Extensions, 1.0.0-beta"
+#r "nuget: Fhi.Authentication.Extensions, 1.0.0"
 
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -723,8 +727,8 @@ await HttpLogger.LogResponse(response);</string,></div>
 </div>
 </div><footer>
 <div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
-<a class="btn btn-neutral float-left" href="../manual-bearertoken-request/" title="Bearer token request using shared secret"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-<a class="btn btn-neutral float-right" href="../manual-dpoptoken-request/" title="DPoP token request">Next <span class="icon icon-circle-arrow-right"></span></a>
+<a class="btn btn-neutral float-left" href="../webserver-host-sample/" title="Using IHttpClientFactory and Duende AccessToken Management"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+<a class="btn btn-neutral float-right" href="../manual-bearertoken-request/" title="Bearer token request using shared secret">Next <span class="icon icon-circle-arrow-right"></span></a>
 </div>
 <hr/>
 <div role="contentinfo">
@@ -742,8 +746,8 @@ await HttpLogger.LogResponse(response);</string,></div>
 <span>
 <a class="fa fa-github" href="https://github.com/FHIDev/Fhi.AuthExtensions" style="color: #fcfcfc"> GitHub</a>
 </span>
-<span><a href="../manual-bearertoken-request/" style="color: #fcfcfc">« Previous</a></span>
-<span><a href="../manual-dpoptoken-request/" style="color: #fcfcfc">Next »</a></span>
+<span><a href="../webserver-host-sample/" style="color: #fcfcfc">« Previous</a></span>
+<span><a href="../manual-bearertoken-request/" style="color: #fcfcfc">Next »</a></span>
 </span>
 </div>
 <script src="../../../js/jquery-3.6.0.min.js"></script>

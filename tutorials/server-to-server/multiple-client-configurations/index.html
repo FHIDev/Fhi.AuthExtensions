@@ -6,7 +6,7 @@
 <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="../../../img/favicon.ico" rel="shortcut icon"/>
-<title>Token Expiry Handling with Blazor server client and Downstream APIs - FHI authentication and authorization extensions</title>
+<title>Service calling multiple external APIs - FHI authentication and authorization extensions</title>
 <link href="../../../css/theme.css" rel="stylesheet"/>
 <link href="../../../css/theme_extra.css" rel="stylesheet"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
@@ -14,8 +14,8 @@
 <link href="../../../overrides/cards.css" rel="stylesheet"/>
 <script>
         // Current page data
-        var mkdocs_page_name = "Token Expiry Handling with Blazor server client and Downstream APIs";
-        var mkdocs_page_input_path = "tutorials/token-expiration/AuthenticationWithBlazorServer.md";
+        var mkdocs_page_name = "Service calling multiple external APIs";
+        var mkdocs_page_input_path = "tutorials/server-to-server/multiple-client-configurations.md";
         var mkdocs_page_url = null;
       </script>
 <!--[if lt IE 9]>
@@ -51,22 +51,28 @@
 </li>
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../protecting-endpoints/">Require authentication by default</a>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../token-expiry-downstream-api/">Handling token expiration</a>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../security-middlewares/">Security middlewares overview</a>
 </li>
-<li class="toctree-l1"><a class="reference internal">Server to server communication</a>
-<ul>
-<li class="toctree-l2"><a class="reference internal" href="../../server-to-server/server-to-server/">Overview</a>
+<li class="toctree-l1 current"><a class="reference internal current">Server to server communication</a>
+<ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../server-to-server/">Overview</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../server-to-server/web-server-host/">Client credentials token request from a Web host</a>
+<li class="toctree-l2"><a class="reference internal" href="../web-server-host/">Client credentials token request from a Web host</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../server-to-server/manual-token-request/">Manual client credential token request</a>
+<li class="toctree-l2"><a class="reference internal" href="../manual-token-request/">Manual client credential token request</a>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../server-to-server/multiple-client-configurations/">Service calling multiple external APIs</a>
+<li class="toctree-l2 current"><a class="reference internal current" href="#">Service calling multiple external APIs</a>
+<ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="#authentication-scenarios">Authentication Scenarios</a>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#code-sample">Code sample</a>
+</li>
+</ul>
 </li>
 </ul>
 </li>
@@ -100,56 +106,85 @@
 <div class="rst-content"><div aria-label="breadcrumbs navigation" role="navigation">
 <ul class="wy-breadcrumbs">
 <li><a aria-label="Docs" class="icon icon-home" href="../../.."></a></li>
-<li class="breadcrumb-item active">Token Expiry Handling with Blazor server client and Downstream APIs</li>
+<li class="breadcrumb-item">Tutorials</li>
+<li class="breadcrumb-item">Server to server communication</li>
+<li class="breadcrumb-item active">Service calling multiple external APIs</li>
 <li class="wy-breadcrumbs-aside">
-<a class="icon icon-github" href="https://github.com/FHIDev/Fhi.AuthExtensions/edit/master/docs/tutorials/token-expiration/AuthenticationWithBlazorServer.md"> Edit on GitHub</a>
+<a class="icon icon-github" href="https://github.com/FHIDev/Fhi.AuthExtensions/edit/master/docs/tutorials/server-to-server/multiple-client-configurations.md"> Edit on GitHub</a>
 </li>
 </ul>
 <hr/>
 </div>
 <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
 <div class="section" itemprop="articleBody">
-<h1 id="token-expiry-handling-with-blazor-server-client-and-downstream-apis">Token Expiry Handling with Blazor server client and Downstream APIs</h1>
-<h2 id="problem">Problem</h2>
-<p>In Blazor Server, communication between the browser (client) and the server is managed through SignalR, which maintains a persistent connection using WebSockets (or fallback mechanisms). Blazor Server uses SignalR for all UI interactions and event handling. The SignalR connection does not have access to HttpContext or cookies directly. When a client establishes a connection to the SignalR server it creates <code>HubCallerContext</code> with ConnectionId, User (Claimsprincipal) and Items (properties). </p>
-<p>Unlike traditional HTTP requests where cookies are sent with each request, SignalR only sends cookies once, during the initial connection (handshake). After that, no HTTP headers are included in individual method calls over SignalR.</p>
-<p>As a result:</p>
+<h1 id="service-calling-multiple-external-apis">Service calling multiple external APIs</h1>
+<p>Modern applications often need to interact with multiple external APIs, each with distinct authentication and authorization requirements. This architectural pattern demonstrates how a single worker service can securely communicate with different APIs using their respective authentication mechanisms.</p>
+<h2 id="authentication-scenarios">Authentication Scenarios</h2>
+<p>The example below showcases a worker service integrating with two APIs that use different OAuth 2.0 flows:</p>
 <ul>
-<li>You cannot access HttpContext.Request.Cookies from inside Blazor components.</li>
-<li>You lose access to cookies during the lifetime of the SignalR connection.</li>
-<li>HubCallerContext.User is not updated when the authentication cookie is renewed.</li>
+<li><strong>API 1 protected with HelseID:</strong> Requires enhanced security using client assertion and Demonstrating Proof of Possession (DPoP)</li>
+<li><strong>API 2 protected with Duende IdentityServer:</strong> Uses the simpler shared secret approach for client authentication</li>
 </ul>
-<p>See <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/state-management?view=aspnetcore-9.0&amp;pivots=server">Blazor state management</a>
-<a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/security/?view=aspnetcore-9.0&amp;tabs=visual-studio#server-side-blazor-authentication">Blazor Server side authentication</a></p>
-<h2 id="alternative-solution">Alternative solution</h2>
-<h3 id="listen-on-401-from-downstream-api-and-redirect-to-login-site-with-full-reload">Listen on 401 from downstream API and redirect to login site with full reload</h3>
-<div class="mermaid">
-sequenceDiagram
-    participant Browser as Blazor (Browser)
-    participant SignalR as SignalR Hub (Blazor Server)
-    participant API as API Backend
-    participant Auth as IdentityServer (Duende)
+<div class="mermaid">flowchart TB
+    subgraph WS ["Worker Service"]
+        W([Background Worker])
 
-    Browser-&gt;&gt;SignalR: Establish connection (via WebSocket)
-    SignalR--&gt;&gt;Browser: Connected
+        subgraph HC1 ["HttpClient API 1"]
+            C1["Configuration📋&lt;br/&gt; Authority: HelseID  &lt;br/&gt; Secret: Shared secret &lt;br/&gt;ClientID:xxx &lt;br/&gt; TokenEndpoint: helseid.no/token "]
+            C2["API client 1&lt;br/&gt;BaseAddress: api1.no&lt;br/&gt;"]
+        end
 
-    Browser-&gt;&gt;API: HTTP Request (e.g., GET /data)
-    API--&gt;&gt;Browser: JSON response
+        subgraph HC2 ["HttpClient API 2"]
+            C3["Configuration📋&lt;br/&gt; Authority: Duende  &lt;br/&gt; Secret: Shared secret &lt;br/&gt;ClientID:xxx &lt;br/&gt; TokenEndpoint: duende.com/token "]
+            C4["API client 2&lt;br/&gt;BaseAddress: api2.no&lt;br/&gt;&lt;br/&gt;  "]
+        end
 
-    Note over Browser: Auth cookie may expire...
 
-    Browser-&gt;&gt;API: Another request (after auth expired)
-    API--&gt;&gt;Browser: Redirect to IdentityServer
+        W --&gt; HC1
+        W --&gt; HC2
+    end
 
-    Browser-&gt;&gt;Auth: OpenID Connect login redirect
-    Auth--&gt;&gt;Browser: Token/Cookie issued, redirected back
 
-    Browser-&gt;&gt;SignalR: Reconnect
-    SignalR--&gt;&gt;Browser: Reconnected
+        A1[[🏛️ HelseID Authority]]
+        API1((🌐API 1))
+        A1 -.-&gt;|protects| API1
+        A2[[🏛️ Duende IdentityServer]]
+        API2((🌐 API 2))
+        A2 -.-&gt;|protects| API2
 
+
+    %% Authentication flows
+    HC1 --&gt;| Request token with &lt;br/&gt;ClientID + Client Assertion| A1
+    A1 --&gt;| access_token| HC1
+    HC1 --&gt;| Bearer access_token| API1
+
+    HC2 --&gt;|Request token with&lt;br/&gt;ClientID + Secret| A2
+    A2 --&gt;|access_token| HC2
+    HC2 --&gt;|Bearer access_token| API2
+
+    %% Styling
+    classDef worker fill:#fff5e6,stroke:#d2691e,stroke-width:2px;
+    classDef httpClient fill:#e6f3ff,stroke:#0066cc,stroke-width:2px;
+    classDef authority fill:#f0f8ff,stroke:#1e90ff,stroke-width:2px;
+    classDef api fill:#f0fff0,stroke:#228b22,stroke-width:2px;
+    classDef ecosystem fill:#f9f9f9,stroke:#999,stroke-width:1px,stroke-dasharray: 3 3;
+    classDef workerService fill:#fff8dc,stroke:#b8860b,stroke-width:2px,stroke-dasharray: 2 2;
+
+    class W worker;
+    class C1,C2 httpClient;
+    class A1,A2 authority;
+    class API1,API2 api;
+    class G1,G2 ecosystem;
+    class WS workerService;
 </div>
+<h2 id="code-sample">Code sample</h2>
+<p>See code sample in <a href="">Fhi.Samples.WorkerServiceMultipleClients</a> project. </p>
 </div>
 </div><footer>
+<div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
+<a class="btn btn-neutral float-left" href="../manual-token-request/" title="Manual client credential token request"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+<a class="btn btn-neutral float-right" href="../../../code-lab/client-credentials/webserver-host-sample/" title="Using IHttpClientFactory and Duende AccessToken Management">Next <span class="icon icon-circle-arrow-right"></span></a>
+</div>
 <hr/>
 <div role="contentinfo">
 <!-- Copyright etc -->
@@ -166,6 +201,8 @@ sequenceDiagram
 <span>
 <a class="fa fa-github" href="https://github.com/FHIDev/Fhi.AuthExtensions" style="color: #fcfcfc"> GitHub</a>
 </span>
+<span><a href="../manual-token-request/" style="color: #fcfcfc">« Previous</a></span>
+<span><a href="../../../code-lab/client-credentials/webserver-host-sample/" style="color: #fcfcfc">Next »</a></span>
 </span>
 </div>
 <script src="../../../js/jquery-3.6.0.min.js"></script>
