@@ -4,6 +4,8 @@ Server-to-server authentication (also called machine to machine or app to app) i
 
 For guidance, see the [Duende documentation on machine-to-machine communication](https://docs.duendesoftware.com/identityserver/tokens/requesting#machine-to-machine-communication).
 
+[Duende Client Credentials](https://docs.duendesoftware.com/accesstokenmanagement/advanced/client-credentials/)
+
 ## Tutorials
 
 | Tutorial                              | Description                                                                 | Link                                               |

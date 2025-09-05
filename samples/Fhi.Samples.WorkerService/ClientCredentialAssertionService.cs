@@ -9,22 +9,23 @@ namespace WorkerService
     internal class ClientCredentialAssertionService : IClientAssertionService
     {
         private readonly IOptionsMonitor<ClientCredentialsClient> _options;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly ClientConfiguration _clientConfiguration;
 
         public ClientCredentialAssertionService(
             IOptionsMonitor<ClientCredentialsClient> options,
-            IOptions<ClientConfiguration> clientConfigurations)
+            IOptions<ClientConfiguration> clientConfigurations,
+            IHttpClientFactory httpClientFactory)
         {
             _options = options;
+            _httpClientFactory = httpClientFactory;
             _clientConfiguration = clientConfigurations.Value;
         }
         public async Task<ClientAssertion?> GetClientAssertionAsync(string? clientName = null, TokenRequestParameters? parameters = null)
         {
-            using var client = new HttpClient();
-            //var options = _options.Get(clientName);
-
-            //Get issuer and token endpoint from discovery document
+            using var client = _httpClientFactory.CreateClient();
             var discovery = await client.GetDiscoveryDocumentAsync(_clientConfiguration.Authority);
+
             var jwt = ClientAssertionTokenHandler.CreateJwtToken(discovery.Issuer!, _clientConfiguration.ClientId, _clientConfiguration.Secret);
 
             return new ClientAssertion
