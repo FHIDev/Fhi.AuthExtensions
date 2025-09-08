@@ -1,4 +1,3 @@
-using Duende.AccessTokenManagement;
 using Duende.IdentityModel;
 using Duende.IdentityModel.Client;
 using Fhi.Authentication.Tokens;
@@ -10,8 +9,8 @@ using WorkerService.Workers;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddHostedService<ClientCredentialDPoPTokenWorkerSample>();
-builder.Services.AddHostedService<ClientCredentialBearerTokenWorkerSample>();
-builder.Services.AddHostedService<ClientCredentialsRefitWorkerSample>();
+//builder.Services.AddHostedService<ClientCredentialBearerTokenWorkerSample>();
+//builder.Services.AddHostedService<ClientCredentialsRefitWorkerSample>();
 
 /***************************************************************************************** 
  * Step 0: Register ClientConfiguration to read client settings from appsettings.json. 
@@ -109,7 +108,7 @@ builder.Services.AddClientCredentialsHttpClient(clientConfiguration.ClientName +
  * Step 2: In order to use asymetric JWK key secret, ClientAssertion, for client credentials flow, we 
  * need to register a service that will handle the creation of the assertion.
  *****************************************************************************************/
-builder.Services.AddTransient<IClientAssertionService, ClientCredentialAssertionService>();
+//builder.Services.AddTransient<IClientAssertionService, ClientCredentialAssertionService>();
 builder.Services.AddDistributedMemoryCache();
 
 var host = builder.Build();

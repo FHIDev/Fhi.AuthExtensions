@@ -38,21 +38,59 @@ internal static partial class Startup
         })
         .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
         {
-            options.Authority = authenticationSettings?.Authority;
-            options.ClientId = authenticationSettings?.ClientId;
-            ////options.ClientSecret = authenticationSettings?.ClientSecret;
-            options.CallbackPath = "/signin-oidc";
-            options.ResponseType = "code";
-            options.EventsType = typeof(BlazorOpenIdConnectEvents);
+            options
+               .WithAuthority(authenticationSettings?.Authority)
+               .WithClientId(authenticationSettings?.ClientId)
+               .WithClientSecret(authenticationSettings?.ClientSecret)
+               .WithCallbackPath("/signin-oidc")
+               .WithResponseType("code")
+               .WithScopes(authenticationSettings?.Scopes?.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>())
+               .OnAuthorizationCodeReceived(context => context.AuthorizationCodeReceivedWithClientAssertionAsync())
+               .OnTokenValidated(async context =>
+               {
+                   var exp = DateTimeOffset.UtcNow.AddSeconds(double.Parse(context.TokenEndpointResponse!.ExpiresIn));
+                   await context.HttpContext.RequestServices
+                       .GetRequiredService<IUserTokenStore>()
+                       .StoreTokenAsync(context.Principal!, new UserToken
+                       {
+                           AccessToken = context.TokenEndpointResponse.AccessToken,
+                           AccessTokenType = context.TokenEndpointResponse.TokenType,
+                           Expiration = exp,
+                           RefreshToken = context.TokenEndpointResponse.RefreshToken,
+                           Scope = context.TokenEndpointResponse.Scope
+                       });
+               })
+               .OnPushAuthorization(context => context.PushAuthorizationWithClientAssertion());
+            //options.Authority = authenticationSettings?.Authority;
+            //options.ClientId = authenticationSettings?.ClientId;
+            //options.ClientSecret = authenticationSettings?.ClientSecret;
+            //options.CallbackPath = "/signin-oidc";
+            //options.ResponseType = "code";
+            //options.Events.OnAuthorizationCodeReceived = context => context.AuthorizationCodeReceivedWithClientAssertionAsync();
+            //options.Events.OnPushAuthorization = context => context.PushAuthorizationWithClientAssertion();
+            //options.Events.OnTokenValidated = async context =>
+            //{
+            //    var exp = DateTimeOffset.UtcNow.AddSeconds(double.Parse(context.TokenEndpointResponse!.ExpiresIn));
+            //    await context.HttpContext.RequestServices
+            //        .GetRequiredService<IUserTokenStore>()
+            //        .StoreTokenAsync(context.Principal!, new UserToken
+            //        {
+            //            AccessToken = context.TokenEndpointResponse.AccessToken,
+            //            AccessTokenType = context.TokenEndpointResponse.TokenType,
+            //            Expiration = exp,
+            //            RefreshToken = context.TokenEndpointResponse.RefreshToken,
+            //            Scope = context.TokenEndpointResponse.Scope
+            //        });
+            //};
 
-            options.Scope.Clear();
-            if (!string.IsNullOrWhiteSpace(authenticationSettings?.Scopes))
-            {
-                foreach (var scope in authenticationSettings.Scopes.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                {
-                    options.Scope.Add(scope);
-                }
-            }
+            //options.Scope.Clear();
+            //if (!string.IsNullOrWhiteSpace(authenticationSettings?.Scopes))
+            //{
+            //    foreach (var scope in authenticationSettings.Scopes.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            //    {
+            //        options.Scope.Add(scope);
+            //    }
+            //}
         });
 
         /*****************************************************************************************************************************
@@ -62,7 +100,6 @@ internal static partial class Startup
         builder.Services.AddOpenIdConnectCookieOptions();
         builder.Services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>, DefaultOpenIdConnectOptions>();
 
-        builder.Services.AddTransient<BlazorOpenIdConnectEvents>();
 
         /**************************************************************************************************************************************************
          * Handling downstream API call with client assertions.                                                                   *
@@ -79,7 +116,10 @@ internal static partial class Startup
         * in in another persistent secure storage available for the downstream API call                                                                   *
         /**************************************************************************************************************************************************/
         builder.Services.AddDistributedMemoryCache();
-        builder.Services.AddOpenIdConnectAccessTokenManagement()
+        builder.Services.AddOpenIdConnectAccessTokenManagement(options =>
+        {
+            options.DPoPJsonWebKey = authenticationSettings?.ClientSecret;
+        })
         .AddBlazorServerAccessTokenManagement<InMemoryUserTokenStore>();
 
         builder.Services.AddScoped<HealthRecordService>();
@@ -151,5 +191,6 @@ internal static partial class Startup
 
         return app;
     }
+
 
 }

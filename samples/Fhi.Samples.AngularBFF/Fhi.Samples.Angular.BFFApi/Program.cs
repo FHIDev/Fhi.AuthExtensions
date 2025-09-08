@@ -79,7 +79,8 @@ builder.Services.AddAuthentication(options =>
     options.Scope.Clear();
     options.Scope.Add("openid");
     options.Scope.Add("offline_access");
-    options.Scope.Add("fhi:authextensions.samples/access");
+    //options.Scope.Add("fhi:authextensions.samples/access");
+    options.Scope.Add("fhi:webapi/access");
 });
 builder.Services.AddOpenIdConnectCookieOptions();
 builder.Services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>, DefaultOpenIdConnectOptions>();
@@ -92,7 +93,9 @@ builder.Services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>, Defau
 builder.Services.AddOpenIdConnectAccessTokenManagement(options =>
 {
     options.RefreshBeforeExpiration = TimeSpan.FromSeconds(10);
-    options.ChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+    //options.ChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+    //Will create DPoP tokens for access token requests if DPoPJsonWebKey is set 
+    options.DPoPJsonWebKey = authenticationSettings?.ClientSecret;
 });
 
 /**************************************************************************************
@@ -186,7 +189,7 @@ app.MapControllers();
 * routing and the backend serves the initial HTML file.
 ************************************************************************************************/
 app.MapFallbackToFile("/index.html")
-    .AllowAnonymous(); 
+    .AllowAnonymous();
 
 app.Run();
 

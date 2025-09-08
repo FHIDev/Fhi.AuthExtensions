@@ -35,12 +35,13 @@ builder.Services
 var api1Config = api1Section.Get<ApiClientSample1>();
 builder.Services
     .AddOptions<ClientCredentialsClient>(api1Config!.ClientName)
-    .Configure<DefaultOidcDiscoveryService>(async (options, discoveryService) =>
+    .Configure<IOidcDiscoveryService>((options, discoveryService) =>
     {
-        var metadata = await discoveryService.GetDiscoveryDocument(api1Config!.ClientAuthentication.Authority);
-        options.TokenEndpoint = metadata?.TokenEndpoint;
+        var metadata = discoveryService.GetDiscoveryDocument(api1Config!.ClientAuthentication.Authority).GetAwaiter().GetResult();
+        options.TokenEndpoint = metadata.TokenEndpoint;
         options.ClientId = api1Config.ClientAuthentication.ClientId;
         options.Scope = api1Config.ClientAuthentication.Scope;
+        options.DPoPJsonWebKey = api1Config.ClientAuthentication.Secret;
         options.Parameters = new Parameters()
         {
             { OidcConstants.TokenRequest.ClientAssertionType, OidcConstants.ClientAssertionTypes.JwtBearer },
@@ -70,9 +71,9 @@ builder.Services.AddOptions<ApiClientSample2>()
 var api2Config = api2Section.Get<ApiClientSample2>();
 builder.Services
     .AddOptions<ClientCredentialsClient>(api2Config!.ClientName)
-    .Configure<DefaultOidcDiscoveryService>(async (options, discoveryService) =>
+    .Configure<IOidcDiscoveryService>((options, discoveryService) =>
     {
-        var metadata = await discoveryService.GetDiscoveryDocument(api2Config!.ClientAuthentication!.Authority);
+        var metadata = discoveryService.GetDiscoveryDocument(api2Config!.ClientAuthentication!.Authority).GetAwaiter().GetResult();
         options.TokenEndpoint = metadata?.TokenEndpoint;
         options.ClientId = api2Config.ClientAuthentication.ClientId;
         options.Scope = api2Config.ClientAuthentication.Scope;

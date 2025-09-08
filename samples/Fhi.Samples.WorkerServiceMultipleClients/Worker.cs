@@ -24,10 +24,11 @@ namespace Fhi.Samples.WorkerServiceMultipleClients
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var api1Client = _factory.CreateClient(_optionsApi1.Value.ClientName);
-            var responseApi1 = await api1Client.GetAsync("api/v1/xxx");
+            //var responseApi1 = await api1Client.GetAsync("api/v2/integration/health-records");
+            var responseApi1 = await api1Client.GetAsync("weatherforecast");
 
             var api2Client = _factory.CreateClient(_optionsApi2.Value.ClientName);
-            var responseApi2 = await api2Client.GetAsync("api/v1/yyy");
+            var responseApi2 = await api2Client.GetAsync("api/v1/integration/health-records");
 
             while (!stoppingToken.IsCancellationRequested)
             {
