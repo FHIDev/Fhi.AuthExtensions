@@ -1,4 +1,5 @@
-﻿using Fhi.Authentication.OpenIdConnect;
+﻿using Duende.AccessTokenManagement.OpenIdConnect;
+using Fhi.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -18,7 +19,7 @@ namespace Fhi.Authentication
         public static IServiceCollection AddOpenIdConnectCookieOptions(this IServiceCollection services)
         {
             services.AddTransient<OpenIdConnectCookieEventsForApi>();
-            services.AddTransient<ITokenService, DefaultTokenService>();
+            services.AddTransient<IUserTokenEndpointService, UserTokenEndpointService>();
             services.AddSingleton<IPostConfigureOptions<CookieAuthenticationOptions>, OpenIdConnectCookieAuthenticationOptions>();
 
             return services;
