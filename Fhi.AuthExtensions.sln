@@ -42,9 +42,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Samples.BlazorInteracti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Samples.WebApi", "samples\Fhi.Samples.WebApi\Fhi.Samples.WebApi.csproj", "{01B67BBE-6A7D-D850-E162-18DBE690CC22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Samples.WorkerService", "samples\Fhi.Samples.WorkerService\Fhi.Samples.WorkerService.csproj", "{9D4E0177-BD4F-312F-3848-814EF034FCAC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Samples.WorkerServiceMultipleClients", "samples\Fhi.Samples.WorkerServiceMultipleClients\Fhi.Samples.WorkerServiceMultipleClients.csproj", "{A348BAF8-717E-4216-826E-38CF1833D8DD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Samples.ClientCredentialsWorkers", "samples\Fhi.Samples.WorkerServiceMultipleClients\Fhi.Samples.ClientCredentialsWorkers.csproj", "{A348BAF8-717E-4216-826E-38CF1833D8DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,10 +88,6 @@ Global
 		{01B67BBE-6A7D-D850-E162-18DBE690CC22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01B67BBE-6A7D-D850-E162-18DBE690CC22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01B67BBE-6A7D-D850-E162-18DBE690CC22}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9D4E0177-BD4F-312F-3848-814EF034FCAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9D4E0177-BD4F-312F-3848-814EF034FCAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9D4E0177-BD4F-312F-3848-814EF034FCAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9D4E0177-BD4F-312F-3848-814EF034FCAC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A348BAF8-717E-4216-826E-38CF1833D8DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A348BAF8-717E-4216-826E-38CF1833D8DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A348BAF8-717E-4216-826E-38CF1833D8DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -113,7 +107,6 @@ Global
 		{0C1902EB-9D39-D424-4D5A-6F842490C576} = {95D7F6A2-3153-4DEA-A5B2-99FB116ECED7}
 		{D6DF8F04-3458-ECA8-244B-F678F02283B9} = {E1C34547-3ACD-4E54-BB6A-3E5DCBFFFF02}
 		{01B67BBE-6A7D-D850-E162-18DBE690CC22} = {E1C34547-3ACD-4E54-BB6A-3E5DCBFFFF02}
-		{9D4E0177-BD4F-312F-3848-814EF034FCAC} = {E1C34547-3ACD-4E54-BB6A-3E5DCBFFFF02}
 		{A348BAF8-717E-4216-826E-38CF1833D8DD} = {E1C34547-3ACD-4E54-BB6A-3E5DCBFFFF02}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

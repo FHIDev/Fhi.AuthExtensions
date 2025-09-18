@@ -18,7 +18,7 @@ internal static partial class Startup
     internal static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
     {
         var authenticationSettingsSection = builder.Configuration.GetSection("Authentication");
-        builder.Services.Configure<AuthenticationSettings>(authenticationSettingsSection);
+        builder.Services.AddOptions<AuthenticationSettings>().Bind(authenticationSettingsSection).ValidateOnStart();
         var authenticationSettings = authenticationSettingsSection.Get<AuthenticationSettings>();
 
         builder.Services.AddAuthentication(options =>
@@ -38,59 +38,35 @@ internal static partial class Startup
         })
         .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
         {
-            options
-               .WithAuthority(authenticationSettings?.Authority)
-               .WithClientId(authenticationSettings?.ClientId)
-               .WithClientSecret(authenticationSettings?.ClientSecret)
-               .WithCallbackPath("/signin-oidc")
-               .WithResponseType("code")
-               .WithScopes(authenticationSettings?.Scopes?.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>())
-               .OnAuthorizationCodeReceived(context => context.AuthorizationCodeReceivedWithClientAssertionAsync())
-               .OnTokenValidated(async context =>
-               {
-                   var exp = DateTimeOffset.UtcNow.AddSeconds(double.Parse(context.TokenEndpointResponse!.ExpiresIn));
-                   await context.HttpContext.RequestServices
-                       .GetRequiredService<IUserTokenStore>()
-                       .StoreTokenAsync(context.Principal!, new UserToken
-                       {
-                           AccessToken = context.TokenEndpointResponse.AccessToken,
-                           AccessTokenType = context.TokenEndpointResponse.TokenType,
-                           Expiration = exp,
-                           RefreshToken = context.TokenEndpointResponse.RefreshToken,
-                           Scope = context.TokenEndpointResponse.Scope
-                       });
-               })
-               .OnPushAuthorization(context => context.PushAuthorizationWithClientAssertion());
-            //options.Authority = authenticationSettings?.Authority;
-            //options.ClientId = authenticationSettings?.ClientId;
-            //options.ClientSecret = authenticationSettings?.ClientSecret;
-            //options.CallbackPath = "/signin-oidc";
-            //options.ResponseType = "code";
-            //options.Events.OnAuthorizationCodeReceived = context => context.AuthorizationCodeReceivedWithClientAssertionAsync();
-            //options.Events.OnPushAuthorization = context => context.PushAuthorizationWithClientAssertion();
-            //options.Events.OnTokenValidated = async context =>
-            //{
-            //    var exp = DateTimeOffset.UtcNow.AddSeconds(double.Parse(context.TokenEndpointResponse!.ExpiresIn));
-            //    await context.HttpContext.RequestServices
-            //        .GetRequiredService<IUserTokenStore>()
-            //        .StoreTokenAsync(context.Principal!, new UserToken
-            //        {
-            //            AccessToken = context.TokenEndpointResponse.AccessToken,
-            //            AccessTokenType = context.TokenEndpointResponse.TokenType,
-            //            Expiration = exp,
-            //            RefreshToken = context.TokenEndpointResponse.RefreshToken,
-            //            Scope = context.TokenEndpointResponse.Scope
-            //        });
-            //};
+            options.Authority = authenticationSettings?.Authority;
+            options.ClientId = authenticationSettings?.ClientId;
+            options.CallbackPath = "/signin-oidc";
+            options.ResponseType = "code";
+            options.Events.OnAuthorizationCodeReceived = context => context.AuthorizationCodeReceivedWithClientAssertionAsync(authenticationSettings!.ClientSecret);
+            options.Events.OnPushAuthorization = context => context.PushAuthorizationWithClientAssertion(authenticationSettings!.ClientSecret);
+            options.Events.OnTokenValidated = async context =>
+            {
+                var exp = DateTimeOffset.UtcNow.AddSeconds(double.Parse(context.TokenEndpointResponse!.ExpiresIn));
+                await context.HttpContext.RequestServices
+                    .GetRequiredService<IUserTokenStore>()
+                    .StoreTokenAsync(context.Principal!, new UserToken
+                    {
+                        AccessToken = context.TokenEndpointResponse.AccessToken,
+                        AccessTokenType = context.TokenEndpointResponse.TokenType,
+                        Expiration = exp,
+                        RefreshToken = context.TokenEndpointResponse.RefreshToken,
+                        Scope = context.TokenEndpointResponse.Scope
+                    });
+            };
 
-            //options.Scope.Clear();
-            //if (!string.IsNullOrWhiteSpace(authenticationSettings?.Scopes))
-            //{
-            //    foreach (var scope in authenticationSettings.Scopes.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-            //    {
-            //        options.Scope.Add(scope);
-            //    }
-            //}
+            options.Scope.Clear();
+            if (!string.IsNullOrWhiteSpace(authenticationSettings?.Scopes))
+            {
+                foreach (var scope in authenticationSettings.Scopes.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    options.Scope.Add(scope);
+                }
+            }
         });
 
         /*****************************************************************************************************************************
@@ -128,16 +104,6 @@ internal static partial class Startup
             parameters: new UserTokenRequestParameters()
             {
                 SignInScheme = OpenIdConnectDefaults.AuthenticationScheme,
-                /******************************************************************************************
-                 * Optionally clientAssertion can be set as parameter or it will by default use IClientAssertionService
-                 *****************************************************************************************/
-                //Assertion = new ClientAssertion
-                //{
-                //    Type = OidcConstants.ClientAssertionTypes.JwtBearer,
-                //    Value = ClientAssertionTokenHandler.CreateJwtToken(authenticationSettings?.ClientId,
-                //        "issuer", //Manually set issuer or use the discovery document
-                //        authenticationSettings.ClientSecret)
-                //}
             },
             configureClient: client =>
             {

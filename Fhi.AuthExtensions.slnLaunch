@@ -17,27 +17,14 @@
     ]
   },
   {
-    "Name": "Worker and API",
+    "Name": "Worker And API",
     "Projects": [
       {
         "Path": "samples\\Fhi.Samples.WebApi\\Fhi.Samples.WebApi.csproj",
         "Action": "Start"
       },
       {
-        "Path": "samples\\Fhi.Samples.WorkerService\\Fhi.Samples.WorkerService.csproj",
-        "Action": "Start"
-      }
-    ]
-  },
-  {
-    "Name": "Multiple client Worker And API",
-    "Projects": [
-      {
-        "Path": "samples\\Fhi.Samples.WebApi\\Fhi.Samples.WebApi.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "samples\\Fhi.Samples.WorkerServiceMultipleClients\\Fhi.Samples.WorkerServiceMultipleClients.csproj",
+        "Path": "samples\\Fhi.Samples.WorkerServiceMultipleClients\\Fhi.Samples.ClientCredentialsWorkers.csproj",
         "Action": "Start"
       }
     ]

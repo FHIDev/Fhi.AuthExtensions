@@ -33,7 +33,6 @@ builder.Services.AddAuthentication(options =>
 {
     options.Authority = authenticationSettings!.Authority;
     options.ClientId = authenticationSettings.ClientId;
-    options.ClientSecret = authenticationSettings.ClientSecret;
     options.CallbackPath = "/signin-oidc";
     options.ResponseType = "code";
 
@@ -70,8 +69,8 @@ builder.Services.AddAuthentication(options =>
      * the authorization code flow with client assertion. This is required when using the client assertion
      * flow for authorization code exchange.
      *********************************************************************************************/
-    options.Events.OnAuthorizationCodeReceived = context => context.AuthorizationCodeReceivedWithClientAssertionAsync();
-    options.Events.OnPushAuthorization = context => context.PushAuthorizationWithClientAssertion();
+    options.Events.OnAuthorizationCodeReceived = context => context.AuthorizationCodeReceivedWithClientAssertionAsync(authenticationSettings.ClientSecret);
+    options.Events.OnPushAuthorization = context => context.PushAuthorizationWithClientAssertion(authenticationSettings.ClientSecret);
 
     /*********************************************************************************************
      * The code below is claims and scope handling that will vary from application to application.

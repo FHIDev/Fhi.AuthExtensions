@@ -54,6 +54,7 @@ builder.Services
         options.Scope = clientConfiguration.Scope;
         //Can use existing secret as key or generate a new key for DPoP proof
         options.DPoPJsonWebKey = clientConfiguration.Secret;
+        options.
         options.Parameters = new Parameters()
         {
             { OidcConstants.TokenRequest.ClientAssertionType, OidcConstants.ClientAssertionTypes.JwtBearer },
