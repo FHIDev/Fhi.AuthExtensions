@@ -66,10 +66,13 @@ namespace Fhi.Auth.IntegrationTests
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             var document = (await response.Content.ReadAsStringAsync()).Deserialize<DiscoveryDocument>();
-            Assert.That(document!.Issuer, Is.EqualTo("https://helseid-sts.test.nhn.no"));
-            Assert.That(document!.Authority, Is.EqualTo(authority));
-            Assert.That(document!.UserInfoEndpoint, Is.EqualTo("https://helseid-sts.test.nhn.no/connect/userinfo"));
-            Assert.That(document!.JwksUri, Is.EqualTo("https://helseid-sts.test.nhn.no/.well-known/openid-configuration/jwks"));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(document!.Issuer, Is.EqualTo("https://helseid-sts.test.nhn.no"));
+                Assert.That(document!.Authority, Is.EqualTo(authority));
+                Assert.That(document!.UserInfoEndpoint, Is.EqualTo("https://helseid-sts.test.nhn.no/connect/userinfo"));
+                Assert.That(document!.JwksUri, Is.EqualTo("https://helseid-sts.test.nhn.no/.well-known/openid-configuration/jwks"));
+            }
         }
 
         [Test]
@@ -93,7 +96,7 @@ namespace Fhi.Auth.IntegrationTests
 
             Assert.That(helseIdAuthorityResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             var documents = (await helseIdAuthorityResponse.Content.ReadAsStringAsync()).Deserialize<List<DiscoveryDocument>>();
-            Assert.That(documents!.Count, Is.EqualTo(2));
+            Assert.That(documents!, Has.Count.EqualTo(2));
 
             var helseIdDocument = documents.FirstOrDefault(d => d.Authority == helseIdAuthority);
             Assert.That(helseIdDocument!.Issuer, Is.EqualTo("https://helseid-sts.test.nhn.no"));
@@ -142,9 +145,9 @@ namespace Fhi.Auth.IntegrationTests
     internal class InMemoryDiscoveryDocumentServiceTestBuilder
     {
         private readonly WebApplicationBuilder _builder;
-        private readonly List<DiscoveryDocumentStoreOptions> _authorities = new();
+        private readonly List<DiscoveryDocumentStoreOptions> _authorities = [];
         private FakeLoggerProvider? _logProvider;
-        private readonly List<Action<WebApplication>> _endpoints = new();
+        private readonly List<Action<WebApplication>> _endpoints = [];
 
         public InMemoryDiscoveryDocumentServiceTestBuilder()
         {

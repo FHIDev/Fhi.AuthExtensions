@@ -46,17 +46,19 @@ internal static partial class Startup
             options.Events.OnPushAuthorization = context => context.PushAuthorizationWithClientAssertion(authenticationSettings!.ClientSecret);
             options.Events.OnTokenValidated = async context =>
             {
-                var exp = DateTimeOffset.UtcNow.AddSeconds(double.Parse(context.TokenEndpointResponse!.ExpiresIn));
-                await context.HttpContext.RequestServices
+                if (context != null)
+                {
+                    await context.HttpContext.RequestServices
                     .GetRequiredService<IUserTokenStore>()
                     .StoreTokenAsync(context.Principal!, new UserToken
                     {
-                        AccessToken = context.TokenEndpointResponse.AccessToken,
-                        AccessTokenType = context.TokenEndpointResponse.TokenType,
-                        Expiration = exp,
-                        RefreshToken = context.TokenEndpointResponse.RefreshToken,
-                        Scope = context.TokenEndpointResponse.Scope
+                        AccessToken = context.TokenEndpointResponse?.AccessToken,
+                        AccessTokenType = context.TokenEndpointResponse?.TokenType,
+                        Expiration = context.TokenEndpointResponse != null ? DateTimeOffset.UtcNow.AddSeconds(double.Parse(context.TokenEndpointResponse.ExpiresIn)) : default,
+                        RefreshToken = context.TokenEndpointResponse?.RefreshToken,
+                        Scope = context.TokenEndpointResponse?.Scope
                     });
+                }
             };
             options.MapInboundClaims = false;
             options.Scope.Clear();

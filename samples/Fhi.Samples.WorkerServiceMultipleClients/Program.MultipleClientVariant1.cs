@@ -1,6 +1,7 @@
 ﻿using Duende.AccessTokenManagement;
 using Fhi.Authentication;
 using Fhi.Authentication.OpenIdConnect;
+using Fhi.Samples.ClientCredentialsWorkers.Oidc;
 using Fhi.Samples.WorkerServiceMultipleClients.MultipleClientVariant1;
 using Fhi.Samples.WorkerServiceMultipleClients.MultipleClientVariant1.Configurations;
 using Fhi.Samples.WorkerServiceMultipleClients.Oidc;
