@@ -43,7 +43,8 @@ namespace Fhi.Samples.WorkerServiceMultipleClients.MultipleClientVariant2
                 _logger.LogInformation("Response: {response}", responseApi2);
 
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                await Task.Delay(10000, stoppingToken);
+
+                await Task.Delay(5000, stoppingToken);
             }
         }
     }

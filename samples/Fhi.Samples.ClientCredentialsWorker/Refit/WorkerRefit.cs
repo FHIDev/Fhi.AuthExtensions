@@ -25,6 +25,8 @@ namespace Fhi.Samples.WorkerServiceMultipleClients.Refit
                 var helseIdBearerResponse = await api1Client.GetAsync("api/v1/integration/health-records/helseid-bearer");
                 _logger.LogInformation("Request: {req}", helseIdBearerResponse.RequestMessage);
                 _logger.LogInformation("Response: {response}", helseIdBearerResponse);
+
+                await Task.Delay(5000, stoppingToken);
             }
         }
     }
