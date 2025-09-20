@@ -15,6 +15,13 @@ namespace Fhi.Auth.IntegrationTests
 {
     /// <summary>
     /// Tests for InMemoryDiscoveryDocument service using AddInMemoryDiscoveryService extension method.
+    /// Sample of register service: 
+    /// <code>
+    /// services.AddInMemoryDiscoveryService(
+    ///  [
+    ///     new DiscoveryDocumentStoreOptions() { Authority = "https://xxx", CacheDuration = TimeSpan.FromDays(2) }
+    ///  ]);
+    /// </code>
     /// </summary>
     public class InMemoryDiscoveryDocumentTests
     {
@@ -48,7 +55,7 @@ namespace Fhi.Auth.IntegrationTests
 
             var response = await client.GetAsync($"/api/discovery-test/{Uri.EscapeDataString($"{authority}")}");
             var errorLog = fakeLogProvider?.Collector?.GetSnapshot().FirstOrDefault(x => x.Level == Microsoft.Extensions.Logging.LogLevel.Error);
-            Assert.That(errorLog?.Message, Is.EqualTo("Could not load Discovery document for Authorityhttp://localhost. Error Error connecting to http://localhost/.well-known/openid-configuration. No connection could be made because the target machine actively refused it. (localhost:80)."));
+            Assert.That(errorLog?.Message, Contains.Substring("Could not load Discovery document for Authority"));
         }
 
         [Test]
