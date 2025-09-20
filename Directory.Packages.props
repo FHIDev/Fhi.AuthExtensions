@@ -13,6 +13,7 @@
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.5" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
     <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.8" />
+	<PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.6.0" />
     <PackageVersion Include="Microsoft.IdentityModel.Protocols" Version="8.5.0" />
     <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.5.0" />
     <PackageVersion Include="Microsoft.IdentityModel.Tokens" Version="8.12.0" />

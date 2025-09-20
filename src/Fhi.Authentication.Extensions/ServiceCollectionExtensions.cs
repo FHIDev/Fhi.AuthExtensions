@@ -1,7 +1,6 @@
 ﻿using Fhi.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Fhi.Authentication
@@ -30,26 +29,42 @@ namespace Fhi.Authentication
         /// Use IDiscoveryDocumentStore to retrieve discovery documents.
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="authorities"></param>
+        /// <param name="options"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>
         public static IServiceCollection AddInMemoryDiscoveryService(
            this IServiceCollection services,
-           IEnumerable<string> authorities)
+           IEnumerable<DiscoveryDocumentStoreOptions> options)
         {
-            var authorityList = authorities.Distinct().ToList();
-            if (!authorityList.Any())
-                throw new ArgumentException("At least one authority must be provided.", nameof(authorities));
-
-            services.AddHttpClient();
-            services.TryAddSingleton<IDiscoveryDocumentStore>(sp =>
+            foreach (var authority in options)
             {
-                var factory = sp.GetRequiredService<IHttpClientFactory>();
-                return new InMemoryDiscoveryDocumentStore(factory, authorityList);
-            });
+                services.AddOptions<DiscoveryDocumentStoreOptions>(authority.Authority)
+                  .Configure(options =>
+                  {
+                      options.Authority = authority.Authority;
+                      options.CacheDuration = authority.CacheDuration;
+                  });
+            }
+
+            services.AddMemoryCache();
+            services.AddHttpClient();
+            services.AddSingleton<IDiscoveryDocumentStore, InMemoryDiscoveryDocumentStore>();
+            //services.TryAddSingleton<IDiscoveryDocumentStore>(sp =>
+            //{
+            //    var factory = sp.GetRequiredService<IHttpClientFactory>();
+            //    return new InMemoryDiscoveryDocumentStore(factory, authorityList);
+            //});
 
             return services;
+        }
+
+        public static IServiceCollection AddInMemoryDiscoveryService(
+               this IServiceCollection services,
+               IEnumerable<string> authorities)
+        {
+            return services.AddInMemoryDiscoveryService(
+                authorities.Select(a => new DiscoveryDocumentStoreOptions { Authority = a }));
         }
     }
 }

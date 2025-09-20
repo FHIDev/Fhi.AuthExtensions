@@ -58,7 +58,7 @@ internal static partial class Startup
                         Scope = context.TokenEndpointResponse.Scope
                     });
             };
-
+            options.MapInboundClaims = false;
             options.Scope.Clear();
             if (!string.IsNullOrWhiteSpace(authenticationSettings?.Scopes))
             {

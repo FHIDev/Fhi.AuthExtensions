@@ -16,7 +16,6 @@ public partial class Program
            {
                IConfiguration configuration = context.Configuration;
 
-               services.AddClientCredentialsTokenManagement();
                services.AddDistributedMemoryCache();
                services.AddTransient<IClientAssertionService, OidcClientAssertionService>();
                services.AddHostedService<WorkerMultipleClientVariant2>();
@@ -71,6 +70,7 @@ public partial class Program
                  && !string.IsNullOrWhiteSpace(clientCredential.TokenEndpoint),
                  failureMessage: "ClientId and TokenEndpoint must be provided and not empty."
              );
+
 
         /***********************************************************************************************
          * Register HttpClient and connect the token client to be used for authentiation
