@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Fhi.Samples.BlazorInteractiveServer.Services
+namespace Client.BlazorInteractiveServer.Services
 {
     public class ServiceResult<T>
     {
