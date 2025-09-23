@@ -9,7 +9,7 @@ namespace Fhi.Authentication.OpenIdConnect
     // TODO: Need to go through this. Copied from HelseId samples and Duende. Should we handle multiple algorithms?
     // need to figure out what algs, size etc. to support
 
-    internal static class DPoPProofGenerator
+    public static class DPoPProofGenerator
     {
         /// <summary>
         /// 
