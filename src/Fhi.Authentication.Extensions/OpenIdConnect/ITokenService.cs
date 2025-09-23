@@ -1,39 +1,59 @@
-﻿using Duende.AccessTokenManagement.OpenIdConnect;
+using Duende.IdentityModel.Client;
+using Fhi.Authentication.Setup;
 using Microsoft.Extensions.Logging;
 
 namespace Fhi.Authentication.OpenIdConnect
 {
-    /// <summary>
-    /// Response for token validation.
-    /// </summary>
-    /// <param name="IsError"></param>
-    public record TokenResponse(bool IsError = false);
-    /// <summary>
-    /// Abstraction for token service.
-    /// TODO: response should be improved
-    /// </summary>
+    public record TokenResponse(string? AccessToken, bool IsError, string? ErrorDescription);
     public interface ITokenService
     {
         /// <summary>
-        /// Refresh access token.
+        /// Create DPoP token
         /// </summary>
-        /// <param name="refreshToken"></param>
+        /// <param name="authority">The OpenId connectprovider authority Url</param>
+        /// <param name="clientId">Client Identifier</param>
+        /// <param name="jwk">The private json web key for client assertion</param>
+        /// <param name="scopes">Separated list of scopes</param>
+        /// <param name="dPopJwk">The private json web key for DPoP</param>
         /// <returns></returns>
-        Task<TokenResponse> RefreshAccessTokenAsync(string refreshToken);
+        public Task<TokenResponse> RequestDPoPToken(string authority, string clientId, string jwk, string scopes, string dPopJwk);
     }
 
-    internal class DefaultTokenService(IUserTokenEndpointService UserTokenEndpointService, ILogger<DefaultTokenService> Logger) : ITokenService
+    public class TokenService(
+        ILogger<TokenService> Logger,
+        IHttpClientFactory HttpClientFactory) : ITokenService
     {
-        public async Task<TokenResponse> RefreshAccessTokenAsync(string refreshToken)
+        public async Task<TokenResponse> RequestDPoPToken(
+            string authority,
+            string clientId,
+            string jwk,
+            string scopes,
+            string dPopJwk)
         {
-            var userToken = await UserTokenEndpointService.RefreshAccessTokenAsync(new UserToken() { RefreshToken = refreshToken }, new UserTokenRequestParameters());
-            if (userToken.IsError)
+            var client = HttpClientFactory.CreateClient();
+            Logger.LogInformation("Get metadata from discovery endpoint from Authority {@Authority}", authority);
+            var discovery = await client.GetDiscoveryDocumentAsync(authority);
+            if (discovery is not null && !discovery.IsError && discovery.Issuer is not null && discovery.TokenEndpoint is not null)
             {
-                Logger.LogError(message: userToken.Error);
-                return new TokenResponse(true);
+                var response = await client.RequestTokenWithDPoP(discovery, clientId, jwk, scopes, dPopJwk);
+
+                if (response.IsError &&
+                    response.Error == "use_dpop_nonce" &&
+                    response.HttpResponse?.Headers.Contains("DPoP-Nonce") == true)
+                {
+                    var nonce = response.HttpResponse.Headers.GetValues("DPoP-Nonce").FirstOrDefault();
+                    if (!string.IsNullOrEmpty(nonce))
+                    {
+                        response = await client.RequestTokenWithDPoP(discovery, clientId, jwk, scopes, dPopJwk, nonce);
+                    }
+                }
+
+                return response.IsError ?
+                    new TokenResponse(null, true, response.ErrorDescription) :
+                    new TokenResponse(response.AccessToken, false, string.Empty);
             }
 
-            return new TokenResponse();
+            return new TokenResponse(null, true, discovery is null ? "No discovery document" : discovery.Error);
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Globalization;
+using Duende.AccessTokenManagement.OpenIdConnect;
 
 namespace Fhi.Authentication.OpenIdConnect
 {
@@ -44,8 +45,8 @@ namespace Fhi.Authentication.OpenIdConnect
                 var expiresAt = DateTimeOffset.Parse(tokens.SingleOrDefault(t => t.Name == ExpiresAt)?.Value ?? string.Empty, CultureInfo.InvariantCulture);
                 if (expiresAt <= DateTimeOffset.UtcNow)
                 {
-                    var tokenService = context.HttpContext.RequestServices.GetRequiredService<ITokenService>();
-                    var refreshedTokens = await tokenService.RefreshAccessTokenAsync(refreshToken.Value);
+                    var userTokenEndpointService  = context.HttpContext.RequestServices.GetRequiredService<IUserTokenEndpointService>();
+                    var refreshedTokens = await userTokenEndpointService.RefreshAccessTokenAsync(new UserToken() { RefreshToken = refreshToken.Value }, new UserTokenRequestParameters());
                     if (refreshedTokens.IsError)
                     {
                         return new TokenValidationResponse(true, TokenValidationErrorCodes.ExpiredRefreshToken, "Refresh token is expired. Rejecting principal so that the user can re-authenticate");

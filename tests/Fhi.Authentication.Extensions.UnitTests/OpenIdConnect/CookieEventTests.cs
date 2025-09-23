@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System.Security.Claims;
+using Duende.AccessTokenManagement.OpenIdConnect;
 
 namespace Fhi.Authentication.Extensions.UnitTests.OpenIdConnect
 {
@@ -121,11 +122,14 @@ namespace Fhi.Authentication.Extensions.UnitTests.OpenIdConnect
     {
         private readonly List<AuthenticationToken> _tokens = [];
         private bool _isAuthenticated = true;
-        private static readonly ITokenService _tokenService = Substitute.For<ITokenService>();
+        private readonly IUserTokenEndpointService _userTokenEndpointService = Substitute.For<IUserTokenEndpointService>();
 
         public CookieContextBuilder WithRefreshAccessTokenError(bool isError)
         {
-            _tokenService.RefreshAccessTokenAsync(Arg.Any<string>()).Returns(Task.FromResult(new TokenResponse(isError)));
+            var userToken = isError ? new UserToken { Error = "invalid_grant" } : new UserToken();
+            _userTokenEndpointService
+                .RefreshAccessTokenAsync(Arg.Any<UserToken>(), Arg.Any<UserTokenRequestParameters>())
+                .Returns(Task.FromResult(userToken));
             return this;
         }
 
@@ -150,18 +154,10 @@ namespace Fhi.Authentication.Extensions.UnitTests.OpenIdConnect
             var principal = new ClaimsPrincipal(identity);
             var props = new AuthenticationProperties();
             props.StoreTokens(_tokens);
-            DefaultHttpContext httpContext;
-            if (_tokenService != null)
-            {
-                var services = new ServiceCollection();
-                services.AddSingleton<ITokenService>(_tokenService);
-                var serviceProvider = services.BuildServiceProvider();
-                httpContext = new DefaultHttpContext { RequestServices = serviceProvider };
-            }
-            else
-            {
-                httpContext = new DefaultHttpContext();
-            }
+            var services = new ServiceCollection();
+            services.AddSingleton(_userTokenEndpointService);
+            var serviceProvider = services.BuildServiceProvider();
+            var httpContext = new DefaultHttpContext { RequestServices = serviceProvider };
             return new CookieValidatePrincipalContext(
                 httpContext,
                 new AuthenticationScheme("oidc", "oidc", typeof(CookieAuthenticationHandler)),

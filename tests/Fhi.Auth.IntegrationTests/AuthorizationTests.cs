@@ -20,7 +20,7 @@ namespace Fhi.Auth.IntegrationTests
         [Test]
         public async Task EndpointWithScopeAuthorization()
         {
-            FakeAuthHandler.TestClaims =
+            Setup.Tests.FakeAuthHandler.TestClaims =
             [
                 new System.Security.Claims.Claim("scope", "fhi:webapi/health-records.read"),
                 new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "Test User")
@@ -31,7 +31,7 @@ namespace Fhi.Auth.IntegrationTests
                 .WithServices(services =>
                 {
                     services.AddAuthentication("Fake")
-                        .AddScheme<AuthenticationSchemeOptions, FakeAuthHandler>("Fake", options => { });
+                        .AddScheme<AuthenticationSchemeOptions, Setup.Tests.FakeAuthHandler>("Fake", options => { });
                     services.AddSingleton<IAuthorizationHandler, ScopeHandler>();
                     services.AddAuthorization();
                 });

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 
-namespace Fhi.Auth.IntegrationTests
+namespace Fhi.Auth.IntegrationTests.Setup
 {
     public partial class Tests
     {
