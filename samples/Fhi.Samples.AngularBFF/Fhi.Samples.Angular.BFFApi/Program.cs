@@ -78,8 +78,7 @@ builder.Services.AddAuthentication(options =>
     options.Scope.Clear();
     options.Scope.Add("openid");
     options.Scope.Add("offline_access");
-    //options.Scope.Add("fhi:authextensions.samples/access");
-    options.Scope.Add("fhi:webapi/access");
+    options.Scope.Add("fhi:authextensions.samples/access");
 });
 builder.Services.AddOpenIdConnectCookieOptions();
 builder.Services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>, DefaultOpenIdConnectOptions>();
