@@ -20,7 +20,7 @@ namespace Fhi.Authentication.OpenIdConnect
         public Task<TokenResponse> RequestDPoPToken(string authority, string clientId, string jwk, string scopes, string dPopJwk);
     }
 
-    internal class TokenService(
+    public class TokenService(
         ILogger<TokenService> Logger,
         IHttpClientFactory HttpClientFactory) : ITokenService
     {
@@ -58,9 +58,9 @@ namespace Fhi.Authentication.OpenIdConnect
         }
     }
 
-    internal static class HttpClientExtensions
+    public static class HttpClientExtensions
     {
-        internal static async Task<Duende.IdentityModel.Client.TokenResponse> RequestTokenWithDPoP(
+        public static async Task<Duende.IdentityModel.Client.TokenResponse> RequestTokenWithDPoP(
           this HttpClient client,
           DiscoveryDocumentResponse discovery,
           string clientId,

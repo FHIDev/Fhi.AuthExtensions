@@ -4,7 +4,7 @@ using System.Text;
 using Duende.IdentityModel;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Fhi.Authentication.OpenIdConnect
+namespace Fhi.Authentication.Tokens
 {
     // TODO: Need to go through this. Copied from HelseId samples and Duende. Should we handle multiple algorithms?
     // need to figure out what algs, size etc. to support
