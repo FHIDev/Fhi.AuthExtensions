@@ -23,5 +23,43 @@ namespace Fhi.Authentication
 
             return services;
         }
+
+        /// <summary>
+        /// Adds an in-memory discovery service for OpenID Connect authorities.
+        /// Use IDiscoveryDocumentStore to retrieve discovery documents.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        public static IServiceCollection AddInMemoryDiscoveryService(
+           this IServiceCollection services,
+           IEnumerable<DiscoveryDocumentStoreOptions> options)
+        {
+            foreach (var authority in options)
+            {
+                services.AddOptions<DiscoveryDocumentStoreOptions>(authority.Authority)
+                  .Configure(options =>
+                  {
+                      options.Authority = authority.Authority;
+                      options.CacheDuration = authority.CacheDuration;
+                  });
+            }
+
+            services.AddMemoryCache();
+            services.AddHttpClient();
+            services.AddSingleton<IDiscoveryDocumentStore, InMemoryDiscoveryDocumentStore>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddInMemoryDiscoveryService(
+               this IServiceCollection services,
+               IEnumerable<string> authorities)
+        {
+            return services.AddInMemoryDiscoveryService(
+                authorities.Select(a => new DiscoveryDocumentStoreOptions { Authority = a }));
+        }
     }
 }

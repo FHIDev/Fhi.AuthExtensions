@@ -13,10 +13,11 @@ namespace Fhi.Authentication.OpenIdConnect
         /// This method is used to create a client assertion for the authorization code flow.
         /// </summary>
         /// <param name="context"></param>
+        /// <param name="privateJwk"></param>
         /// <returns></returns>
-        public static async Task AuthorizationCodeReceivedWithClientAssertionAsync(this AuthorizationCodeReceivedContext context)
+        public static async Task AuthorizationCodeReceivedWithClientAssertionAsync(this AuthorizationCodeReceivedContext context, string privateJwk)
         {
-            await AuthorizationCodeReceivedWithClientAssertionAsync(context, context.Options.ClientId!, context.Options.ClientSecret!);
+            await AuthorizationCodeReceivedWithClientAssertionAsync(context, context.Options.ClientId!, privateJwk);
         }
 
         /// <summary>
@@ -24,29 +25,30 @@ namespace Fhi.Authentication.OpenIdConnect
         /// </summary>
         /// <param name="context"></param>
         /// <param name="clientId"></param>
-        /// <param name="jwk"></param>
+        /// <param name="privateJwk"></param>
         /// <returns></returns>
-        public static async Task AuthorizationCodeReceivedWithClientAssertionAsync(this AuthorizationCodeReceivedContext context, string clientId, string jwk)
+        public static async Task AuthorizationCodeReceivedWithClientAssertionAsync(this AuthorizationCodeReceivedContext context, string clientId, string privateJwk)
         {
             if (context.Options.ConfigurationManager is not null)
             {
                 var discovery = await context.Options.ConfigurationManager.GetConfigurationAsync(default);
 
                 context.TokenEndpointRequest!.ClientAssertionType = ClientAssertionType;
-                context.TokenEndpointRequest.ClientAssertion = ClientAssertionTokenHandler.CreateJwtToken(discovery.Issuer, clientId, jwk);
+                context.TokenEndpointRequest.ClientAssertion = ClientAssertionTokenHandler.CreateJwtToken(discovery.Issuer, clientId, privateJwk);
             }
         }
 
 #if NET9_0
-        
+
         /// <summary>
         /// This method is used to create a client assertion for the authorization code flow.
         /// </summary>
         /// <param name="context"></param>
+        /// <param name="privateJwk"></param>
         /// <returns></returns>
-        public static async Task PushAuthorizationWithClientAssertion(this PushedAuthorizationContext context)
+        public static async Task PushAuthorizationWithClientAssertion(this PushedAuthorizationContext context, string privateJwk)
         {
-            await PushAuthorizationWithClientAssertion(context, context.Options.ClientId!, context.Options.ClientSecret!);
+            await PushAuthorizationWithClientAssertion(context, context.Options.ClientId!, privateJwk);
         }
         /// <summary>
         /// This method is used to create a client assertion for the authorization code flow.

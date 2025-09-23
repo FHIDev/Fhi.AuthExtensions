@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Fhi.Samples.WorkerServiceMultipleClients.Configurations
+namespace Fhi.Samples.WorkerServiceMultipleClients.MultipleClientVariant1.Configurations
 {
     public class ApiClientSample2
     {
@@ -10,7 +10,7 @@ namespace Fhi.Samples.WorkerServiceMultipleClients.Configurations
         public string ClientName => nameof(ApiClientSample2);
 
         [Required]
-        public ClientCredentialsConfiguration? ClientAuthentication { get; set; }
+        public required string OidcClientName { get; set; }
     }
 }
 

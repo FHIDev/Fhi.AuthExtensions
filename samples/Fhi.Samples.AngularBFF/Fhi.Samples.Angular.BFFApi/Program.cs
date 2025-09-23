@@ -33,7 +33,6 @@ builder.Services.AddAuthentication(options =>
 {
     options.Authority = authenticationSettings!.Authority;
     options.ClientId = authenticationSettings.ClientId;
-    options.ClientSecret = authenticationSettings.ClientSecret;
     options.CallbackPath = "/signin-oidc";
     options.ResponseType = "code";
 
@@ -70,8 +69,8 @@ builder.Services.AddAuthentication(options =>
      * the authorization code flow with client assertion. This is required when using the client assertion
      * flow for authorization code exchange.
      *********************************************************************************************/
-    options.Events.OnAuthorizationCodeReceived = context => context.AuthorizationCodeReceivedWithClientAssertionAsync();
-    options.Events.OnPushAuthorization = context => context.PushAuthorizationWithClientAssertion();
+    options.Events.OnAuthorizationCodeReceived = context => context.AuthorizationCodeReceivedWithClientAssertionAsync(authenticationSettings.ClientSecret);
+    options.Events.OnPushAuthorization = context => context.PushAuthorizationWithClientAssertion(authenticationSettings.ClientSecret);
 
     /*********************************************************************************************
      * The code below is claims and scope handling that will vary from application to application.
@@ -92,7 +91,9 @@ builder.Services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>, Defau
 builder.Services.AddOpenIdConnectAccessTokenManagement(options =>
 {
     options.RefreshBeforeExpiration = TimeSpan.FromSeconds(10);
-    options.ChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+    //options.ChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+    //Will create DPoP tokens for access token requests if DPoPJsonWebKey is set 
+    options.DPoPJsonWebKey = authenticationSettings?.ClientSecret;
 });
 
 /**************************************************************************************
@@ -186,7 +187,7 @@ app.MapControllers();
 * routing and the backend serves the initial HTML file.
 ************************************************************************************************/
 app.MapFallbackToFile("/index.html")
-    .AllowAnonymous(); 
+    .AllowAnonymous();
 
 app.Run();
 

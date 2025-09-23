@@ -37,7 +37,7 @@ namespace Fhi.Authentication.Tokens
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub, clientId),
-                new(JwtRegisteredClaimNames.Iat, DateTimeOffset.Now.ToUnixTimeSeconds().ToString()),
+                new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
             };
             var payload = new JwtPayload(clientId, issuer, claims, DateTime.UtcNow, DateTime.UtcNow.AddSeconds(60));

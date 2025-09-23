@@ -8,7 +8,8 @@
     <PackageReference Include="coverlet.collector" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit.Analyzers">
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" />
+	<PackageReference Include="NUnit.Analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -18,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Fhi.Authorization.Extensions\Fhi.Authorization.Extensions.csproj" />
+    <ProjectReference Include="..\Fhi.Authentication.Extensions.UnitTests\Fhi.Authentication.Extensions.UnitTests.csproj" />
   </ItemGroup>
 
   <ItemGroup>
