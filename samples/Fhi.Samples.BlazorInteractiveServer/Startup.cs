@@ -1,11 +1,11 @@
 ﻿using BlazorInteractiveServer.Hosting.Authentication;
+using Client.BlazorInteractiveServer.Components;
+using Client.BlazorInteractiveServer.Services;
 using Duende.AccessTokenManagement;
 using Duende.AccessTokenManagement.OpenIdConnect;
 using Duende.IdentityModel.Client;
 using Fhi.Authentication;
 using Fhi.Authentication.OpenIdConnect;
-using Fhi.Samples.BlazorInteractiveServer.Components;
-using Fhi.Samples.BlazorInteractiveServer.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -18,7 +18,7 @@ internal static partial class Startup
     internal static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
     {
         var authenticationSettingsSection = builder.Configuration.GetSection("Authentication");
-        builder.Services.Configure<AuthenticationSettings>(authenticationSettingsSection);
+        builder.Services.AddOptions<AuthenticationSettings>().Bind(authenticationSettingsSection).ValidateOnStart();
         var authenticationSettings = authenticationSettingsSection.Get<AuthenticationSettings>();
 
         builder.Services.AddAuthentication(options =>
@@ -40,11 +40,27 @@ internal static partial class Startup
         {
             options.Authority = authenticationSettings?.Authority;
             options.ClientId = authenticationSettings?.ClientId;
-            ////options.ClientSecret = authenticationSettings?.ClientSecret;
             options.CallbackPath = "/signin-oidc";
             options.ResponseType = "code";
-            options.EventsType = typeof(BlazorOpenIdConnectEvents);
-
+            options.Events.OnAuthorizationCodeReceived = context => context.AuthorizationCodeReceivedWithClientAssertionAsync(authenticationSettings!.ClientSecret);
+            options.Events.OnPushAuthorization = context => context.PushAuthorizationWithClientAssertion(authenticationSettings!.ClientSecret);
+            options.Events.OnTokenValidated = async context =>
+            {
+                if (context != null)
+                {
+                    await context.HttpContext.RequestServices
+                    .GetRequiredService<IUserTokenStore>()
+                    .StoreTokenAsync(context.Principal!, new UserToken
+                    {
+                        AccessToken = context.TokenEndpointResponse?.AccessToken,
+                        AccessTokenType = context.TokenEndpointResponse?.TokenType,
+                        Expiration = context.TokenEndpointResponse != null ? DateTimeOffset.UtcNow.AddSeconds(double.Parse(context.TokenEndpointResponse.ExpiresIn)) : default,
+                        RefreshToken = context.TokenEndpointResponse?.RefreshToken,
+                        Scope = context.TokenEndpointResponse?.Scope
+                    });
+                }
+            };
+            options.MapInboundClaims = false;
             options.Scope.Clear();
             if (!string.IsNullOrWhiteSpace(authenticationSettings?.Scopes))
             {
@@ -62,7 +78,6 @@ internal static partial class Startup
         builder.Services.AddOpenIdConnectCookieOptions();
         builder.Services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>, DefaultOpenIdConnectOptions>();
 
-        builder.Services.AddTransient<BlazorOpenIdConnectEvents>();
 
         /**************************************************************************************************************************************************
          * Handling downstream API call with client assertions.                                                                   *
@@ -79,7 +94,10 @@ internal static partial class Startup
         * in in another persistent secure storage available for the downstream API call                                                                   *
         /**************************************************************************************************************************************************/
         builder.Services.AddDistributedMemoryCache();
-        builder.Services.AddOpenIdConnectAccessTokenManagement()
+        builder.Services.AddOpenIdConnectAccessTokenManagement(options =>
+        {
+            options.DPoPJsonWebKey = authenticationSettings?.ClientSecret;
+        })
         .AddBlazorServerAccessTokenManagement<InMemoryUserTokenStore>();
 
         builder.Services.AddScoped<HealthRecordService>();
@@ -88,16 +106,6 @@ internal static partial class Startup
             parameters: new UserTokenRequestParameters()
             {
                 SignInScheme = OpenIdConnectDefaults.AuthenticationScheme,
-                /******************************************************************************************
-                 * Optionally clientAssertion can be set as parameter or it will by default use IClientAssertionService
-                 *****************************************************************************************/
-                //Assertion = new ClientAssertion
-                //{
-                //    Type = OidcConstants.ClientAssertionTypes.JwtBearer,
-                //    Value = ClientAssertionTokenHandler.CreateJwtToken(authenticationSettings?.ClientId,
-                //        "issuer", //Manually set issuer or use the discovery document
-                //        authenticationSettings.ClientSecret)
-                //}
             },
             configureClient: client =>
             {
@@ -151,5 +159,6 @@ internal static partial class Startup
 
         return app;
     }
+
 
 }

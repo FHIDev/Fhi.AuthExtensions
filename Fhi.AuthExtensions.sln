@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		fhi.png = fhi.png
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fhi.Samples.AngularClientBFF", "Fhi.Samples.AngularClientBFF", "{95D7F6A2-3153-4DEA-A5B2-99FB116ECED7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{95D7F6A2-3153-4DEA-A5B2-99FB116ECED7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Authentication.Extensions", "src\Fhi.Authentication.Extensions\Fhi.Authentication.Extensions.csproj", "{3D40162D-4861-1586-9DF4-29AC796D09D7}"
 EndProject
@@ -34,17 +34,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Authorization.Extension
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Auth.IntegrationTests", "tests\Fhi.Auth.IntegrationTests\Fhi.Auth.IntegrationTests.csproj", "{50310A01-6FFB-48FD-8036-2884D8003D21}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client.BlazorInteractiveServer", "samples\Fhi.Samples.BlazorInteractiveServer\Client.BlazorInteractiveServer.csproj", "{D6DF8F04-3458-ECA8-244B-F678F02283B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.WebApi", "samples\Fhi.Samples.WebApi\Api.WebApi.csproj", "{01B67BBE-6A7D-D850-E162-18DBE690CC22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client.ClientCredentialsWorkers", "samples\Fhi.Samples.ClientCredentialsWorker\Client.ClientCredentialsWorkers.csproj", "{A60812FD-3201-987D-6E83-AEB5344B6582}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Samples.Angular.BFFApi", "samples\Fhi.Samples.AngularBFF\Fhi.Samples.Angular.BFFApi\Fhi.Samples.Angular.BFFApi.csproj", "{4BD31A58-9C65-1A32-D54F-FAA2868BC0D3}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Fhi.Samples.Angular.Client", "samples\Fhi.Samples.AngularBFF\Fhi.Samples.Angular.Client\Fhi.Samples.Angular.Client.esproj", "{0C1902EB-9D39-D424-4D5A-6F842490C576}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Samples.BlazorInteractiveServer", "samples\Fhi.Samples.BlazorInteractiveServer\Fhi.Samples.BlazorInteractiveServer.csproj", "{D6DF8F04-3458-ECA8-244B-F678F02283B9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Samples.WebApi", "samples\Fhi.Samples.WebApi\Fhi.Samples.WebApi.csproj", "{01B67BBE-6A7D-D850-E162-18DBE690CC22}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Samples.WorkerService", "samples\Fhi.Samples.WorkerService\Fhi.Samples.WorkerService.csproj", "{9D4E0177-BD4F-312F-3848-814EF034FCAC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Samples.WorkerServiceMultipleClients", "samples\Fhi.Samples.WorkerServiceMultipleClients\Fhi.Samples.WorkerServiceMultipleClients.csproj", "{A348BAF8-717E-4216-826E-38CF1833D8DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,6 +70,18 @@ Global
 		{50310A01-6FFB-48FD-8036-2884D8003D21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50310A01-6FFB-48FD-8036-2884D8003D21}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50310A01-6FFB-48FD-8036-2884D8003D21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6DF8F04-3458-ECA8-244B-F678F02283B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6DF8F04-3458-ECA8-244B-F678F02283B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6DF8F04-3458-ECA8-244B-F678F02283B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6DF8F04-3458-ECA8-244B-F678F02283B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01B67BBE-6A7D-D850-E162-18DBE690CC22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01B67BBE-6A7D-D850-E162-18DBE690CC22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01B67BBE-6A7D-D850-E162-18DBE690CC22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01B67BBE-6A7D-D850-E162-18DBE690CC22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A60812FD-3201-987D-6E83-AEB5344B6582}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A60812FD-3201-987D-6E83-AEB5344B6582}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A60812FD-3201-987D-6E83-AEB5344B6582}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A60812FD-3201-987D-6E83-AEB5344B6582}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4BD31A58-9C65-1A32-D54F-FAA2868BC0D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4BD31A58-9C65-1A32-D54F-FAA2868BC0D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BD31A58-9C65-1A32-D54F-FAA2868BC0D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -82,22 +92,6 @@ Global
 		{0C1902EB-9D39-D424-4D5A-6F842490C576}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C1902EB-9D39-D424-4D5A-6F842490C576}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0C1902EB-9D39-D424-4D5A-6F842490C576}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{D6DF8F04-3458-ECA8-244B-F678F02283B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D6DF8F04-3458-ECA8-244B-F678F02283B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D6DF8F04-3458-ECA8-244B-F678F02283B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D6DF8F04-3458-ECA8-244B-F678F02283B9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{01B67BBE-6A7D-D850-E162-18DBE690CC22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{01B67BBE-6A7D-D850-E162-18DBE690CC22}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{01B67BBE-6A7D-D850-E162-18DBE690CC22}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{01B67BBE-6A7D-D850-E162-18DBE690CC22}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9D4E0177-BD4F-312F-3848-814EF034FCAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9D4E0177-BD4F-312F-3848-814EF034FCAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9D4E0177-BD4F-312F-3848-814EF034FCAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9D4E0177-BD4F-312F-3848-814EF034FCAC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A348BAF8-717E-4216-826E-38CF1833D8DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A348BAF8-717E-4216-826E-38CF1833D8DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A348BAF8-717E-4216-826E-38CF1833D8DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A348BAF8-717E-4216-826E-38CF1833D8DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -109,12 +103,11 @@ Global
 		{74FE561C-B596-014B-90CE-501DD27B2A90} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{80A70E21-66EC-41F3-B5BA-EB6F38275AE3} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{50310A01-6FFB-48FD-8036-2884D8003D21} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{4BD31A58-9C65-1A32-D54F-FAA2868BC0D3} = {95D7F6A2-3153-4DEA-A5B2-99FB116ECED7}
-		{0C1902EB-9D39-D424-4D5A-6F842490C576} = {95D7F6A2-3153-4DEA-A5B2-99FB116ECED7}
 		{D6DF8F04-3458-ECA8-244B-F678F02283B9} = {E1C34547-3ACD-4E54-BB6A-3E5DCBFFFF02}
 		{01B67BBE-6A7D-D850-E162-18DBE690CC22} = {E1C34547-3ACD-4E54-BB6A-3E5DCBFFFF02}
-		{9D4E0177-BD4F-312F-3848-814EF034FCAC} = {E1C34547-3ACD-4E54-BB6A-3E5DCBFFFF02}
-		{A348BAF8-717E-4216-826E-38CF1833D8DD} = {E1C34547-3ACD-4E54-BB6A-3E5DCBFFFF02}
+		{A60812FD-3201-987D-6E83-AEB5344B6582} = {E1C34547-3ACD-4E54-BB6A-3E5DCBFFFF02}
+		{4BD31A58-9C65-1A32-D54F-FAA2868BC0D3} = {95D7F6A2-3153-4DEA-A5B2-99FB116ECED7}
+		{0C1902EB-9D39-D424-4D5A-6F842490C576} = {95D7F6A2-3153-4DEA-A5B2-99FB116ECED7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {113A468C-B364-454A-BDF5-BE678F61C31A}

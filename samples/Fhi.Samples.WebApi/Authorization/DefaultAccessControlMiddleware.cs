@@ -38,7 +38,7 @@ namespace WebApi.Authorization
             var authResult = await context.AuthenticateAsync();
             var scheme = authResult?.Ticket?.AuthenticationScheme
                          ?? policy.AuthenticationSchemes.FirstOrDefault()
-                         ?? "Bearer";
+                         ?? "";
 
             context.Response.Headers.Append("WWW-Authenticate",
                 $"{scheme} error=\"{errorCode}\", error_description=\"{errorDescription}\"");

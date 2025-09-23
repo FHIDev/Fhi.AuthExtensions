@@ -8,14 +8,30 @@ namespace WebApi.Api.HealthRecord.Integration.v1
 {
     [ApiController]
     [Route("api/v1/integration/health-records")]
-    [Authorize(AuthenticationSchemes = "bearer.integration", Policy = "IntegrationPolicy")]
-    [Scope("api")]
     public class HealthRecordController(IHealthRecordService healthRecordService) : ControllerBase
     {
         private readonly IHealthRecordService _healthRecordService = healthRecordService;
 
-        [HttpGet]
-        public IEnumerable<HealthRecordDto> Get()
+        [HttpGet("helseid-bearer")]
+        [Scope("fhi:authextensions.samples/access")]
+        [Authorize(AuthenticationSchemes = AuthenticationSchemes.HelseIdBearer, Policy = Policies.IntegrationPolicy)]
+        public IEnumerable<HealthRecordDto> GetWithHelseIdBearerToken()
+        {
+            return _healthRecordService.GetHealthRecords().Select(r => new HealthRecordDto(r.Name, r.Description, r.CreatedAt));
+        }
+
+        [HttpGet("helseid-dpop")]
+        [Scope("fhi:authextensions.samples/access")]
+        [Authorize(AuthenticationSchemes = AuthenticationSchemes.HelseIdDPoP, Policy = Policies.IntegrationPolicy)]
+        public IEnumerable<HealthRecordDto> GetWithHelseIdDPoPToken()
+        {
+            return _healthRecordService.GetHealthRecords().Select(r => new HealthRecordDto(r.Name, r.Description, r.CreatedAt));
+        }
+
+        [HttpGet("duende")]
+        [Scope("api")]
+        [Authorize(AuthenticationSchemes = AuthenticationSchemes.Duende, Policy = Policies.IntegrationPolicy)]
+        public IEnumerable<HealthRecordDto> GetWithDuendeToken()
         {
             return _healthRecordService.GetHealthRecords().Select(r => new HealthRecordDto(r.Name, r.Description, r.CreatedAt));
         }

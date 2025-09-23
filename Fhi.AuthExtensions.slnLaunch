@@ -11,21 +11,22 @@
         "Action": "Start"
       },
       {
-        "Path": "samples\\Fhi.Samples.WebApi\\Fhi.Samples.WebApi.csproj",
+        "Path": "samples\\Fhi.Samples.WebApi\\Api.WebApi.csproj",
         "Action": "Start"
       }
     ]
   },
   {
-    "Name": "Worker and API",
+    "Name": "Worker And API",
     "Projects": [
       {
-        "Path": "samples\\Fhi.Samples.WebApi\\Fhi.Samples.WebApi.csproj",
+        "Path": "samples\\Fhi.Samples.WebApi\\Api.WebApi.csproj",
         "Action": "Start"
       },
       {
-        "Path": "samples\\Fhi.Samples.WorkerService\\Fhi.Samples.WorkerService.csproj",
-        "Action": "Start"
+        "Path": "samples\\Fhi.Samples.ClientCredentialsWorker\\Client.ClientCredentialsWorkers.csproj",
+        "Action": "Start",
+        "DebugTarget": "MultipleClientVariant1"
       }
     ]
   }

@@ -8,16 +8,27 @@ namespace WebApi.Api.HealthRecord.Me.v1
 
     [ApiController]
     [Route("api/v1/me/health-records")]
-    [Authorize(AuthenticationSchemes = "bearer.me", Policy = "EndUserPolicy")]
+
     public class HealthRecordController(IHealthRecordService healthRecordService) : ControllerBase
     {
         private readonly IHealthRecordService _healthRecordService = healthRecordService;
 
-        [HttpGet]
-        public IEnumerable<HealthRecordPersonDto> Get()
+        [HttpGet("helseid-bearer")]
+        [Authorize(AuthenticationSchemes = AuthenticationSchemes.HelseIdBearer, Policy = Policies.EndUserPolicy)]
+        public IEnumerable<HealthRecordPersonDto> GetWithHelseIdBearer()
         {
             Task.Delay(1000).Wait();
             return _healthRecordService.GetHealthRecords().Select(r => new HealthRecordPersonDto(r.Pid, r.Name, r.Description, r.CreatedAt));
+        }
+
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = AuthenticationSchemes.HelseIdBearer, Policy = Policies.EndUserPolicy)]
+        public ActionResult<UserDto> GetMe()
+        {
+            return Ok(new UserDto(
+                User.Identity?.Name,
+                User.Claims.Select(c => new ClaimDto(c.Type, c.Value)).ToList(),
+                User.Identity?.AuthenticationType ?? string.Empty));
         }
     }
 }
