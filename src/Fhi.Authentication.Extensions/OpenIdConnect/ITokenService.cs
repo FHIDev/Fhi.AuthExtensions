@@ -1,6 +1,5 @@
-using Duende.IdentityModel;
 using Duende.IdentityModel.Client;
-using Fhi.Authentication.Tokens;
+using Fhi.Authentication.Setup;
 using Microsoft.Extensions.Logging;
 
 namespace Fhi.Authentication.OpenIdConnect
@@ -55,41 +54,6 @@ namespace Fhi.Authentication.OpenIdConnect
             }
 
             return new TokenResponse(null, true, discovery is null ? "No discovery document" : discovery.Error);
-        }
-    }
-
-    public static class HttpClientExtensions
-    {
-        public static async Task<Duende.IdentityModel.Client.TokenResponse> RequestTokenWithDPoP(
-          this HttpClient client,
-          DiscoveryDocumentResponse discovery,
-          string clientId,
-          string jwk,
-          string scopes,
-          string dPopJwk,
-          string? nonce = null)
-        {
-            var tokenRequest = new ClientCredentialsTokenRequest
-            {
-                ClientId = clientId,
-                Address = discovery.TokenEndpoint,
-                GrantType = OidcConstants.GrantTypes.ClientCredentials,
-                ClientCredentialStyle = ClientCredentialStyle.PostBody,
-                DPoPProofToken = DPoPProofGenerator.CreateDPoPProof(
-                    discovery.TokenEndpoint!,
-                    "POST",
-                    dPopJwk,
-                    "PS256",
-                    dPoPNonce: nonce),
-                ClientAssertion = new ClientAssertion
-                {
-                    Type = OidcConstants.ClientAssertionTypes.JwtBearer,
-                    Value = ClientAssertionTokenHandler.CreateJwtToken(discovery.Issuer!, clientId, jwk)
-                },
-                Scope = scopes
-            };
-
-            return await client.RequestClientCredentialsTokenAsync(tokenRequest);
         }
     }
 }

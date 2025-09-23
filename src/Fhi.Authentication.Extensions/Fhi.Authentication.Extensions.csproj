@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
 		<RootNamespace>Fhi.Authentication</RootNamespace>
-        <Version>2.1.0-local</Version>
+        <Version>2.1.0-local3</Version>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Duende.AccessTokenManagement.OpenIdConnect" />
