@@ -60,6 +60,8 @@ public partial class Program
                 options.TokenEndpoint = discoveryDocument.TokenEndpoint;
                 options.ClientId = helseIdProtectedApi.Authentication.ClientId;
                 options.Scope = helseIdProtectedApi.Authentication.Scope;
+                //To enable DPoP
+                //options.DPoPJsonWebKey = helseIdProtectedApi.Authentication.PrivateJwk;
                 options.Parameters = new ClientCredentialParametersBuilder()
                       .AddIssuer(discoveryDocument.Issuer)
                       .AddPrivateJwk(helseIdProtectedApi.Authentication.PrivateJwk)

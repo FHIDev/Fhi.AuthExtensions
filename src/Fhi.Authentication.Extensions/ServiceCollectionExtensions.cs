@@ -50,11 +50,6 @@ namespace Fhi.Authentication
             services.AddMemoryCache();
             services.AddHttpClient();
             services.AddSingleton<IDiscoveryDocumentStore, InMemoryDiscoveryDocumentStore>();
-            //services.TryAddSingleton<IDiscoveryDocumentStore>(sp =>
-            //{
-            //    var factory = sp.GetRequiredService<IHttpClientFactory>();
-            //    return new InMemoryDiscoveryDocumentStore(factory, authorityList);
-            //});
 
             return services;
         }
