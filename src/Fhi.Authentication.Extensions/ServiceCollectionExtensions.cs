@@ -20,6 +20,7 @@ namespace Fhi.Authentication
         {
             services.AddTransient<OpenIdConnectCookieEventsForApi>();
             services.AddTransient<IUserTokenEndpointService, UserTokenEndpointService>();
+            services.AddTransient<ITokenService, TokenService>();
             services.AddSingleton<IPostConfigureOptions<CookieAuthenticationOptions>, OpenIdConnectCookieAuthenticationOptions>();
 
             return services;

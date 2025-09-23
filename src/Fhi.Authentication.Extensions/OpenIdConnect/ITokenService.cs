@@ -5,8 +5,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Fhi.Authentication.OpenIdConnect
 {
-    internal record TokenResponse(string? AccessToken, bool IsError, string? ErrorDescription);
-    internal interface ITokenService
+    public record TokenResponse(string? AccessToken, bool IsError, string? ErrorDescription);
+    public interface ITokenService
     {
         /// <summary>
         /// Create DPoP token
