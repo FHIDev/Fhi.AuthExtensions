@@ -54,6 +54,14 @@ namespace Fhi.Authentication
             return services;
         }
 
+        /// <summary>
+        /// Adds an in-memory discovery service to the specified service collection using the provided list of authority
+        /// endpoints.
+        /// </summary>
+        /// <param name="services">The service collection to which the in-memory discovery service will be added.</param>
+        /// <param name="authorities">A collection of authority endpoint URLs to be used for discovery. Each string should represent a valid
+        /// authority URL.</param>
+        /// <returns>The updated service collection with the in-memory discovery service registered.</returns>
         public static IServiceCollection AddInMemoryDiscoveryService(
                this IServiceCollection services,
                IEnumerable<string> authorities)

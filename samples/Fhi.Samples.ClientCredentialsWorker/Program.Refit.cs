@@ -1,8 +1,7 @@
 ﻿using Duende.AccessTokenManagement;
 using Fhi.Authentication;
+using Fhi.Authentication.ClientCredentials;
 using Fhi.Authentication.OpenIdConnect;
-using Fhi.Samples.ClientCredentialsWorkers.Oidc;
-using Fhi.Samples.WorkerServiceMultipleClients.Oidc;
 using Fhi.Samples.WorkerServiceMultipleClients.Refit;
 using Refit;
 
@@ -20,7 +19,7 @@ public partial class Program
 
                services.AddClientCredentialsTokenManagement();
                services.AddDistributedMemoryCache();
-               services.AddTransient<IClientAssertionService, OidcClientAssertionService>();
+               services.AddTransient<IClientAssertionService, ClientCredentialsAssertionService>();
                services.AddHostedService<WorkerRefit>();
 
                var apiSection = configuration.GetSection("Api");

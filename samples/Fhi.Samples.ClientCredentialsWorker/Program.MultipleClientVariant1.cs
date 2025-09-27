@@ -1,10 +1,9 @@
 ﻿using Duende.AccessTokenManagement;
 using Fhi.Authentication;
+using Fhi.Authentication.ClientCredentials;
 using Fhi.Authentication.OpenIdConnect;
-using Fhi.Samples.ClientCredentialsWorkers.Oidc;
 using Fhi.Samples.WorkerServiceMultipleClients.MultipleClientVariant1;
 using Fhi.Samples.WorkerServiceMultipleClients.MultipleClientVariant1.Configurations;
-using Fhi.Samples.WorkerServiceMultipleClients.Oidc;
 
 /// <summary>
 /// 
@@ -30,7 +29,7 @@ public partial class Program
 
                 services.AddClientCredentialsTokenManagement();
                 services.AddDistributedMemoryCache();
-                services.AddTransient<IClientAssertionService, OidcClientAssertionService>();
+                services.AddTransient<IClientAssertionService, ClientCredentialsAssertionService>();
                 services.AddHostedService<WorkerMultipleClientVariant1>();
                 /*****************************************************************************
                  * 2. Configure Oidc clients that should be used by the HttpClient for authentication
@@ -52,13 +51,14 @@ public partial class Program
                         if (clientOption.SecretType == "SharedSecret")
                             options.ClientSecret = clientOption.Secret;
                         options.Parameters = new ClientCredentialParametersBuilder()
-                            .AddIssuer(discoveryDocument.Issuer)
+                            .AddIssuer(discoveryDocument.Issuer ?? string.Empty)
                             .AddPrivateJwk(clientOption.Secret)
                             .Build();
                     })
                     .Validate(clientCredential =>
                         !string.IsNullOrWhiteSpace(clientCredential.ClientId)
-                        && !string.IsNullOrWhiteSpace(clientCredential.TokenEndpoint),
+                        && !string.IsNullOrWhiteSpace(clientCredential.TokenEndpoint)
+                        && !string.IsNullOrWhiteSpace(clientCredential.Parameters.FirstOrDefault(x => x.Key == ClientCredentialParameter.Issuer).Value),
                         failureMessage: "ClientId, ClientSecret, and TokenEndpoint must be provided and not empty.");
                 }
 

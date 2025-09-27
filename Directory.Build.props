@@ -6,6 +6,6 @@
     <!-- Vulnerability severity level: NU1991 Low, NU1902 Moderate, NU1903 High, NU1904 Critical -->
     <WarningsNotAsErrors>NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>CS1591</NoWarn>
+    <!--<NoWarn>CS1591</NoWarn>-->
   </PropertyGroup>
 </Project>

@@ -1,9 +1,8 @@
 ﻿using Duende.AccessTokenManagement;
 using Fhi.Authentication;
+using Fhi.Authentication.ClientCredentials;
 using Fhi.Authentication.OpenIdConnect;
-using Fhi.Samples.ClientCredentialsWorkers.Oidc;
 using Fhi.Samples.WorkerServiceMultipleClients.MultipleClientVariant2;
-using Fhi.Samples.WorkerServiceMultipleClients.Oidc;
 
 public partial class Program
 {
@@ -18,7 +17,7 @@ public partial class Program
                IConfiguration configuration = context.Configuration;
 
                services.AddDistributedMemoryCache();
-               services.AddTransient<IClientAssertionService, OidcClientAssertionService>();
+               services.AddTransient<IClientAssertionService, ClientCredentialsAssertionService>();
                services.AddHostedService<WorkerMultipleClientVariant2>();
 
                //Register APIs with Client credentials authentication
@@ -63,7 +62,7 @@ public partial class Program
                 //To enable DPoP
                 //options.DPoPJsonWebKey = helseIdProtectedApi.Authentication.PrivateJwk;
                 options.Parameters = new ClientCredentialParametersBuilder()
-                      .AddIssuer(discoveryDocument.Issuer)
+                      .AddIssuer(discoveryDocument.Issuer ?? string.Empty)
                       .AddPrivateJwk(helseIdProtectedApi.Authentication.PrivateJwk)
                       .Build();
             })
