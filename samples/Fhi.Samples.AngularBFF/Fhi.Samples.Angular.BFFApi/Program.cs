@@ -1,4 +1,6 @@
 using AngularBFF.Net8.Api.HealthRecords;
+using Duende.AccessTokenManagement.DPoP;
+using Duende.AccessTokenManagement.OpenIdConnect;
 using Fhi.Authentication;
 using Fhi.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
@@ -93,7 +95,7 @@ builder.Services.AddOpenIdConnectAccessTokenManagement(options =>
     options.RefreshBeforeExpiration = TimeSpan.FromSeconds(10);
     //options.ChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
     //Will create DPoP tokens for access token requests if DPoPJsonWebKey is set 
-    options.DPoPJsonWebKey = authenticationSettings?.ClientSecret;
+    options.DPoPJsonWebKey = DPoPProofKey.ParseOrDefault(authenticationSettings?.ClientSecret);
 });
 
 /**************************************************************************************

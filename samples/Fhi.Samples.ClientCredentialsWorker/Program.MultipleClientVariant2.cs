@@ -56,20 +56,20 @@ public partial class Program
             .Configure<IDiscoveryDocumentStore>((options, discoveryStore) =>
             {
                 var discoveryDocument = discoveryStore.Get(helseIdProtectedApi!.Authentication.Authority);
-                options.TokenEndpoint = discoveryDocument.TokenEndpoint;
-                options.ClientId = helseIdProtectedApi.Authentication.ClientId;
-                options.Scope = helseIdProtectedApi.Authentication.Scope;
+                options.TokenEndpoint = discoveryDocument?.TokenEndpoint is not null ? new Uri(discoveryDocument.TokenEndpoint) : null;
+                options.ClientId = ClientId.Parse(helseIdProtectedApi.Authentication.ClientId);
+                options.Scope = Scope.Parse(helseIdProtectedApi.Authentication.Scope);
                 //To enable DPoP
                 //options.DPoPJsonWebKey = helseIdProtectedApi.Authentication.PrivateJwk;
                 options.Parameters = new ClientCredentialParametersBuilder()
-                      .AddIssuer(discoveryDocument.Issuer ?? string.Empty)
+                      .AddIssuer(discoveryDocument?.Issuer ?? string.Empty)
                       .AddPrivateJwk(helseIdProtectedApi.Authentication.PrivateJwk)
                       .Build();
             })
             .Validate(
              clientCredential =>
                  !string.IsNullOrWhiteSpace(clientCredential.ClientId)
-                 && !string.IsNullOrWhiteSpace(clientCredential.TokenEndpoint),
+                 && !string.IsNullOrWhiteSpace(clientCredential?.TokenEndpoint?.AbsoluteUri),
                  failureMessage: "ClientId and TokenEndpoint must be provided and not empty."
              );
 
@@ -77,7 +77,7 @@ public partial class Program
         /***********************************************************************************************
          * Register HttpClient and connect the token client to be used for authentiation
          * *********************************************************************************************/
-        services.AddClientCredentialsHttpClient(helseIdProtectedApi!.ClientName, helseIdProtectedApi.ClientName, client =>
+        services.AddClientCredentialsHttpClient(helseIdProtectedApi!.ClientName, ClientCredentialsClientName.Parse(helseIdProtectedApi.ClientName), client =>
         {
             client.BaseAddress = new Uri(helseIdProtectedApi?.BaseAddress!);
         });
@@ -113,25 +113,22 @@ public partial class Program
             .Configure<IDiscoveryDocumentStore>((options, discoveryStore) =>
             {
                 var discoveryDocument = discoveryStore.Get(duendeProtectedApi!.Authentication.Authority);
-                options.TokenEndpoint = discoveryDocument.TokenEndpoint;
-                options.ClientId = duendeProtectedApi.Authentication.ClientId;
-                options.Scope = duendeProtectedApi.Authentication.Scope;
-                options.ClientSecret = duendeProtectedApi.Authentication.SharedSecret;
-                options.Parameters = new ClientCredentialParametersBuilder()
-                      .AddIssuer(discoveryDocument.Issuer)
-                      .Build();
+                options.TokenEndpoint = discoveryDocument?.TokenEndpoint is not null ? new Uri(discoveryDocument.TokenEndpoint) : null;
+                options.ClientId = ClientId.Parse(duendeProtectedApi.Authentication.ClientId);
+                options.Scope = Scope.Parse(duendeProtectedApi.Authentication.Scope);
+                options.ClientSecret = ClientSecret.Parse(duendeProtectedApi.Authentication.SharedSecret);
             })
             .Validate(
              clientCredential =>
                  !string.IsNullOrWhiteSpace(clientCredential.ClientId)
-                 && !string.IsNullOrWhiteSpace(clientCredential.TokenEndpoint),
+                 && !string.IsNullOrWhiteSpace(clientCredential?.TokenEndpoint?.AbsoluteUri),
                  failureMessage: "ClientId and TokenEndpoint must be provided and not empty."
              );
 
         /***********************************************************************************************
          * Register HttpClient and connect the token client to be used for authentiation
          * *********************************************************************************************/
-        services.AddClientCredentialsHttpClient(duendeProtectedApi!.ClientName, duendeProtectedApi.ClientName, client =>
+        services.AddClientCredentialsHttpClient(duendeProtectedApi!.ClientName, ClientCredentialsClientName.Parse(duendeProtectedApi.ClientName), client =>
         {
             client.BaseAddress = new Uri(duendeProtectedApi?.BaseAddress!);
         });

@@ -30,24 +30,24 @@ public partial class Program
 
                var apiOption = apiSection.Get<ApiOption>() ?? new ApiOption();
                services
-                   .AddOptions<ClientCredentialsClient>("Api")
+                   .AddOptions<ClientCredentialsClient>("TokenClientName")
                    .Configure<IDiscoveryDocumentStore>((options, discoveryStore) =>
                    {
                        var discoveryDocument = discoveryStore.Get(apiOption.ClientAuthentication.Authority);
-                       options.TokenEndpoint = discoveryDocument.TokenEndpoint;
-                       options.ClientId = apiOption.ClientAuthentication.ClientId;
-                       options.Scope = apiOption.ClientAuthentication.Scope;
+                       options.TokenEndpoint = discoveryDocument?.TokenEndpoint is not null ? new Uri(discoveryDocument.TokenEndpoint) : null;
+                       options.ClientId = ClientId.Parse(apiOption.ClientAuthentication.ClientId);
+                       options.Scope = Scope.Parse(apiOption.ClientAuthentication.Scope);
                        options.Parameters = new ClientCredentialParametersBuilder()
-                             .AddIssuer(discoveryDocument.Issuer)
+                             .AddIssuer(discoveryDocument?.Issuer)
                              .AddPrivateJwk(apiOption.ClientAuthentication.Secret)
                              .Build();
                    })
                    .Validate(clientCredential =>
                    !string.IsNullOrWhiteSpace(clientCredential.ClientId)
-                   && !string.IsNullOrWhiteSpace(clientCredential.TokenEndpoint),
+                   && !string.IsNullOrWhiteSpace(clientCredential?.TokenEndpoint?.AbsoluteUri),
                    failureMessage: "ClientId, and TokenEndpoint must be provided and not empty.");
 
-               services.AddClientCredentialsHttpClient(apiOption!.ClientName, "Api", client =>
+               services.AddClientCredentialsHttpClient(apiOption!.ClientName, ClientCredentialsClientName.Parse("TokenClientName"), client =>
                {
                    client.BaseAddress = new Uri(apiOption?.BaseAddress!);
                })

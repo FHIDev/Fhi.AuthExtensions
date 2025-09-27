@@ -13,6 +13,6 @@ namespace Fhi.Samples.WorkerServiceMultipleClients.MultipleClientVariant1.Config
 
         public bool UseDpop { get; set; } = false;
 
-        public string? Scope { get; set; }
+        public string Scope { get; set; } = string.Empty;
     }
 }

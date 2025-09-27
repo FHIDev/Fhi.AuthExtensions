@@ -27,7 +27,7 @@ namespace BlazorInteractiveServer.Hosting.Authentication
             using var scope = _scopeFactory.CreateScope();
             var userTokenStore = scope.ServiceProvider.GetRequiredService<IUserTokenStore>();
             var token = await userTokenStore.GetTokenAsync(authenticationState.User);
-            if (token is null || token.Expiration < DateTimeOffset.UtcNow || token.IsError)
+            if (token is null || token.Token?.TokenForSpecifiedParameters?.Expiration < DateTimeOffset.UtcNow || !token.Succeeded)
             {
                 return false;
             }

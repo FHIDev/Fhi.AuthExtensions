@@ -2,6 +2,7 @@
 using Client.BlazorInteractiveServer.Components;
 using Client.BlazorInteractiveServer.Services;
 using Duende.AccessTokenManagement;
+using Duende.AccessTokenManagement.DPoP;
 using Duende.AccessTokenManagement.OpenIdConnect;
 using Duende.IdentityModel.Client;
 using Fhi.Authentication;
@@ -52,11 +53,12 @@ internal static partial class Startup
                     .GetRequiredService<IUserTokenStore>()
                     .StoreTokenAsync(context.Principal!, new UserToken
                     {
-                        AccessToken = context.TokenEndpointResponse?.AccessToken,
-                        AccessTokenType = context.TokenEndpointResponse?.TokenType,
+                        ClientId = ClientId.Parse(authenticationSettings?.ClientId ?? string.Empty),
+                        AccessToken = AccessToken.Parse(context.TokenEndpointResponse?.AccessToken ?? string.Empty),
+                        AccessTokenType = AccessTokenType.ParseOrDefault(context.TokenEndpointResponse?.TokenType),
                         Expiration = context.TokenEndpointResponse != null ? DateTimeOffset.UtcNow.AddSeconds(double.Parse(context.TokenEndpointResponse.ExpiresIn)) : default,
-                        RefreshToken = context.TokenEndpointResponse?.RefreshToken,
-                        Scope = context.TokenEndpointResponse?.Scope
+                        RefreshToken = RefreshToken.Parse(context.TokenEndpointResponse?.RefreshToken ?? string.Empty),
+                        Scope = Scope.ParseOrDefault(context.TokenEndpointResponse?.Scope)
                     });
                 }
             };
@@ -96,17 +98,13 @@ internal static partial class Startup
         builder.Services.AddDistributedMemoryCache();
         builder.Services.AddOpenIdConnectAccessTokenManagement(options =>
         {
-            options.DPoPJsonWebKey = authenticationSettings?.ClientSecret;
+            options.DPoPJsonWebKey = DPoPProofKey.ParseOrDefault(authenticationSettings?.ClientSecret);
         })
         .AddBlazorServerAccessTokenManagement<InMemoryUserTokenStore>();
 
         builder.Services.AddScoped<HealthRecordService>();
         builder.Services.AddUserAccessTokenHttpClient(
             "WebApi",
-            parameters: new UserTokenRequestParameters()
-            {
-                SignInScheme = OpenIdConnectDefaults.AuthenticationScheme,
-            },
             configureClient: client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7150");

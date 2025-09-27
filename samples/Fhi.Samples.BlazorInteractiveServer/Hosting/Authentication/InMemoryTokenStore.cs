@@ -1,5 +1,7 @@
-﻿using Duende.AccessTokenManagement.OpenIdConnect;
+﻿using Duende.AccessTokenManagement;
+using Duende.AccessTokenManagement.OpenIdConnect;
 using Duende.IdentityModel;
+using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
 using System.Security.Claims;
 
@@ -11,29 +13,33 @@ using System.Security.Claims;
 /// </summary>
 public class InMemoryUserTokenStore : IUserTokenStore
 {
-    private static readonly ConcurrentDictionary<string, UserToken> _tokenStore = new();
+    private static readonly ConcurrentDictionary<string, TokenForParameters> _tokenStore = new();
 
-    public Task StoreTokenAsync(ClaimsPrincipal user, UserToken token, UserTokenRequestParameters? parameters = null)
+    public Task StoreTokenAsync(ClaimsPrincipal user, UserToken token, UserTokenRequestParameters? parameters = null, CancellationToken ct = default)
     {
         var userId = user.FindFirst(JwtClaimTypes.Subject)?.Value;
         if (userId != null)
         {
-            _tokenStore[userId] = token;
+            _tokenStore[userId] = new TokenForParameters(token,
+           token.RefreshToken == null
+               ? null
+               : new UserRefreshToken(token.RefreshToken.Value, token.DPoPJsonWebKey));
         }
         return Task.CompletedTask;
     }
 
-    public Task<UserToken> GetTokenAsync(ClaimsPrincipal user, UserTokenRequestParameters? parameters = null)
+    public Task<TokenResult<TokenForParameters>> GetTokenAsync(ClaimsPrincipal user, UserTokenRequestParameters? parameters, CancellationToken ct)
     {
         var userId = user.FindFirst(JwtClaimTypes.Subject)?.Value;
         if (userId != null && _tokenStore.TryGetValue(userId, out var token))
         {
-            return Task.FromResult<UserToken>(token);
+            return Task.FromResult(TokenResult.Success(token));
         }
-        return Task.FromResult<UserToken>(new UserToken());
+
+        return Task.FromResult((TokenResult<TokenForParameters>)TokenResult.Failure("not found"));
     }
 
-    public Task ClearTokenAsync(ClaimsPrincipal user, UserTokenRequestParameters? parameters = null)
+    public Task ClearTokenAsync(ClaimsPrincipal user, UserTokenRequestParameters? parameters = null, CancellationToken ct = default)
     {
         var userId = user.FindFirst(JwtClaimTypes.Subject)?.Value;
         if (userId != null)
@@ -42,4 +48,5 @@ public class InMemoryUserTokenStore : IUserTokenStore
         }
         return Task.CompletedTask;
     }
+   
 }

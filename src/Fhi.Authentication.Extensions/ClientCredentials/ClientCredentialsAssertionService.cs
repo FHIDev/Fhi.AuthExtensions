@@ -27,7 +27,7 @@ namespace Fhi.Authentication.ClientCredentials
         }
 
         /// <inheritdoc/>
-        public Task<ClientAssertion?> GetClientAssertionAsync(string? clientName = null, TokenRequestParameters? parameters = null)
+        public Task<ClientAssertion?> GetClientAssertionAsync(ClientCredentialsClientName? clientName = null, TokenRequestParameters? parameters = null, CancellationToken ct = default)
         {
             var clientOption = _clientCredentialsClients.Get(clientName);
             if (clientOption != null && clientOption.ClientSecret == null)
