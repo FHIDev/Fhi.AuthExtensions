@@ -20,6 +20,6 @@ namespace Fhi.Samples.WorkerServiceMultipleClients.Refit
 
         [Required] public string Secret { get; set; } = string.Empty;
 
-        public string? Scope { get; set; }
+        public string Scope { get; set; } = string.Empty;
     }
 }

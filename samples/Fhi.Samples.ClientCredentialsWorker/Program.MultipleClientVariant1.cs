@@ -1,10 +1,9 @@
 ﻿using Duende.AccessTokenManagement;
 using Fhi.Authentication;
+using Fhi.Authentication.ClientCredentials;
 using Fhi.Authentication.OpenIdConnect;
-using Fhi.Samples.ClientCredentialsWorkers.Oidc;
 using Fhi.Samples.WorkerServiceMultipleClients.MultipleClientVariant1;
 using Fhi.Samples.WorkerServiceMultipleClients.MultipleClientVariant1.Configurations;
-using Fhi.Samples.WorkerServiceMultipleClients.Oidc;
 
 /// <summary>
 /// 
@@ -24,41 +23,42 @@ public partial class Program
                  *  1. Register the core services needed for OAuth client credentials flow and token management
                  *  -  AddClientCredentialsTokenManagement(): Enables automatic token acquisition and refresh
                  *  -  AddDistributedMemoryCache(): Provides token caching capabilities
-                 *  -  IOidcDiscoveryService: Discovers OIDC endpoints from authority metadata
                  *  -  Worker: The background service that will consume the APIs
                  **********************************************************************/
 
                 services.AddClientCredentialsTokenManagement();
                 services.AddDistributedMemoryCache();
-                services.AddTransient<IClientAssertionService, OidcClientAssertionService>();
+                services.AddTransient<IClientAssertionService, ClientCredentialsAssertionService>();
                 services.AddHostedService<WorkerMultipleClientVariant1>();
                 /*****************************************************************************
                  * 2. Configure Oidc clients that should be used by the HttpClient for authentication
                  * ****************************************************************************/
 
                 var oidcClientSection = configuration.GetSection("OidcClients");
+                // Register available authorities to get discovery documents
                 services.AddInMemoryDiscoveryService(oidcClientSection.GetChildren().Select(c => c.Get<OidcClientOption>()?.Authority ?? ""));
                 foreach (var clientSection in oidcClientSection.GetChildren())
                 {
-                    var clientOption = clientSection.Get<OidcClientOption>();
+                    var clientOption = clientSection.Get<OidcClientOption>() ?? new OidcClientOption();
                     services
                     .AddOptions<ClientCredentialsClient>(clientSection.Key)
                     .Configure<IDiscoveryDocumentStore>((options, discoveryStore) =>
                     {
                         var discoveryDocument = discoveryStore.Get(clientOption!.Authority);
-                        options.TokenEndpoint = discoveryDocument.TokenEndpoint;
-                        options.ClientId = clientOption.ClientId;
-                        options.Scope = clientOption.Scope;
+                        options.TokenEndpoint = discoveryDocument?.TokenEndpoint is not null ? new Uri(discoveryDocument.TokenEndpoint) : null;
+                        options.ClientId = ClientId.Parse(clientOption.ClientId);
+                        options.Scope = Scope.Parse(clientOption.Scope);
                         if (clientOption.SecretType == "SharedSecret")
-                            options.ClientSecret = clientOption.Secret;
+                            options.ClientSecret = ClientSecret.Parse(clientOption.Secret);
                         options.Parameters = new ClientCredentialParametersBuilder()
-                            .AddIssuer(discoveryDocument.Issuer)
+                            .AddIssuer(discoveryDocument?.Issuer ?? string.Empty)
                             .AddPrivateJwk(clientOption.Secret)
                             .Build();
                     })
                     .Validate(clientCredential =>
                         !string.IsNullOrWhiteSpace(clientCredential.ClientId)
-                        && !string.IsNullOrWhiteSpace(clientCredential.TokenEndpoint),
+                        && !string.IsNullOrWhiteSpace(clientCredential?.TokenEndpoint?.AbsoluteUri)
+                        && !string.IsNullOrWhiteSpace(clientCredential?.Parameters.FirstOrDefault(x => x.Key == ClientCredentialParameter.Issuer).Value),
                         failureMessage: "ClientId, ClientSecret, and TokenEndpoint must be provided and not empty.");
                 }
 
@@ -73,7 +73,7 @@ public partial class Program
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
                 var api1Config = api1Section.Get<ApiClientSample1>();
-                services.AddClientCredentialsHttpClient(api1Config!.ClientName, api1Config.OidcClientName, (sp, client) =>
+                services.AddClientCredentialsHttpClient(api1Config!.ClientName, ClientCredentialsClientName.Parse(api1Config!.OidcClientName), (sp, client) =>
                 {
                     client.BaseAddress = new Uri(api1Config.BaseAddress!);
                 });
@@ -86,7 +86,7 @@ public partial class Program
                     .ValidateOnStart();
 
                 var api2Config = api2Section.Get<ApiClientSample2>();
-                services.AddClientCredentialsHttpClient(api2Config!.ClientName, api2Config.OidcClientName, (sp, client) =>
+                services.AddClientCredentialsHttpClient(api2Config!.ClientName, ClientCredentialsClientName.Parse(api2Config.OidcClientName), (sp, client) =>
                 {
                     client.BaseAddress = new Uri(api2Config.BaseAddress!);
                 });

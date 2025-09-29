@@ -5,7 +5,9 @@ using Microsoft.Extensions.Options;
 
 namespace Fhi.Authentication.OpenIdConnect
 {
-
+    /// <summary>
+    /// Options for the DiscoveryDocument store.
+    /// </summary>
     public class DiscoveryDocumentStoreOptions
     {
         /// <summary>

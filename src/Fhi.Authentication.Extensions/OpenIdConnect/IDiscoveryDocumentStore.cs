@@ -5,6 +5,7 @@
     /// </summary>
     public interface IDiscoveryDocumentStore
     {
+        ///<inheritdoc/>
         IDiscoveryDocument Get(string authority);
     }
 }
