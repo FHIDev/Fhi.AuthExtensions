@@ -2,9 +2,7 @@
 using Client.BlazorInteractiveServer.Components;
 using Client.BlazorInteractiveServer.Services;
 using Duende.AccessTokenManagement;
-using Duende.AccessTokenManagement.DPoP;
 using Duende.AccessTokenManagement.OpenIdConnect;
-using Duende.IdentityModel.Client;
 using Fhi.Authentication;
 using Fhi.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
@@ -13,6 +11,10 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
 
 internal static partial class Startup
 {
@@ -43,8 +45,24 @@ internal static partial class Startup
             options.ClientId = authenticationSettings?.ClientId;
             options.CallbackPath = "/signin-oidc";
             options.ResponseType = "code";
-            options.Events.OnAuthorizationCodeReceived = context => context.AuthorizationCodeReceivedWithClientAssertionAsync(authenticationSettings!.ClientSecret);
-            options.Events.OnPushAuthorization = context => context.PushAuthorizationWithClientAssertion(authenticationSettings!.ClientSecret);
+            options.Events.OnAuthorizationCodeReceived = (context) =>
+            {
+                //var idportenKid = "abd7e1b6-40e3-4d42-846d-5d957eec4594";
+                var ansattportenKid = "1705a2db-61cb-4e55-a493-7d0fe0cbb28e";
+                var clientAssertion = GenerateClientAssertionFromPem(
+                    issuer: authenticationSettings!.ClientId,
+                    //audience: "https://test.idporten.no",
+                    audience: "https://test.ansattporten.no",
+                    privateKey: authenticationSettings.ClientSecret,
+                    validForSeconds: 300, ansattportenKid);
+
+                context.TokenEndpointRequest!.ClientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+                context.TokenEndpointRequest.ClientAssertion = clientAssertion;
+                return Task.CompletedTask;
+            };
+            options.PushedAuthorizationBehavior = PushedAuthorizationBehavior.Disable;
+            //options.Events.OnAuthorizationCodeReceived = context => context.AuthorizationCodeReceivedWithClientAssertionAsync(authenticationSettings!.ClientSecret);
+            //options.Events.OnPushAuthorization = context => context.PushAuthorizationWithClientAssertion(authenticationSettings!.ClientSecret);
             options.Events.OnTokenValidated = async context =>
             {
                 if (context != null)
@@ -84,12 +102,12 @@ internal static partial class Startup
         /**************************************************************************************************************************************************
          * Handling downstream API call with client assertions.                                                                   *
          **************************************************************************************************************************************************/
-        builder.Services.AddTransient<IClientAssertionService, ClientAssertionService>();
-        builder.Services.AddSingleton<IDiscoveryCache>(serviceProvider =>
-        {
-            var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
-            return new DiscoveryCache(authenticationSettings!.Authority, () => httpClientFactory.CreateClient());
-        });
+        //builder.Services.AddTransient<IClientAssertionService, ClientAssertionService>();
+        //builder.Services.AddSingleton<IDiscoveryCache>(serviceProvider =>
+        //{
+        //    var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
+        //    return new DiscoveryCache(authenticationSettings!.Authority, () => httpClientFactory.CreateClient());
+        //});
 
         /**************************************************************************************************************************************************
         * Handling downstream API call with token handling. Since Blazor uses SignalR, tokens are not available through httpcontext. Tokens must be stored *
@@ -98,7 +116,7 @@ internal static partial class Startup
         builder.Services.AddDistributedMemoryCache();
         builder.Services.AddOpenIdConnectAccessTokenManagement(options =>
         {
-            options.DPoPJsonWebKey = DPoPProofKey.ParseOrDefault(authenticationSettings?.ClientSecret);
+            //options.DPoPJsonWebKey = DPoPProofKey.ParseOrDefault(authenticationSettings?.ClientSecret);
         })
         .AddBlazorServerAccessTokenManagement<InMemoryUserTokenStore>();
 
@@ -156,6 +174,32 @@ internal static partial class Startup
             .AddInteractiveServerRenderMode();
 
         return app;
+    }
+
+    public static string GenerateClientAssertionFromPem(string issuer, string audience, string privateKey, int validForSeconds, string kid)
+    {
+        var rsa = RSA.Create();
+        rsa.ImportFromPem(privateKey);
+
+        var securityKey = new RsaSecurityKey(rsa)
+        {
+            KeyId = kid
+        };
+        var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
+
+        var claims = new List<Claim>
+            {
+                new(JwtRegisteredClaimNames.Sub, issuer),
+                //new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
+            };
+        var payload = new JwtPayload(issuer, audience, claims, DateTime.UtcNow, DateTime.UtcNow.AddSeconds(validForSeconds));
+
+        var header = new JwtHeader(signingCredentials, null, "client-authentication+jwt");
+
+        var jwtSecurityToken = new JwtSecurityToken(header, payload);
+
+        return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
     }
 
 
