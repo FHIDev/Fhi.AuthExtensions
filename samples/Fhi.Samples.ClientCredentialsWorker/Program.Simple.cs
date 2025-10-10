@@ -45,16 +45,19 @@ namespace Client.ClientCredentialsWorkers
                    services.AddTransient<IClientAssertionService, ClientCredentialsAssertionService>();
                    services.AddHostedService<WorkerRefit>();
 
+                   services.AddOptions<ClientAssertionOptions>("m2mTokenClient")
+                       .Configure((options) =>
+                       {
+                           options.Issuer = issuer;
+                           options.PrivateJwk = privateJwk;
+                       });
+
                    services.AddClientCredentialsTokenManagement()
                     .AddClient("m2mTokenClient", options =>
                      {
                          options.TokenEndpoint = new Uri("https://demo.duendesoftware.com/connect/token");
                          options.ClientId = ClientId.Parse(clientId);
                          options.Scope = Scope.Parse(scope);
-                         options.Parameters = new ClientCredentialParametersBuilder()
-                             .AddIssuer(issuer)
-                             .AddPrivateJwk(privateJwk)
-                             .Build();
                      });
 
                    services.AddClientCredentialsHttpClient("m2mHttpClient", ClientCredentialsClientName.Parse("m2mTokenClient"), client =>

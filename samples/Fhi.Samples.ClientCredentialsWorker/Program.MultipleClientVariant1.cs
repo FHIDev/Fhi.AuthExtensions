@@ -40,6 +40,20 @@ public partial class Program
                 foreach (var clientSection in oidcClientSection.GetChildren())
                 {
                     var clientOption = clientSection.Get<OidcClientOption>() ?? new OidcClientOption();
+
+                    if (clientOption.SecretType == "JWK")
+                    {
+                        services
+                            .AddOptions<ClientAssertionOptions>(clientSection.Key)
+                            .Configure<IDiscoveryDocumentStore>((options, discoveryStore) =>
+                            {
+                                var discoveryDocument = discoveryStore.Get(clientOption.Authority);
+                                options.Issuer = discoveryDocument?.Issuer ?? string.Empty;
+                                options.PrivateJwk = clientOption.Secret;
+                            });
+                    }
+
+
                     services
                     .AddOptions<ClientCredentialsClient>(clientSection.Key)
                     .Configure<IDiscoveryDocumentStore>((options, discoveryStore) =>
@@ -50,10 +64,6 @@ public partial class Program
                         options.Scope = Scope.Parse(clientOption.Scope);
                         if (clientOption.SecretType == "SharedSecret")
                             options.ClientSecret = ClientSecret.Parse(clientOption.Secret);
-                        options.Parameters = new ClientCredentialParametersBuilder()
-                            .AddIssuer(discoveryDocument?.Issuer ?? string.Empty)
-                            .AddPrivateJwk(clientOption.Secret)
-                            .Build();
                     })
                     .Validate(clientCredential =>
                         !string.IsNullOrWhiteSpace(clientCredential.ClientId)

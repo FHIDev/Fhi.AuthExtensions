@@ -21,6 +21,7 @@ public partial class Program
                services.AddHostedService<WorkerMultipleClientVariant2>();
 
                //Register APIs with Client credentials authentication
+               services.AddClientCredentialsTokenManagement();
                var helseAIdApiOption = AddHelseIdProtectedApi(services, configuration);
                var duendeProtectedApi = AddDuendeProtectedApi(services, configuration);
 
@@ -51,6 +52,16 @@ public partial class Program
          * Configure Client credentials options used by the HttpClient to authenticate
          * *********************************************************************************************/
         var helseIdProtectedApi = helseIdProtectedApiSection.Get<HelseIdProtectedApiOption>() ?? default;
+
+        services
+          .AddOptions<ClientAssertionOptions>(helseIdProtectedApi!.ClientName)
+          .Configure<IDiscoveryDocumentStore>((options, discoveryStore) =>
+          {
+              var discoveryDocument = discoveryStore.Get(helseIdProtectedApi!.Authentication.Authority);
+              options.Issuer = discoveryDocument?.Issuer ?? string.Empty;
+              options.PrivateJwk = helseIdProtectedApi.Authentication.PrivateJwk;
+          });
+
         services
             .AddOptions<ClientCredentialsClient>(helseIdProtectedApi!.ClientName)
             .Configure<IDiscoveryDocumentStore>((options, discoveryStore) =>
@@ -61,10 +72,6 @@ public partial class Program
                 options.Scope = Scope.Parse(helseIdProtectedApi.Authentication.Scope);
                 //To enable DPoP
                 //options.DPoPJsonWebKey = helseIdProtectedApi.Authentication.PrivateJwk;
-                options.Parameters = new ClientCredentialParametersBuilder()
-                      .AddIssuer(discoveryDocument?.Issuer ?? string.Empty)
-                      .AddPrivateJwk(helseIdProtectedApi.Authentication.PrivateJwk)
-                      .Build();
             })
             .Validate(
              clientCredential =>
