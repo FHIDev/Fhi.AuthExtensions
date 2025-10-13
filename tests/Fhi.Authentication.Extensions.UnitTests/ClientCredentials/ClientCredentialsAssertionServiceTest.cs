@@ -18,14 +18,16 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             clientOptions.Get("name").Returns(new ClientCredentialsClient
             {
                 ClientId = ClientId.Parse("client-id"),
-                Scope = null,
-                Parameters = new ClientCredentialParametersBuilder()
-                    .AddIssuer("issuer")
-                    .AddPrivateJwk(jwk.PrivateKey)
-                    .Build()
+                Scope = null
+            });
+            var clientAssertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
+            clientAssertionOptions.Get("name").Returns(new ClientAssertionOptions()
+            {
+                Issuer = "issuer",
+                PrivateJwk = jwk.PrivateKey
             });
 
-            var clientAssertionService = new ClientCredentialsAssertionService(Substitute.For<ILogger<ClientCredentialsAssertionService>>(), clientOptions);
+            var clientAssertionService = new ClientCredentialsAssertionService(Substitute.For<ILogger<ClientCredentialsAssertionService>>(), clientAssertionOptions, clientOptions);
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
 
             var jwt = new JsonWebToken(result!.Value);
@@ -42,6 +44,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             var logger = Substitute.For<ILogger<ClientCredentialsAssertionService>>();
             var clientAssertionService = new ClientCredentialsAssertionService(
                 logger,
+                Substitute.For<IOptionsMonitor<ClientAssertionOptions>>(),
                 Substitute.For<IOptionsMonitor<ClientCredentialsClient>>());
 
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("non-existing-client"));
@@ -64,14 +67,16 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             clientOptions.Get("name").Returns(new ClientCredentialsClient
             {
                 ClientId = ClientId.Parse("client-id"),
-                Scope = null,
-                Parameters =  new ClientCredentialParametersBuilder()
-                    .AddIssuer(issuer)
-                    .AddPrivateJwk("jwk")
-                    .Build()
+                Scope = null
+            });
+            var clientAssertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
+            clientAssertionOptions.Get("name").Returns(new ClientAssertionOptions()
+            {
+                Issuer = issuer!,
+                PrivateJwk = "jwk"
             });
 
-            var clientAssertionService = new ClientCredentialsAssertionService(logger,clientOptions);
+            var clientAssertionService = new ClientCredentialsAssertionService(logger, clientAssertionOptions, clientOptions);
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
 
             logger.Received().Log(
@@ -92,14 +97,15 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             clientOptions.Get("name").Returns(new ClientCredentialsClient
             {
                 ClientId = ClientId.Parse("client-id"),
-                Scope = null,
-                Parameters = new ClientCredentialParametersBuilder()
-                    .AddIssuer("issuer")
-                    .AddPrivateJwk(jwk!)
-                    .Build()
+                Scope = null
             });
-
-            var clientAssertionService = new ClientCredentialsAssertionService(logger, clientOptions);
+            var clientAssertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
+            clientAssertionOptions.Get("name").Returns(new ClientAssertionOptions()
+            {
+                Issuer = "issuer",
+                PrivateJwk = jwk!
+            });
+            var clientAssertionService = new ClientCredentialsAssertionService(logger, clientAssertionOptions, clientOptions);
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
 
             logger.Received().Log(

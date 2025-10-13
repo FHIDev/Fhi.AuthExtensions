@@ -28,7 +28,19 @@ public partial class Program
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
+
+
                var apiOption = apiSection.Get<ApiOption>() ?? new ApiOption();
+
+               services
+                 .AddOptions<ClientAssertionOptions>(apiOption.ClientName)
+                 .Configure<IDiscoveryDocumentStore>((options, discoveryStore) =>
+                 {
+                     var discoveryDocument = discoveryStore.Get(apiOption.ClientAuthentication.Authority);
+                     options.Issuer = discoveryDocument?.Issuer ?? string.Empty;
+                     options.PrivateJwk = apiOption.ClientAuthentication.Secret;
+                 });
+
                services
                    .AddOptions<ClientCredentialsClient>("TokenClientName")
                    .Configure<IDiscoveryDocumentStore>((options, discoveryStore) =>
@@ -37,10 +49,6 @@ public partial class Program
                        options.TokenEndpoint = discoveryDocument?.TokenEndpoint is not null ? new Uri(discoveryDocument.TokenEndpoint) : null;
                        options.ClientId = ClientId.Parse(apiOption.ClientAuthentication.ClientId);
                        options.Scope = Scope.Parse(apiOption.ClientAuthentication.Scope);
-                       options.Parameters = new ClientCredentialParametersBuilder()
-                             .AddIssuer(discoveryDocument?.Issuer)
-                             .AddPrivateJwk(apiOption.ClientAuthentication.Secret)
-                             .Build();
                    })
                    .Validate(clientCredential =>
                    !string.IsNullOrWhiteSpace(clientCredential.ClientId)
