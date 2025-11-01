@@ -24,7 +24,7 @@
         "Action": "Start"
       },
       {
-        "Path": "samples\\Fhi.Samples.ClientCredentialsWorker\\Client.ClientCredentialsWorkers.csproj",
+        "Path": "samples\\Fhi.Samples.ClientCredentialsWorker\\M2M.Host.MultipleClients.csproj",
         "Action": "Start",
         "DebugTarget": "MultipleClientVariant1"
       }

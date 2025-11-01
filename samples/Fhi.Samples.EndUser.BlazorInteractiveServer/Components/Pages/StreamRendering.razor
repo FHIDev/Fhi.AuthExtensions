@@ -1,0 +1,71 @@
+﻿@page "/http-streaming"
+@rendermode InteractiveServer
+@using EndUser.BlazorInteractiveServer.Services
+@attribute [StreamRendering]
+@inject HealthRecordService HealthRecordService;
+@inject NavigationService NavigationService;
+
+<PageTitle>Stream rendering</PageTitle>
+
+<h1>Health data</h1>
+
+Stream rendering sample
+
+@if (isLoading)
+{
+    <p><em>Loading...</em></p>
+}
+
+@if (Records != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Created</th>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in Records)
+            {
+                <tr>
+                    <td>@record.CreatedAt.ToShortDateString()</td>
+                    <td>@record.Name</td>
+                    <td>@record.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<HealthRecord>? Records;
+    private bool isLoading = false;
+    private ServiceResult<IEnumerable<HealthRecord>>? _result;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            _result = await HealthRecordService.GetHealthrecords();
+            Records = _result?.Data;
+            isLoading = false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }        
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_result?.ShouldNavigate == true && !string.IsNullOrEmpty(_result.NavigateTo))
+        {
+            NavigationService.RedirectToLogin();
+        }
+
+        return Task.CompletedTask;
+    }
+}

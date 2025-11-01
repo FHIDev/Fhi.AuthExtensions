@@ -1,0 +1,21 @@
+﻿{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "MultipleHttpClients": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "PROGRAM_VARIANT": "MultipleClientsNoExtensions"
+      }
+    },
+    "Refit": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "PROGRAM_VARIANT": "MultipleClientsUsingExtensions"
+      }
+    }
+  }
+}

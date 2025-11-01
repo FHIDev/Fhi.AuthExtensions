@@ -1,4 +1,4 @@
-using WebApi;
+using Api.WebApi.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
