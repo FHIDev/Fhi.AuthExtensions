@@ -14,7 +14,7 @@ namespace Fhi.Samples.M2M.Manuel
         /// Sample requests to Maskinporten using a PEM formatted private key.
         /// </summary>
         /// <returns></returns>
-        [Test]
+        [Test, Explicit("Sample")]
         public async Task MaskinportenTokenRequest_WithPEMKeyFormat()
         {
             string pem = """
@@ -38,7 +38,7 @@ namespace Fhi.Samples.M2M.Manuel
         /// Sample requests to Maskinporten using a JWK formatted private key.
         /// </summary>
         /// <returns></returns>
-        [Test]
+        [Test, Explicit("Sample")]
         public async Task MaskinportenTokenRequest_WithJWKKeyFormat()
         {
             string jwk = """

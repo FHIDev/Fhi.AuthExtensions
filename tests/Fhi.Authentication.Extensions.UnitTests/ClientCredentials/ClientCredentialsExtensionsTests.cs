@@ -16,11 +16,9 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
         {
             var namedOption = "nameOnOption";
             var authority = "https://authority";
+            var tokenEndpoint = "https://tokenendpoint";
             var clientCredentialsOption = new ServiceCollection()
-                .AddSingleton(
-                    Substitute.For<IDiscoveryDocumentStore>()
-                    .Get(authority)
-                    .Returns(new DiscoveryDocument(authority, "https://issuer", null, "https://token", null, null, null)))
+                .AddSingleton(CreateDiscoveryStoreMock(authority, "issuer", tokenEndpoint))
                 .AddClientCredentialsClientOptions(
                     namedOption,
                     authority,
@@ -31,9 +29,9 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             var options = clientCredentialsOption.CreateServiceProvider().GetClientCredentialsOption(namedOption);
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(options.ClientId.ToString(), Is.EqualTo("ClienId"), "");
+                Assert.That(options.ClientId.ToString(), Is.EqualTo("ClientId"), "");
                 Assert.That(options.Scope.ToString(), Is.EqualTo("scope1"), "");
-                Assert.That(options.TokenEndpoint, Is.EqualTo("https://token"), "");
+                Assert.That(options.TokenEndpoint, Is.EqualTo(tokenEndpoint), "");
             }
         }
 
@@ -42,11 +40,10 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
         {
             var namedOption = "nameOnOption";
             var authority = "https://authority";
+            var tokenEndpoint = "https://tokenendpoint";
+            var issuer = "https://issuer";
             var clientCredentialsOption = new ServiceCollection()
-                .AddSingleton(
-                    Substitute.For<IDiscoveryDocumentStore>()
-                    .Get(authority)
-                    .Returns(new DiscoveryDocument(authority, "https://issuer", null, "https://token", null, null, null)))
+                .AddSingleton(CreateDiscoveryStoreMock(authority, issuer, tokenEndpoint))
                 .AddClientCredentialsClientOptions(
                     namedOption,
                     authority,
@@ -58,16 +55,16 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             var options = provider.GetClientCredentialsOption(namedOption);
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(options.ClientId.ToString(), Is.EqualTo("ClienId"), "");
+                Assert.That(options.ClientId.ToString(), Is.EqualTo("ClientId"), "");
                 Assert.That(options.Scope.ToString(), Is.EqualTo("scope1"), "");
-                Assert.That(options.TokenEndpoint, Is.EqualTo("https://token"), "");
+                Assert.That(options.TokenEndpoint, Is.EqualTo(tokenEndpoint), "");
             }
 
             var clientAssertionOptions = provider.GetClientAssertionOption(namedOption);
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(clientAssertionOptions.Issuer, Is.EqualTo("https://issuer"), "");
-                Assert.That(clientAssertionOptions.ClientAssertionType, Is.EqualTo(""), "");
+                Assert.That(clientAssertionOptions.Issuer, Is.EqualTo(issuer), "");
+                Assert.That(clientAssertionOptions.ClientAssertionType, Is.EqualTo("urn:ietf:params:oauth:client-assertion-type:jwt-bearer"), "");
             }
             var jsonWebKey = new JsonWebKey(clientAssertionOptions.PrivateJwk.ToString());
             Assert.That(jsonWebKey.Kid, Is.EqualTo("authextension.sample"));
@@ -125,6 +122,13 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
                         .SetBasePath(AppContext.BaseDirectory)
                         .AddJsonFile(fileName, optional: false, reloadOnChange: false)
                         .Build();
+        }
+
+        private static IDiscoveryDocumentStore CreateDiscoveryStoreMock(string authority, string issuer = "https://issuer", string tokenEndpoint = "https://token")
+        {
+            var discoveryDocMock = Substitute.For<IDiscoveryDocumentStore>();
+            discoveryDocMock.Get(authority).Returns(new DiscoveryDocument(authority, issuer, null, tokenEndpoint, null, null, null));
+            return discoveryDocMock;
         }
     }
 

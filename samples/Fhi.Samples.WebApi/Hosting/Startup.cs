@@ -66,11 +66,7 @@ namespace Api.WebApi.Hosting
                 .AddJwtBearer(AuthenticationSchemes.MaskinPorten, options =>
                 {
                     options.Audience = maskinportenOptions.Audience;
-                    //options.TokenValidationParameters = new TokenValidationParameters()
-                    //{
-                    //    ValidateAudience = true,
-                    //};
-                    options.MetadataAddress = "https://test.maskinporten.no/.well-known/oauth-authorization-server";
+                    options.MetadataAddress = maskinportenOptions.Authority;
                     options.Events = new JwtBearerEvents()
                     {
                         OnChallenge = OnChallenge(AuthenticationSchemes.MaskinPorten),

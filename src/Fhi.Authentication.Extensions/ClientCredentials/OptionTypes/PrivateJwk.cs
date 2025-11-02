@@ -8,7 +8,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// Represents a JSON Web Key (JWK) that contains private key information.  
     /// </summary>
     /// <remarks>This struct provides implicit conversion to and from <see cref="string"/>, allowing easy
-    /// manipulation of the JWK as a string. It is designed to encapsulate private key data securely.</remarks>
+    /// manipulation of the JWK as a string.</remarks>
     public readonly struct PrivateJwk
     {
         private readonly string _json;
@@ -37,7 +37,6 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 throw new ArgumentException("Invalid JWK JSON format.", ex);
             }
-
             return new PrivateJwk(json.Trim());
         }
 

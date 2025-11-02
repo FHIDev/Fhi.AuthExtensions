@@ -15,6 +15,15 @@ namespace Fhi.Auth.IntegrationTests.Setup
             return builder;
         }
 
+        internal static WebApplicationBuilder WithUserSecrets(this WebApplicationBuilder builder, string usersecretId)
+        {
+            var config = new ConfigurationBuilder()
+                        .AddUserSecrets(usersecretId)
+                        .Build();
+            builder.Configuration.AddConfiguration(config);
+            return builder;
+        }
+
         internal static WebApplicationBuilder WithAppSettings(this WebApplicationBuilder builder, string fileName)
         {
             var config = new ConfigurationBuilder()
@@ -22,10 +31,8 @@ namespace Fhi.Auth.IntegrationTests.Setup
                         .AddJsonFile(fileName, optional: false, reloadOnChange: false)
                         .Build();
             builder.Configuration.AddConfiguration(config);
-            //builder.Configuration.AddJsonFile(path, optional: true, reloadOnChange: true);
             return builder;
         }
-
 
         internal static WebApplicationBuilder WithUrls(this WebApplicationBuilder builder, params string[] urls)
         {
