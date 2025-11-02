@@ -73,7 +73,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
         [Test]
         public void GIVEN_addClientCredentialsClientOptions_and_ParseFromBase64Encoded_WHEN_validEscapedJson_THEN_success()
         {
-            var jsonEscaped = CreateConfig("ClientCredentials\\appsettings.ClientCredentialsTests.json")
+            var jsonEscaped = CreateConfig("ClientCredentials//appsettings.ClientCredentialsTests.json")
                 .GetValue<string>("Keys:PrivateJwkJsonEscaped");
 
             var clientCredentialsOption = CreateServiceCollectionWithDiscoveryStoreMock()
@@ -92,7 +92,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
         [Test]
         public void GIVEN_addClientCredentialsClientOptions_and_ParseFrom_WHEN_validstring_THEN_success()
         {
-            var base64Encoded = CreateConfig("ClientCredentials\\appsettings.ClientCredentialsTests.json")
+            var base64Encoded = CreateConfig("ClientCredentials//appsettings.ClientCredentialsTests.json")
                 .GetValue<string>("Keys:PrivateJwkBase64");
 
             var clientCredentialsOption = CreateServiceCollectionWithDiscoveryStoreMock()
