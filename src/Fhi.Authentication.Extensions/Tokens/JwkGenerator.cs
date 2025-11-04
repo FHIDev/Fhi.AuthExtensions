@@ -59,7 +59,7 @@ namespace Fhi.Authentication.Tokens
             var publicJwk = new JsonWebKey
             {
                 Alg = signingAlgorithm,
-                Kty = "RSA",
+                Kty = privateJwk.Kty,
                 Kid = privateJwk.Kid,
                 N = privateJwk.N,
                 E = privateJwk.E,
