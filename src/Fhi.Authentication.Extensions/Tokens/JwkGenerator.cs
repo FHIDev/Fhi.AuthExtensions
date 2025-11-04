@@ -21,16 +21,20 @@ namespace Fhi.Authentication.Tokens
         /// Generate a Json web key with RSA signing algorithm. Returns both private key and public key 
         /// Following key requirement https://utviklerportal.nhn.no/informasjonstjenester/helseid/protokoller-og-sikkerhetsprofil/sikkerhetsprofil/docs/vedlegg/krav_til_kryptografi_enmd
         /// </summary>
-        /// <returns>JwkKeypair</returns>
-        public static JwkKeyPair GenerateRsaJwk(string signingAlgorithm = SecurityAlgorithms.RsaSha512)
+        /// <param name="signingAlgorithm"></param>
+        /// <param name="customKid"></param>
+        /// <returns></returns>
+        public static JwkKeyPair GenerateRsaJwk(
+            string signingAlgorithm = SecurityAlgorithms.RsaSha512,
+            string? customKid = null)
         {
             using var rsa = RSA.Create(4096);
             var rsaParameters = rsa.ExportParameters(true);
+
             var privateJwk = new JsonWebKey
             {
                 Alg = signingAlgorithm,
                 Kty = "RSA",
-                Kid = Guid.NewGuid().ToString(),
                 N = Base64UrlEncoder.Encode(rsaParameters.Modulus),
                 E = Base64UrlEncoder.Encode(rsaParameters.Exponent),
                 D = Base64UrlEncoder.Encode(rsaParameters.D),
@@ -41,7 +45,15 @@ namespace Fhi.Authentication.Tokens
                 QI = Base64UrlEncoder.Encode(rsaParameters.InverseQ),
                 Use = "sig",
             };
-            privateJwk.Kid = Base64UrlEncoder.Encode(privateJwk.ComputeJwkThumbprint());
+
+            if (!string.IsNullOrWhiteSpace(customKid))
+            {
+                privateJwk.Kid = customKid;
+            }
+            else
+            {
+                privateJwk.Kid = Base64UrlEncoder.Encode(privateJwk.ComputeJwkThumbprint());
+            }
 
             var publicJwk = new JsonWebKey
             {
