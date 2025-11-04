@@ -1,6 +1,7 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Fhi.Authentication.Tokens
 {
@@ -38,20 +39,22 @@ namespace Fhi.Authentication.Tokens
                 DP = Base64UrlEncoder.Encode(rsaParameters.DP),
                 DQ = Base64UrlEncoder.Encode(rsaParameters.DQ),
                 QI = Base64UrlEncoder.Encode(rsaParameters.InverseQ),
+                Use = "sig",
             };
             privateJwk.Kid = Base64UrlEncoder.Encode(privateJwk.ComputeJwkThumbprint());
 
             var publicJwk = new JsonWebKey
             {
+                Alg = signingAlgorithm,
                 Kty = "RSA",
                 Kid = privateJwk.Kid,
                 N = privateJwk.N,
-                E = privateJwk.E
+                E = privateJwk.E,
+                Use = "sig"
             };
 
-            JsonSerializerOptions options = new() { WriteIndented = true };
-            string privateJwkJson = JsonSerializer.Serialize(privateJwk, options);
-            string publicJwkJson = JsonSerializer.Serialize(publicJwk, options);
+            string privateJwkJson = JsonSerializer.Serialize(privateJwk);
+            string publicJwkJson = publicJwk.ToFilteredJson();
 
             return new JwkKeyPair(publicJwkJson, privateJwkJson);
         }

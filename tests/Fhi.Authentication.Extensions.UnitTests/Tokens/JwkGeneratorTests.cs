@@ -8,6 +8,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
         public void GenerateJwk()
         {
             var jwk = JwkGenerator.GenerateRsaJwk();
+            Console.WriteLine(jwk);
         }
     }
 }
