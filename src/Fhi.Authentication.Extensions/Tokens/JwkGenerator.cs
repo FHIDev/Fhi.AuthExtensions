@@ -1,5 +1,4 @@
 ﻿using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
 
@@ -22,10 +21,12 @@ namespace Fhi.Authentication.Tokens
         /// Following key requirement https://utviklerportal.nhn.no/informasjonstjenester/helseid/protokoller-og-sikkerhetsprofil/sikkerhetsprofil/docs/vedlegg/krav_til_kryptografi_enmd
         /// </summary>
         /// <param name="signingAlgorithm"></param>
+        /// <param name="keyUse"></param>
         /// <param name="customKid"></param>
         /// <returns></returns>
         public static JwkKeyPair GenerateRsaJwk(
             string signingAlgorithm = SecurityAlgorithms.RsaSha512,
+            string keyUse = "sig",
             string? customKid = null)
         {
             using var rsa = RSA.Create(4096);
@@ -43,16 +44,16 @@ namespace Fhi.Authentication.Tokens
                 DP = Base64UrlEncoder.Encode(rsaParameters.DP),
                 DQ = Base64UrlEncoder.Encode(rsaParameters.DQ),
                 QI = Base64UrlEncoder.Encode(rsaParameters.InverseQ),
-                Use = "sig",
+                Use = keyUse,
             };
 
-            if (!string.IsNullOrWhiteSpace(customKid))
+            if (string.IsNullOrWhiteSpace(customKid))
             {
-                privateJwk.Kid = customKid;
+                privateJwk.Kid = Base64UrlEncoder.Encode(privateJwk.ComputeJwkThumbprint());
             }
             else
             {
-                privateJwk.Kid = Base64UrlEncoder.Encode(privateJwk.ComputeJwkThumbprint());
+                privateJwk.Kid = customKid;
             }
 
             var publicJwk = new JsonWebKey
@@ -62,11 +63,11 @@ namespace Fhi.Authentication.Tokens
                 Kid = privateJwk.Kid,
                 N = privateJwk.N,
                 E = privateJwk.E,
-                Use = "sig"
+                Use = keyUse
             };
 
             string privateJwkJson = JsonSerializer.Serialize(privateJwk);
-            string publicJwkJson = publicJwk.ToFilteredJson();
+            string publicJwkJson = publicJwk.ToPublicJwk();
 
             return new JwkKeyPair(publicJwkJson, privateJwkJson);
         }

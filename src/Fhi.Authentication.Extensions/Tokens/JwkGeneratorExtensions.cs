@@ -5,19 +5,23 @@ using Microsoft.IdentityModel.Tokens;
 namespace Fhi.Authentication.Tokens
 {
     /// <summary>
-    /// 
+    /// Extensions for the Microsoft JsonWebKey object.
     /// </summary>
     public static class JsonWebKeyExtensions
     {
-        private static readonly HashSet<string> ExcludedPublicProps =
-            new(StringComparer.OrdinalIgnoreCase) { "oth", "x5c", "key_ops" };
+        private static readonly HashSet<string> AllowedPublicProps =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                "kty", "n", "e", "alg", "use", "kid", "x5u"
+            };
 
         /// <summary>
-        /// Serializes the JsonWebKey and filters out parameters to create a "public" key.
+        /// Certain private key fields are present as default when we use the JsonWebKey Microsoft object.
+        /// This method ensures only the public key parameters are present when creating a public jwk.
         /// </summary>
         /// <param name="jwk"></param>
         /// <returns></returns>
-        public static string ToFilteredJson(this JsonWebKey jwk)
+        public static string ToPublicJwk(this JsonWebKey jwk)
         {
             var rawJson = JsonSerializer.Serialize(jwk);
             using var doc = JsonDocument.Parse(rawJson);
@@ -27,8 +31,10 @@ namespace Fhi.Authentication.Tokens
                 writer.WriteStartObject();
                 foreach (var prop in doc.RootElement.EnumerateObject())
                 {
-                    if (!ExcludedPublicProps.Contains(prop.Name))
+                    if (AllowedPublicProps.Contains(prop.Name))
+                    {
                         prop.WriteTo(writer);
+                    }
                 }
                 writer.WriteEndObject();
             }
