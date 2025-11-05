@@ -22,12 +22,12 @@ namespace Fhi.Authentication.Tokens
         /// </summary>
         /// <param name="signingAlgorithm"></param>
         /// <param name="keyUse"></param>
-        /// <param name="customKid"></param>
+        /// <param name="kid"></param>
         /// <returns></returns>
         public static JwkKeyPair GenerateRsaJwk(
             string signingAlgorithm = SecurityAlgorithms.RsaSha512,
             string keyUse = "sig",
-            string? customKid = null)
+            string? kid = null)
         {
             using var rsa = RSA.Create(4096);
             var rsaParameters = rsa.ExportParameters(true);
@@ -47,13 +47,13 @@ namespace Fhi.Authentication.Tokens
                 Use = keyUse,
             };
 
-            if (string.IsNullOrWhiteSpace(customKid))
+            if (string.IsNullOrWhiteSpace(kid))
             {
                 privateJwk.Kid = Base64UrlEncoder.Encode(privateJwk.ComputeJwkThumbprint());
             }
             else
             {
-                privateJwk.Kid = customKid;
+                privateJwk.Kid = kid;
             }
 
             var publicJwk = new JsonWebKey
