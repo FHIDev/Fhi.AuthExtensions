@@ -1,13 +1,12 @@
 using System.Text;
 using System.Text.Json;
-using Microsoft.IdentityModel.Tokens;
 
-namespace Fhi.Authentication.Tokens
+namespace Microsoft.IdentityModel.Tokens
 {
     /// <summary>
     /// Extensions for the Microsoft JsonWebKey object.
     /// </summary>
-    public static class JsonWebKeyExtensions
+    internal static class JsonWebKeyExtensions
     {
         private static readonly HashSet<string> AllowedPublicProps =
             new(StringComparer.OrdinalIgnoreCase)
@@ -21,7 +20,7 @@ namespace Fhi.Authentication.Tokens
         /// </summary>
         /// <param name="jwk"></param>
         /// <returns></returns>
-        public static string ToPublicJwk(this JsonWebKey jwk)
+        internal static string ToPublicJwk(this JsonWebKey jwk)
         {
             var rawJson = JsonSerializer.Serialize(jwk);
             using var doc = JsonDocument.Parse(rawJson);
