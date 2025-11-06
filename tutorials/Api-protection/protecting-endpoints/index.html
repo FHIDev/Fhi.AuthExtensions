@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../../../img/favicon.ico" />
-    <title>Token expiration handling with Angular BFF Client and Downstream APIs - FHI authentication and authorization extensions</title>
+    <title>Require authentication by default in .NET Core - FHI authentication and authorization extensions</title>
     <link rel="stylesheet" href="../../../css/theme.css" />
     <link rel="stylesheet" href="../../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -14,8 +14,8 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Token expiration handling with Angular BFF Client and Downstream APIs";
-        var mkdocs_page_input_path = "tutorials/token-expiration/AuthenticationWithAngularBFF.md";
+        var mkdocs_page_name = "Require authentication by default in .NET Core";
+        var mkdocs_page_input_path = "tutorials/Api-protection/protecting-endpoints.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -56,13 +56,13 @@
               </ul>
               <p class="caption"><span class="caption-text">Tutorials</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../protecting-endpoints/">Require authentication by default</a>
+                  <li class="toctree-l1"><a class="" href="../../protecting-endpoints.md">Require authentication by default</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../token-expiry-downstream-api/">Handling token expiration</a>
+                  <li class="toctree-l1"><a class="" href="../../token-expiry-downstream-api.md">Handling token expiration</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../security-middlewares/">Security middlewares overview</a>
+                  <li class="toctree-l1"><a class="" href="../../security-middlewares.md">Security middlewares overview</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" >Server to server communication</a>
+                  <li class="toctree-l1"><a class="reference internal" >Server to server communication (M2M)</a>
     <ul>
                 <li class="toctree-l2"><a class="reference internal" href="../../server-to-server/server-to-server/">Overview</a>
                 </li>
@@ -106,9 +106,9 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">Token expiration handling with Angular BFF Client and Downstream APIs</li>
+      <li class="breadcrumb-item active">Require authentication by default in .NET Core</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/FHIDev/Fhi.AuthExtensions/edit/master/docs/tutorials/token-expiration/AuthenticationWithAngularBFF.md" class="icon icon-github"> Edit on GitHub</a>
+          <a href="https://github.com/FHIDev/Fhi.AuthExtensions/edit/master/docs/tutorials/Api-protection/protecting-endpoints.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
   <hr/>
@@ -116,65 +116,53 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="token-expiration-handling-with-angular-bff-client-and-downstream-apis">Token expiration handling with Angular BFF Client and Downstream APIs</h1>
-<h2 id="problem">Problem</h2>
-<p>When the <code>access_token</code> and <code>refresh_token</code> expire, but the <strong>authentication cookie is still valid</strong>, the user will <strong>appear authenticated</strong>, yet calls to downstream APIs will start to fail with <code>401 Unauthorized</code>. See <a href="https://learn.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view=aspnetcore-9.0#react-to-back-end-changes">React to back-end changes</a></p>
-<h2 id="alternative-solutions">Alternative solutions</h2>
-<p>To avoid this mismatch there are several possible solutions: </p>
+                <h1 id="require-authentication-by-default-in-net-core">Require authentication by default in .NET Core</h1>
+<p>To require authentication by default on all incoming requests, configure a fallback authorization policy in your application's service pipeline. The policy will automatically require users to be authenticated for all endpoints unless explicitly overridden to allow anonymous access. This approach reduces the risk of accidentally exposing sensitive endpoints.</p>
+<p>Code samples:</p>
 <ul>
-<li><strong>Use CookieEvent to validate the refresh token:</strong> To ensure the session remains valid from the API’s perspective, proactively validate the refresh_token.</li>
-<li><strong>Implement a global exception handler for downstream API errors:</strong> Set up a global exception handler to capture exceptions from downstream APIs. Specifically, handle 401 responses by throwing a 401 exception, which can then be handled appropriately by the client.</li>
-<li><strong>Create custom middleware for token management:</strong> Develop middleware that checks the token’s expiration before forwarding requests to downstream APIs. If the token has expired, refresh it automatically before proceeding.</li>
+<li><a href="https://github.com/FHIDev/Fhi.AuthExtensions/blob/main/samples/Fhi.Samples.AngularBFF/Fhi.Samples.Angular.BFFApi/Program.cs">Angular BFF sample</a></li>
+<li><a href="https://github.com/FHIDev/Fhi.AuthExtensions/blob/main/samples/Fhi.Samples.WebApi/HostingExtensions.cs">Web Api</a></li>
 </ul>
-<h3 id="use-cookieevent-to-validate-the-refresh-token">Use CookieEvent to validate the refresh token</h3>
-<p>Override the <code>ValidatePrincipal</code> method on the CookieEvent and check the status of both the <code>access_token</code> and <code>refresh_token</code>. If the <code>access_token</code> is expired, attempt to use the <code>refresh_token</code> to obtain a new one. If that fails, reject the principal.</p>
-<blockquote>
-<p>🔒 This logic must be combined with proper cookie expiration settings using <code>ExpireTimeSpan</code> to manage session longevity consistently.</p>
-</blockquote>
-<p>See sample code in<a href="https://github.com/FHIDev/Fhi.AuthExtensions/tree/main/samples/Fhi.Samples.AngularBFF"> Angular</a> and <a href="https://github.com/FHIDev/Fhi.AuthExtensions/tree/main/samples/Fhi.Samples.BlazorInteractiveServer">Blazor</a></p>
-<p>Do the following steps:</p>
-<h4 id="step-1-change-cookie-expiration-time">Step 1: Change Cookie expiration time</h4>
-<p>ExpireTimeSpan should be set out from access_token and refresh_token lifetime. This is to ensure that the cookie is not expired after the refresh token is expired. </p>
-<p>Sample code</p>
-<pre><code>builder.Services.AddAuthentication(options =&gt;
+<h2 id="1-add-the-fallback-policy">1: Add the fallback policy</h2>
+<p>All controllers and endpoints require an authenticated user. If a request is made to any endpoint and the user is not authenticated, a 401 Unauthorized response is returned. This is achieved using the <code>SetFallbackPolicy</code> method or <code>FallbackPolicy</code> option in the authorization configuration:</p>
+<pre><code>// Option 1: by default
+builder.Services.AddAuthorizationBuilder()
+    .SetFallbackPolicy(new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build());
+
+// Or option 2:
+builder.Services.AddAuthorization(options =&gt;
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-}).AddCookie(options =&gt;
-{
-    options.ExpireTimeSpan = TimeSpan.FromSeconds(90);
-})
-...
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+
+// Or option 3: for multiple authentication schemes
+builder.Services.AddAuthorizationBuilder()
+                .SetFallbackPolicy(new AuthorizationPolicyBuilder()
+                            .RequireAuthenticatedUser()
+                            .Build())
+                .AddPolicy(&quot;Scheme1&quot;, policy =&gt;
+                {
+                    policy.AuthenticationSchemes.Add(&quot;Scheme1&quot;);
+                    policy.RequireAuthenticatedUser();
+                })
+                 .AddPolicy(&quot;Scheme2&quot;, policy =&gt;
+                 {
+                     policy.AuthenticationSchemes.Add(&quot;Scheme2&quot;);
+                     policy.RequireAuthenticatedUser();
+                 });
+
+});
 </code></pre>
-<h4 id="step-2-add-addopenidconnectcookieoptions-to-the-pipeline">Step 2: Add AddOpenIdConnectCookieOptions to the pipeline</h4>
-<p>You can use <a href="https://www.nuget.org/packages/Fhi.Authentication.Extensions/"><code>Fhi.Authentication.Extensions</code> package</a> to validate the token expiration.</p>
-<p>The <code>AddOpenIdConnectCookieOptions</code> will add <code>ValidatePrincipal</code> event that checks if token is expired, see implementation and handle <code>SignOut</code> <a href="https://github.com/FHIDev/Fhi.AuthExtensions/blob/main/src/Fhi.Authentication.Extensions/OpenIdConnect/OpenIdConnectCookieEventsForApi.cs#L11">OpenIdConnectCookieEventsForApi</a></p>
-<pre><code>builder.Services.AddOpenIdConnectCookieOptions();
-</code></pre>
-<h3 id="create-custom-middleware-for-token-management">Create custom middleware for token management</h3>
-<p>The sample below uses <a href="https://docs.duendesoftware.com/accesstokenmanagement/web-apps/">Duende accesstoken management <code>GetUserAccessTokenAsync</code> extension</a></p>
-<pre><code class="language-csharp">public class TokenExpirationMiddleware
-{
-    private readonly RequestDelegate _next;
+<h2 id="2-permit-anonymous-access">2: Permit anonymous access</h2>
+<p>To allow anonymous access to specific endpoints (such as /login, /session, or the SPA fallback) use <code>[AllowAnonymous]</code> or <code>AllowAnonymous()</code> attribute on specific endpoints to permit anonymous access.</p>
+<pre><code>// This endpoint allows anonymous access
+app.MapGet(&quot;/login&quot;, [AllowAnonymous] async (HttpContext context) =&gt; { ... });
 
-    public TokenExpirationMiddleware(RequestDelegate next) =&gt; _next = next;
-
-    public async Task InvokeAsync(HttpContext context)
-    {
-        var user = context.User;
-        if (user.Identity is not null &amp;&amp; user.Identity.IsAuthenticated)
-        {
-            var userToken = await context.GetUserAccessTokenAsync();
-            if (userToken.IsError)
-            {
-                //Handle token expiration in your application in your preffered way
-                //await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            }
-        }
-
-        await _next(context);
-    }
-}
+// For an SPA client like Angular should allow anonymous access to the index page
+app.MapFallbackToFile(&quot;/index.html&quot;).AllowAnonymous();
 
 </code></pre>
               
