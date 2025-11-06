@@ -15,7 +15,7 @@ nav:
     - Require authentication by default: tutorials/protecting-endpoints.md
     - Handling token expiration: tutorials/token-expiry-downstream-api.md
     - Security middlewares overview: tutorials/security-middlewares.md
-    - Server to server communication: 
+    - Server to server communication (M2M): 
       - Overview: tutorials/server-to-server/server-to-server.md
       - Client credentials token request from a Web host: tutorials/server-to-server/web-server-host.md
       - Manual client credential token request: tutorials/server-to-server/manual-token-request.md

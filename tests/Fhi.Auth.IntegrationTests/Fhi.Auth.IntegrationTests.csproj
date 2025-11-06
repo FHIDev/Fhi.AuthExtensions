@@ -25,5 +25,7 @@
   <ItemGroup>
     <Using Include="NUnit.Framework" />
   </ItemGroup>
-
+	<ItemGroup>
+		<InternalsVisibleTo Include="Fhi.Auth.EndToEndTests" />
+	</ItemGroup>
 </Project>

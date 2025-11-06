@@ -15,8 +15,9 @@ namespace Fhi.Authentication.Tokens
         /// <param name="issuer">This value is the audience, but should be set as the OIDC issues</param>
         /// <param name="clientId">client identifier</param>
         /// <param name="jwk">json web key string</param>
+        /// <param name="kid">ke identifier</param>
         /// <returns></returns>
-        public static string CreateJwtToken(string issuer, string clientId, string jwk)
+        public static string CreateJwtToken(string issuer, string clientId, string jwk, string? kid = null)
         {
             var securityKey = new JsonWebKey(jwk);
             var token = CreateJwtToken(issuer, clientId, securityKey);
@@ -24,26 +25,20 @@ namespace Fhi.Authentication.Tokens
             return token;
         }
 
-        //public static string CreateJwtToken(string issuer, string clientId, string certificatePath, string certificatePassword)
-        //{
-        //    var certificate = new X509Certificate2(certificatePath, certificatePassword);
-        //    var securityKey = new X509SecurityKey(certificate);
-        //    string token = CreateJwtToken(issuer, clientId, securityKey);
-        //    return token;
-        //}
-
-        private static string CreateJwtToken(string issuer, string clientId, JsonWebKey securityKey)
+        private static string CreateJwtToken(string issuer, string clientId, JsonWebKey securityKey, DateTime? expiration = null, string? kid = null)
         {
             var claims = new List<Claim>
             {
+
                 new(JwtRegisteredClaimNames.Sub, clientId),
                 new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
             };
-            var payload = new JwtPayload(clientId, issuer, claims, DateTime.UtcNow, DateTime.UtcNow.AddSeconds(60));
+            var payload = new JwtPayload(clientId, issuer, claims, DateTime.UtcNow, expiration ?? DateTime.UtcNow.AddSeconds(60));
 
             if (string.IsNullOrEmpty(securityKey.Alg))
                 securityKey.Alg = SecurityAlgorithms.RsaSha256;
+            securityKey.KeyId = kid ?? securityKey.Kid;
             var signingCredentials = new SigningCredentials(securityKey, securityKey.Alg);
             var header = new JwtHeader(signingCredentials, null, "client-authentication+jwt");
 

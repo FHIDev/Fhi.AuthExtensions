@@ -1,4 +1,5 @@
-﻿using Fhi.Samples.WebApi.Api.HealthRecord.Me.v1.Dtos;
+﻿using Api.WebApi.Hosting;
+using Fhi.Samples.WebApi.Api.HealthRecord.Me.v1.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Services;

@@ -1,0 +1,61 @@
+﻿@page "/access-test"
+@using EndUser.BlazorInteractiveServer.Services
+@rendermode InteractiveServer
+@inject HealthRecordService HealthRecordService;
+<h1>Access denied test</h1>
+
+<p>
+    Try to get health record from integration endpoint. Should give Access denied.
+</p>
+
+<button class="btn btn-primary" @onclick="FetchHealthRecords">Get Health records</button>
+@if (isLoading)
+{
+    <p><em>Loading...</em></p>
+}
+
+@if (Result != null)
+{
+    <br />
+    <p>
+        <strong>Error:</strong> @Result.IsError
+        <br />
+        <strong>Error Message:</strong> @Result.ErrorMessage
+
+        <h3>Http Response</h3>
+        <strong>Status Code:</strong> @Result.Raw.StatusCode
+        <br />
+        <strong>Reason Phrase:</strong> @Result.Raw.ReasonPhrase
+        <br />
+        <strong>Headers:</strong>
+        <ul>
+            @foreach (var header in Result.Raw.Headers)
+            {
+                <li>@header.Key: @string.Join(", ", header.Value)</li>
+            }
+        </ul>
+        <br />
+        <strong>Content:</strong>
+        <pre>@RawContent</pre>
+    </p>
+}
+
+@code {
+    private bool isLoading = false;
+    private ServiceResult<IEnumerable<HealthRecord>>? Result;
+    private string RawContent = string.Empty;
+
+    private async Task FetchHealthRecords()
+    {
+        isLoading = true;
+        var result = await HealthRecordService.GetHealthrecordsFromIntegrationEndpoint();
+        Result = result;
+
+        if (Result?.Raw?.Content != null)
+        {
+            RawContent = await Result.Raw.Content.ReadAsStringAsync();
+        }
+
+        isLoading = false;
+    }
+}

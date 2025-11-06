@@ -3,12 +3,12 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace Fhi.Authentication.Tokens
 {
-    //TODO
+    //TODO: Complete DPoP proof creation
     internal interface IDPoPProofHandler
     {
         public string CreateDPoPProof(string url, string httpMethod, string key);
-        public string CreateDPoPProofWithNonce(string url, string httpMethod, string jwk, string dPoPNonce);
-        public string CreateDPoPProofWithAccessToken(string url, string httpMethod, string jwk, string accessToken);
+        //public string CreateDPoPProofWithNonce(string url, string httpMethod, string jwk, string dPoPNonce);
+        //public string CreateDPoPProofWithAccessToken(string url, string httpMethod, string jwk, string accessToken);
     }
 
     internal class DefaultDPoPProofHandler : IDPoPProofHandler

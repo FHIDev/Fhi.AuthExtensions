@@ -28,7 +28,7 @@ namespace Fhi.Auth.IntegrationTests
 
             var builder = WebApplicationBuilderTestHost
                 .CreateWebHostBuilder()
-                .WithServices(services =>
+                .WithServices((services, _) =>
                 {
                     services.AddAuthentication("Fake")
                         .AddScheme<AuthenticationSchemeOptions, FakeAuthHandler>("Fake", options => { });
