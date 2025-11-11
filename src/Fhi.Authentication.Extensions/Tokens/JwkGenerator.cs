@@ -29,6 +29,23 @@ namespace Fhi.Authentication.Tokens
             string keyUse = "sig",
             string? kid = null)
         {
+            var allowedAlgorithms = new[]
+            {
+                //SecurityAlgorithms.RsaSha256,
+                //SecurityAlgorithms.RsaSha384,
+                SecurityAlgorithms.RsaSha512
+            };
+            if (!allowedAlgorithms.Contains(signingAlgorithm))
+            {
+                throw new ArgumentException($"Invalid signing algorithm: '{signingAlgorithm}'. Expected one of: {string.Join(", ", allowedAlgorithms)}", nameof(signingAlgorithm));
+            }
+
+            var allowedKeyUses = new[] { "sig", "enc" };
+            if (!allowedKeyUses.Contains(keyUse))
+            {
+                throw new ArgumentException($"Invalid key use: '{keyUse}'. Expected one of: {string.Join(", ", allowedKeyUses)}", nameof(keyUse));
+            }
+
             using var rsa = RSA.Create(4096);
             var rsaParameters = rsa.ExportParameters(true);
 
@@ -47,14 +64,9 @@ namespace Fhi.Authentication.Tokens
                 Use = keyUse,
             };
 
-            if (string.IsNullOrWhiteSpace(kid))
-            {
-                privateJwk.Kid = Base64UrlEncoder.Encode(privateJwk.ComputeJwkThumbprint());
-            }
-            else
-            {
-                privateJwk.Kid = kid;
-            }
+            privateJwk.Kid = string.IsNullOrWhiteSpace(kid)
+                ? Base64UrlEncoder.Encode(privateJwk.ComputeJwkThumbprint())
+                : kid;
 
             var publicJwk = new JsonWebKey
             {
