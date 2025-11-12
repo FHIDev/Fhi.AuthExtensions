@@ -10,7 +10,7 @@ namespace Fhi.Authentication.UnitTests.Tokens
         /// Generate JWK with default parameters and validate key structure.
         /// </summary>
         [Test]
-        public void GIVEN_GenerateJwk_WHEN_OnlyDefaultValues_THEN_CreateValidKeyPair()
+        public void GIVEN_GenerateRsaJwk_WHEN_OnlyDefaultValues_THEN_CreateValidKeyPair()
         {
             var keys = JwkGenerator.GenerateRsaJwk();
 
@@ -34,7 +34,7 @@ namespace Fhi.Authentication.UnitTests.Tokens
         /// Generate JWK with custom kid and verify it is applied.
         /// </summary>
         [Test]
-        public void GIVEN_GenerateJwk_WHEN_CustomKidValue_THEN_CreateValidKeyPairWithCustomKid()
+        public void GIVEN_GenerateRsaJwk_WHEN_CustomKidValue_THEN_CreateValidKeyPairWithCustomKid()
         {
             var customKid = "custom-key-id";
             var keys = JwkGenerator.GenerateRsaJwk(kid: customKid);
@@ -53,7 +53,7 @@ namespace Fhi.Authentication.UnitTests.Tokens
         /// Generate JWK with invalid key use and expect exception.
         /// </summary>
         [Test]
-        public void GIVEN_GenerateJwk_WHEN_InvalidKeyUseType_THEN_ThrowException()
+        public void GIVEN_GenerateRsaJwk_WHEN_InvalidKeyUseType_THEN_ThrowException()
         {
             var ex = Assert.Throws<ArgumentException>(() =>
             {
@@ -67,7 +67,7 @@ namespace Fhi.Authentication.UnitTests.Tokens
         /// Generate JWK with invalid signing algorithm and expect exception.
         /// </summary>
         [Test]
-        public void GIVEN_GenerateJwk_WHEN_InvalidSigningAlgorithm_THEN_ThrowException()
+        public void GIVEN_GenerateRsaJwk_WHEN_InvalidSigningAlgorithm_THEN_ThrowException()
         {
             var ex = Assert.Throws<ArgumentException>(() =>
             {
