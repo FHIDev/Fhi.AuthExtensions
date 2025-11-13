@@ -68,8 +68,15 @@ namespace Fhi.Authentication.Tokens
             privateJwk.Kid = string.IsNullOrWhiteSpace(kid)
                 ? Base64UrlEncoder.Encode(privateJwk.ComputeJwkThumbprint())
                 : kid;
-                
-            string publicJwkJson = privateJwk.SerializeToPublicJwk();
+
+            var publicOptions = new JsonSerializerOptions
+            {
+                // Converter ensures only public key values are added to the public key
+                Converters = { new PublicJsonWebKeyConverter() },
+                WriteIndented = false
+            };
+
+            string publicJwkJson = JsonSerializer.Serialize(privateJwk, publicOptions);
             string privateJwkJson = JsonSerializer.Serialize(privateJwk);
 
             return new JwkKeyPair(publicJwkJson, privateJwkJson);
