@@ -31,6 +31,7 @@ namespace Fhi.Authentication.Tokens
         {
             var allowedAlgorithms = new[]
             {
+                // TODO: add support for multiple algorithms
                 //SecurityAlgorithms.RsaSha256,
                 //SecurityAlgorithms.RsaSha384,
                 SecurityAlgorithms.RsaSha512
@@ -67,19 +68,9 @@ namespace Fhi.Authentication.Tokens
             privateJwk.Kid = string.IsNullOrWhiteSpace(kid)
                 ? Base64UrlEncoder.Encode(privateJwk.ComputeJwkThumbprint())
                 : kid;
-
-            var publicJwk = new JsonWebKey
-            {
-                Alg = signingAlgorithm,
-                Kty = privateJwk.Kty,
-                Kid = privateJwk.Kid,
-                N = privateJwk.N,
-                E = privateJwk.E,
-                Use = keyUse
-            };
-
+                
+            string publicJwkJson = privateJwk.SerializeToPublicJwk();
             string privateJwkJson = JsonSerializer.Serialize(privateJwk);
-            string publicJwkJson = publicJwk.ToPublicJwk();
 
             return new JwkKeyPair(publicJwkJson, privateJwkJson);
         }
