@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Concepts and terminology - FHI authentication and authorization extensions</title>
+    <title>Consepts and glossary - FHI authentication and authorization extensions</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -14,7 +14,7 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Concepts and terminology";
+        var mkdocs_page_name = "Consepts and glossary";
         var mkdocs_page_input_path = "concepts.md";
         var mkdocs_page_url = null;
       </script>
@@ -46,50 +46,81 @@
                 <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
               </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../packages/">Overview packages</a>
-                </li>
-              </ul>
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="#">Concepts and terminology</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Consepts and glossary</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#oauth-2-and-oidc-providers">OAuth 2 and OIDC providers</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#secret-types">Secret types</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#authorization-server">Authorization server</a>
+    </li>
     </ul>
                 </li>
               </ul>
-              <p class="caption"><span class="caption-text">Tutorials</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="" href="../tutorials/protecting-endpoints.md">Require authentication by default</a>
+                <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started - Learning and code samples</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../packages/">Overview of packages</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Api protection</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../api-protection/protecting-endpoints/">Require authentication by default (in .NET Core)</a>
                   </li>
-                  <li class="toctree-l1"><a class="" href="../tutorials/token-expiry-downstream-api.md">Handling token expiration</a>
+              </ul>
+              <p class="caption"><span class="caption-text">End user authentication</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../end-user-authentication/end-user-authentication/">End user authentication</a>
                   </li>
-                  <li class="toctree-l1"><a class="" href="../tutorials/security-middlewares.md">Security middlewares overview</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" >Server to server communication (M2M)</a>
+                  <li class="toctree-l1"><a class="reference internal" >How to</a>
     <ul>
-                <li class="toctree-l2"><a class="reference internal" href="../tutorials/server-to-server/server-to-server/">Overview</a>
+                <li class="toctree-l2"><a class="reference internal" href="../end-user-authentication/how-to/angular/">Authentication with an Angular + BFF application</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="../tutorials/server-to-server/web-server-host/">Client credentials token request from a Web host</a>
+                <li class="toctree-l2"><a class="reference internal" href="../end-user-authentication/how-to/blazor/">Blazor</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="../tutorials/server-to-server/manual-token-request/">Manual client credential token request</a>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Tutorials</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../end-user-authentication/tutorials/security-middlewares/">Security middlewares</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="../tutorials/server-to-server/multiple-client-configurations/">Service calling multiple external APIs</a>
+                <li class="toctree-l2"><a class="reference internal" >Token expiration</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../end-user-authentication/tutorials/token-expiration/AuthenticationWithAngularBFF/">Token expiration handling with Angular BFF Client and Downstream APIs</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../end-user-authentication/tutorials/token-expiration/AuthenticationWithBlazorServer/">Token Expiry Handling with Blazor server client and Downstream APIs</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../end-user-authentication/tutorials/token-expiration/token-expiry-downstream-api/">Token Expiry Handling with Downstream APIs</a>
+                </li>
+    </ul>
                 </li>
     </ul>
                   </li>
               </ul>
-              <p class="caption"><span class="caption-text">Code lab</span></p>
+              <p class="caption"><span class="caption-text">Server to server authentication</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" >Client credentials flow (server to server)</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../server-to-server-authentication/server-to-server/">Server to server (M2M)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >How to</a>
     <ul>
-                <li class="toctree-l2"><a class="reference internal" href="../code-lab/client-credentials/webserver-host-sample/">Using IHttpClientFactory and Duende AccessToken Management</a>
+                <li class="toctree-l2"><a class="reference internal" href="../server-to-server-authentication/how-to/ClientCredentials/">HttpClient: Client credentials token request(HelseID and EntraID)</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="../code-lab/client-credentials/manual-bearertoken-request-withclientassertion/">Bearer token request using client assertion</a>
+                <li class="toctree-l2"><a class="reference internal" href="../server-to-server-authentication/how-to/manual-tokenrequest-using-duende/">Manual tokenrequest using duende</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="../code-lab/client-credentials/manual-bearertoken-request/">Bearer token request using shared secret</a>
+                <li class="toctree-l2"><a class="reference internal" href="../server-to-server-authentication/how-to/maskinporten-m2m/">HttpClient: Maskinporten token request (JWT-bearer authorization grant)</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="../code-lab/client-credentials/manual-dpoptoken-request/">DPoP token request</a>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Tutorials</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" >ClientCredentials</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../server-to-server-authentication/tutorials/ClientCredentials/Duende-accesstokenmanagement/">Duende AccessTokenManagement library</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="../code-lab/client-credentials/manual-tokenrequest-with-duendeidentitymodel/">Manual token request with Duende IdentityModel</a>
+    </ul>
                 </li>
     </ul>
                   </li>
@@ -108,7 +139,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">Concepts and terminology</li>
+      <li class="breadcrumb-item active">Consepts and glossary</li>
     <li class="wy-breadcrumbs-aside">
           <a href="https://github.com/FHIDev/Fhi.AuthExtensions/edit/master/docs/concepts.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
@@ -118,25 +149,32 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="useful-links">Useful links</h1>
+                <h1 id="consepts-and-glossary">Consepts and glossary</h1>
+<ul>
+<li><a href="https://docs.duendesoftware.com/identityserver/overview/terminology/">Terminology</a></li>
+<li><a href="https://learn.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-9.0#authentication-concepts">Authentication concepts</a></li>
+</ul>
+<h2 id="oauth-2-and-oidc-providers">OAuth 2 and OIDC providers</h2>
 <ul>
 <li><a href="https://docs.digdir.no/">Digdir</a></li>
 <li><a href="https://www.nhn.no/tjenester/helseid">HelseID</a></li>
 <li><a href="https://eid.difi.no/nb/id-porten">ID Porten</a></li>
-<li><a href="https://docs.duendesoftware.com/identityserver/overview/terminology/">Terminology</a></li>
-<li><a href="https://learn.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-9.0#authentication-concepts">Authentication concepts</a></li>
-<li>Secret types: <ul>
+</ul>
+<h2 id="secret-types">Secret types</h2>
+<ul>
 <li><a href="https://docs.duendesoftware.com/identityserver/tokens/client-authentication#shared-secrets">Shared secret</a></li>
 <li><a href="https://docs.duendesoftware.com/identityserver/tokens/client-authentication#shared-secrets">Asymmetric keys</a>, also see RFC 7521 for detailed description <a href="https://www.rfc-editor.org/rfc/rfc7521.html#section-3">Client assertion</a></li>
 </ul>
-</li>
+<h2 id="authorization-server">Authorization server</h2>
+<ul>
+<li>See RFC679 spesification <a href="https://datatracker.ietf.org/doc/html/rfc6749#section-1.1">Roles</a> and <a href="https://datatracker.ietf.org/doc/html/rfc6749#section-1.2">Protocol flow</a> chapter</li>
 </ul>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../packages/" class="btn btn-neutral float-left" title="Overview packages"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../tutorials/server-to-server/server-to-server/" class="btn btn-neutral float-right" title="Overview">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../getting-started/" class="btn btn-neutral float-right" title="Getting started - Learning and code samples">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -163,10 +201,10 @@
         </span>
     
     
-      <span><a href="../packages/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../tutorials/server-to-server/server-to-server/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../getting-started/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

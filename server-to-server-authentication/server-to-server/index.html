@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Server to server (M2M) - FHI authentication and authorization extensions</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../overrides/readthedocs.css" rel="stylesheet" />
+        <link href="../../overrides/cards.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Server to server (M2M)";
+        var mkdocs_page_input_path = "server-to-server-authentication/server-to-server.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../..">
+          <img src="../../logo_small.webp" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../concepts/">Consepts and glossary</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started - Learning and code samples</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../packages/">Overview of packages</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Api protection</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../api-protection/protecting-endpoints/">Require authentication by default (in .NET Core)</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">End user authentication</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../end-user-authentication/end-user-authentication/">End user authentication</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >How to</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../end-user-authentication/how-to/angular/">Authentication with an Angular + BFF application</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../end-user-authentication/how-to/blazor/">Blazor</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Tutorials</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../end-user-authentication/tutorials/security-middlewares/">Security middlewares</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >Token expiration</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../end-user-authentication/tutorials/token-expiration/AuthenticationWithAngularBFF/">Token expiration handling with Angular BFF Client and Downstream APIs</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../end-user-authentication/tutorials/token-expiration/AuthenticationWithBlazorServer/">Token Expiry Handling with Blazor server client and Downstream APIs</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../end-user-authentication/tutorials/token-expiration/token-expiry-downstream-api/">Token Expiry Handling with Downstream APIs</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Server to server authentication</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Server to server (M2M)</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#server-to-server-m2m-authorization-grants">Server to server (M2M) authorization grants</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#useful-guides-and-samples">Useful guides and samples</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >How to</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../how-to/ClientCredentials/">HttpClient: Client credentials token request(HelseID and EntraID)</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../how-to/manual-tokenrequest-using-duende/">Manual tokenrequest using duende</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../how-to/maskinporten-m2m/">HttpClient: Maskinporten token request (JWT-bearer authorization grant)</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Tutorials</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" >ClientCredentials</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../tutorials/ClientCredentials/Duende-accesstokenmanagement/">Duende AccessTokenManagement library</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">FHI authentication and authorization extensions</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Server to server authentication</li>
+      <li class="breadcrumb-item active">Server to server (M2M)</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/FHIDev/Fhi.AuthExtensions/edit/master/docs/server-to-server-authentication/server-to-server.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="server-to-server-m2m">Server to server (M2M)</h1>
+<h2 id="introduction">Introduction</h2>
+<p>Server-to-server authentication (also called machine to machine or app to app) is used for integrations between applications where no user is present. </p>
+<p>Modern applications often need to interact with multiple external APIs, each with distinct authentication and authorization requirements. APIs can be protected with different Autorization Servers (or an OpenID Connect Provider) as illustrated below. The illustration show an API integrating with three APIs that use different OAuth 2.0 flows (authentication flow and authorization grants):</p>
+<p><img alt="" src="../../images/M2M_multipleAPIs.png" /></p>
+<ul>
+<li><strong>HelseNorge API protected with HelseID:</strong> Uses client credential flow with client assertion for authentication. Requires enhanced security using client assertion and Demonstrating Proof of Possession (DPoP)</li>
+<li><strong>KRR protected with Maskinporten:</strong> Uses Jwt bearer grant with client assertion for authentication</li>
+<li><strong>Intern API protected with EntraID:</strong> Uses client credential flow with shared secret approach for client authentication</li>
+</ul>
+<h2 id="server-to-server-m2m-authorization-grants">Server to server (M2M) authorization grants</h2>
+<p>There are mainly two common flows that can be used for getting an OAuth 2 access token.</p>
+<ul>
+<li>
+<p><strong>Client credentials authorization grant:</strong> This flow is described in <a href="https://datatracker.ietf.org/doc/html/rfc6749#section-4.4">RFC6749 section Client Credentials grant</a> also see <a href="https://docs.duendesoftware.com/identityserver/tokens/requesting#machine-to-machine-communication">Duende documentation on machine-to-machine communication</a>. Also see <a href="https://docs.duendesoftware.com/accesstokenmanagement/advanced/client-credentials/">Duende Client Credentials library</a></p>
+</li>
+<li>
+<p><strong>JWT-bearer authorization grant:</strong> This flow is described in <a href="https://docs.digdir.no/docs/Maskinporten/maskinporten_protocol_jwtgrant">Maskinporten protocol</a> spescified can be found in 
+<a href="https://datatracker.ietf.org/doc/html/rfc7523">RFC7523</a></p>
+</li>
+</ul>
+<h2 id="useful-guides-and-samples">Useful guides and samples</h2>
+<ul>
+<li><a href="https://duendesoftware.com/blog/20250902-dotnet-httpclient-and-delegating-handlers">Delegation handler blog from duende</a></li>
+<li><a href="https://learn.microsoft.com/en-us/aspnet/web-api/overview/advanced/http-message-handlers">Http message handlers</a></li>
+<li><a href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-9.0">Options pattern</a></li>
+<li><a href="https://github.com/DuendeSoftware/foss">Duende foss libraries</a>
+and <a href="https://github.com/DuendeSoftware/foss/tree/main/access-token-management">Duende.AccessTokenManagement</a></li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../end-user-authentication/tutorials/token-expiration/token-expiry-downstream-api/" class="btn btn-neutral float-left" title="Token Expiry Handling with Downstream APIs"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../how-to/ClientCredentials/" class="btn btn-neutral float-right" title="HttpClient: Client credentials token request(HelseID and EntraID)">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/FHIDev/Fhi.AuthExtensions" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../../end-user-authentication/tutorials/token-expiration/token-expiry-downstream-api/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../how-to/ClientCredentials/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

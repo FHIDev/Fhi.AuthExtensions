@@ -40,47 +40,72 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="/packages/">Overview packages</a>
+                <li class="toctree-l1"><a class="reference internal" href="/concepts/">Consepts and glossary</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="/concepts/">Concepts and terminology</a>
+                <li class="toctree-l1"><a class="reference internal" href="/getting-started/">Getting started - Learning and code samples</a>
                 </li>
               </ul>
-              <p class="caption"><span class="caption-text">Tutorials</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="" href="/tutorials/protecting-endpoints.md">Require authentication by default</a>
+                <li class="toctree-l1"><a class="reference internal" href="/packages/">Overview of packages</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Api protection</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/api-protection/protecting-endpoints/">Require authentication by default (in .NET Core)</a>
                   </li>
-                  <li class="toctree-l1"><a class="" href="/tutorials/token-expiry-downstream-api.md">Handling token expiration</a>
+              </ul>
+              <p class="caption"><span class="caption-text">End user authentication</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/end-user-authentication/end-user-authentication/">End user authentication</a>
                   </li>
-                  <li class="toctree-l1"><a class="" href="/tutorials/security-middlewares.md">Security middlewares overview</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" >Server to server communication (M2M)</a>
+                  <li class="toctree-l1"><a class="reference internal" >How to</a>
     <ul>
-                <li class="toctree-l2"><a class="reference internal" href="/tutorials/server-to-server/server-to-server/">Overview</a>
+                <li class="toctree-l2"><a class="reference internal" href="/end-user-authentication/how-to/angular/">Authentication with an Angular + BFF application</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="/tutorials/server-to-server/web-server-host/">Client credentials token request from a Web host</a>
+                <li class="toctree-l2"><a class="reference internal" href="/end-user-authentication/how-to/blazor/">Blazor</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="/tutorials/server-to-server/manual-token-request/">Manual client credential token request</a>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Tutorials</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="/end-user-authentication/tutorials/security-middlewares/">Security middlewares</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="/tutorials/server-to-server/multiple-client-configurations/">Service calling multiple external APIs</a>
+                <li class="toctree-l2"><a class="reference internal" >Token expiration</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="/end-user-authentication/tutorials/token-expiration/AuthenticationWithAngularBFF/">Token expiration handling with Angular BFF Client and Downstream APIs</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="/end-user-authentication/tutorials/token-expiration/AuthenticationWithBlazorServer/">Token Expiry Handling with Blazor server client and Downstream APIs</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="/end-user-authentication/tutorials/token-expiration/token-expiry-downstream-api/">Token Expiry Handling with Downstream APIs</a>
+                </li>
+    </ul>
                 </li>
     </ul>
                   </li>
               </ul>
-              <p class="caption"><span class="caption-text">Code lab</span></p>
+              <p class="caption"><span class="caption-text">Server to server authentication</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" >Client credentials flow (server to server)</a>
+                  <li class="toctree-l1"><a class="reference internal" href="/server-to-server-authentication/server-to-server/">Server to server (M2M)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >How to</a>
     <ul>
-                <li class="toctree-l2"><a class="reference internal" href="/code-lab/client-credentials/webserver-host-sample/">Using IHttpClientFactory and Duende AccessToken Management</a>
+                <li class="toctree-l2"><a class="reference internal" href="/server-to-server-authentication/how-to/ClientCredentials/">HttpClient: Client credentials token request(HelseID and EntraID)</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="/code-lab/client-credentials/manual-bearertoken-request-withclientassertion/">Bearer token request using client assertion</a>
+                <li class="toctree-l2"><a class="reference internal" href="/server-to-server-authentication/how-to/manual-tokenrequest-using-duende/">Manual tokenrequest using duende</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="/code-lab/client-credentials/manual-bearertoken-request/">Bearer token request using shared secret</a>
+                <li class="toctree-l2"><a class="reference internal" href="/server-to-server-authentication/how-to/maskinporten-m2m/">HttpClient: Maskinporten token request (JWT-bearer authorization grant)</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="/code-lab/client-credentials/manual-dpoptoken-request/">DPoP token request</a>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Tutorials</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" >ClientCredentials</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="/server-to-server-authentication/tutorials/ClientCredentials/Duende-accesstokenmanagement/">Duende AccessTokenManagement library</a>
                 </li>
-                <li class="toctree-l2"><a class="reference internal" href="/code-lab/client-credentials/manual-tokenrequest-with-duendeidentitymodel/">Manual token request with Duende IdentityModel</a>
+    </ul>
                 </li>
     </ul>
                   </li>
