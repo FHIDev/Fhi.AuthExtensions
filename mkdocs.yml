@@ -7,26 +7,32 @@ theme:
   features:
   custom_dir: docs/overrides
 
-nav: 
-- Home: index.md
-- Overview packages: packages.md
-- Concepts and terminology: concepts.md
-- Tutorials:
-    - Require authentication by default: tutorials/protecting-endpoints.md
-    - Handling token expiration: tutorials/token-expiry-downstream-api.md
-    - Security middlewares overview: tutorials/security-middlewares.md
-    - Server to server communication (M2M): 
-      - Overview: tutorials/server-to-server/server-to-server.md
-      - Client credentials token request from a Web host: tutorials/server-to-server/web-server-host.md
-      - Manual client credential token request: tutorials/server-to-server/manual-token-request.md
-      - Service calling multiple external APIs: tutorials/server-to-server/multiple-client-configurations.md
-- Code lab:
-    - Client credentials flow (server to server):
-        - Using IHttpClientFactory and Duende AccessToken Management: code-lab/client-credentials/webserver-host-sample.ipynb
-        - Client assertion sample: code-lab/client-credentials/manual-bearertoken-request-withclientassertion.ipynb
-        - Manual bearer token request: code-lab/client-credentials/manual-bearertoken-request.ipynb
-        - Manual DPoP token request: code-lab/client-credentials/manual-dpoptoken-request.ipynb
-        - Manual token request with Duende IdentityModel: code-lab/client-credentials/manual-tokenrequest-with-duendeidentitymodel.ipynb
+# nav: 
+# - Home: index.md
+# - Overview packages: packages.md
+# - Concepts and terminology: concepts.md
+# - Test: tutorials/server-to-server-authentication/test.md
+# - Tutorials:
+#     - Api protection:
+#       - Overview: tutorials/api-protection/api-protection.md
+#       - Require authentication by default: tutorials/api-protection/protecting-endpoints.md
+#       - Protecting APIs with scopes: tutorials/api-protection/protecting-endpoints.md
+#       - Handling token expiration: tutorials/api-protection/token-expiry-downstream-api.md
+#     - End user authentication:
+#       - Overview: tutorials/end-user-authentication/end-user-authentication.md
+#       - Security middlewares overview: tutorials/end-user-authentication/security-middlewares.md
+#     - Server to server communication (M2M): 
+#       - Overview: tutorials/server-to-server/server-to-server.md
+#       - Client credentials token request from a Web host: tutorials/server-to-server/web-server-host.md
+#       - Manual client credential token request: tutorials/server-to-server/manual-token-request.md
+#       - Service calling multiple external APIs: tutorials/server-to-server/multiple-client-configurations.md
+# - Code lab:
+#     - Client credentials flow (server to server):
+#         - Using IHttpClientFactory and Duende AccessToken Management: code-lab/client-credentials/webserver-host-sample.ipynb
+#         - Client assertion sample: code-lab/client-credentials/manual-bearertoken-request-withclientassertion.ipynb
+#         - Manual bearer token request: code-lab/client-credentials/manual-bearertoken-request.ipynb
+#         - Manual DPoP token request: code-lab/client-credentials/manual-dpoptoken-request.ipynb
+#         - Manual token request with Duende IdentityModel: code-lab/client-credentials/manual-tokenrequest-with-duendeidentitymodel.ipynb
         
 
 plugins:

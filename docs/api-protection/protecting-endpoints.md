@@ -1,4 +1,4 @@
-# Require authentication by default in .NET Core
+# Require authentication by default (in .NET Core)
 To require authentication by default on all incoming requests, configure a fallback authorization policy in your application's service pipeline. The policy will automatically require users to be authenticated for all endpoints unless explicitly overridden to allow anonymous access. This approach reduces the risk of accidentally exposing sensitive endpoints.
 
 
