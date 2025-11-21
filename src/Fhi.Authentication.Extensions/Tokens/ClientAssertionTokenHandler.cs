@@ -34,7 +34,7 @@ namespace Fhi.Authentication.Tokens
                 new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
             };
-            var payload = new JwtPayload(clientId, issuer, claims, DateTime.UtcNow, expiration ?? DateTime.UtcNow.AddSeconds(60));
+            var payload = new JwtPayload(clientId, issuer, claims, DateTime.UtcNow, expiration ?? DateTime.UtcNow.AddSeconds(10));
 
             if (string.IsNullOrEmpty(securityKey.Alg))
                 securityKey.Alg = SecurityAlgorithms.RsaSha256;
