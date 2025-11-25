@@ -44,7 +44,8 @@ namespace Fhi.Authentication.ClientCredentials
                     return Task.FromResult<ClientAssertion?>(null);
                 }
                 
-                // IF JWK isnt nul or empty, do the thing with JWK and return
+                // JWK is preferred, but if not present, try certificate thumbprint
+                // TODO: Evaluate whether PEM or JWK should have first priority. Most implementations use JWK.
                 if (!string.IsNullOrEmpty(clientAssertionOptions.PrivateJwk))
                 {
                     var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client.ClientId ?? "", clientAssertionOptions.PrivateJwk);
@@ -55,7 +56,6 @@ namespace Fhi.Authentication.ClientCredentials
                     });
                 }
                 
-                // IF CertificateThumbprint isnt null or empty, do the thing with certificate and return
                 if (_certificateKeyHandler != null && !string.IsNullOrEmpty(clientAssertionOptions.CertificateThumbprint))
                 {
                     var jwk =  _certificateKeyHandler.GetPrivateKeyAsJwk(clientAssertionOptions.CertificateThumbprint);
