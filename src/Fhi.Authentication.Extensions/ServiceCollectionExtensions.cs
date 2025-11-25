@@ -1,4 +1,5 @@
 ﻿using Fhi.Authentication.OpenIdConnect;
+using Fhi.Authentication.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -21,6 +22,17 @@ namespace Fhi.Authentication
             services.AddTransient<ITokenService, DefaultTokenService>();
             services.AddSingleton<IPostConfigureOptions<CookieAuthenticationOptions>, OpenIdConnectCookieAuthenticationOptions>();
 
+            return services;
+        }
+
+        /// <summary>
+        /// Add handler for certificate store keys. This is used for retrieving keys stored as PEM certificates from the certificate store.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddCertificateStoreKeyHandler(this IServiceCollection services)
+        {
+            services.AddTransient<ICertificateKeyHandler, CertificateKeyHandler>();
             return services;
         }
 
