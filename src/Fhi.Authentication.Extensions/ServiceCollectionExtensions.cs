@@ -32,6 +32,7 @@ namespace Fhi.Authentication
         /// <returns></returns>
         public static IServiceCollection AddCertificateStoreKeyHandler(this IServiceCollection services)
         {
+            services.AddTransient<ICertificateProvider, StoreCertificateProvider>();
             services.AddTransient<ICertificateKeyHandler, CertificateKeyHandler>();
             return services;
         }
