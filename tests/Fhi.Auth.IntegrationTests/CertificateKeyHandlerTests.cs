@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Fhi.Auth.IntegrationTests
 {
     [TestFixture]
-    [Category("RequiresLocalCertificateStore")]
+    [Explicit ("Requires Windows and Local Machine Certificate Store access")]
     public class CertificateKeyHandlerTests
     {
         private IServiceProvider? _serviceProvider;
@@ -74,18 +74,17 @@ namespace Fhi.Auth.IntegrationTests
         [Test]
         public void GIVEN_ValidCertificateInStore_When_GetPrivateKeyAsJwk_Then_ReturnsPrivateJwk()
         {
-            // Given: create and install a certificate with private key
             var cert = CreateAndInstallCertificate();
-
-            // When
             var jwk = _certificateKeyHandler!.GetPrivateKeyAsJwk(cert.Thumbprint);
 
-            // Then
-            Assert.That(jwk, Is.Not.Null.Or.Empty);
-            TestContext.Progress.WriteLine("Test JWK: " + jwk);
-            Assert.That(jwk, Does.Contain("\"kty\":\"RSA\""));
-            Assert.That(jwk, Does.Contain("\"kid\":"));
-            Assert.That(jwk, Does.Contain("\"d\":"));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(jwk, Is.Not.Null.Or.Empty);
+                TestContext.Progress.WriteLine("Test JWK: " + jwk);
+                Assert.That(jwk, Does.Contain("\"kty\":\"RSA\""));
+                Assert.That(jwk, Does.Contain("\"kid\":"));
+                Assert.That(jwk, Does.Contain("\"d\":"));    
+            }
 
             cert.Dispose();
         }
