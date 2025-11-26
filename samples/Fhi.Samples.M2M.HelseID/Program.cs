@@ -26,6 +26,9 @@ public partial class Program
                     .ValidateOnStart();
 
             var api = apiSection.Get<HelseIdProtectedApiOption>() ?? new HelseIdProtectedApiOption();
+
+            //hent ut certificate fra Windows cert store og gjør om til PrivateJwk
+
             var clientCredentialsOption = services
                 .AddClientCredentialsClientOptions(
                     api.ClientName,

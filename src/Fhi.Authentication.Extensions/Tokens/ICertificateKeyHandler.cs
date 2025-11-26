@@ -1,20 +1,21 @@
+using Fhi.Authentication.ClientCredentials;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Fhi.Authentication.Tokens
 {
     /// <summary>
     /// Abstraction for resolving a certificate private key as a JWK.
     /// </summary>
-    public interface ICertificateKeyHandler
+    public interface ICertificateKeyHandler<T>
     {
         /// <summary>
-        /// Returns the private key for the certificate identified by <paramref name="certificateThumbprint"/> serialized as a JWK.
+        /// Returns the private key for the certificate identified by <paramref name="options"/> serialized as a JWK.
         /// </summary>
-        /// <param name="certificateThumbprint">Certificate thumbprint (not null or empty).</param>
+        /// <param name="options">Certificate thumbprint (not null or empty).</param>
         /// <returns>Serialized JWK string.</returns>
-        public string GetPrivateKeyAsJwk(string certificateThumbprint);
+        public string GetPrivateKeyAsJwk(IJwkOptions options);
     }
 
     /// <summary>
@@ -33,8 +34,10 @@ namespace Fhi.Authentication.Tokens
         }
 
         /// <inheritdoc/>
-        public string GetPrivateKeyAsJwk(string certificateThumbprint)
+        public string GetPrivateKeyAsJwk(IJwkOptions certificateThumbprint)
         {
+            var options = certificateThumbprint as CertificateOptions;
+
             if (string.IsNullOrWhiteSpace(certificateThumbprint))
             {
                 throw new ArgumentNullException(nameof(certificateThumbprint));
@@ -49,7 +52,7 @@ namespace Fhi.Authentication.Tokens
             }
 
             ValidateCertificate(certificate);
-            
+
             using var rsa = _certificateProvider.GetPrivateKey(normalizedThumbprint);
             if (rsa == null)
             {

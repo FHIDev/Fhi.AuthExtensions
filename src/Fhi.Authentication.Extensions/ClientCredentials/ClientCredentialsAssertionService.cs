@@ -43,7 +43,7 @@ namespace Fhi.Authentication.ClientCredentials
                     _logger.LogError("Could not resolve issuer for {clientName}. Missing parameter", clientName);
                     return Task.FromResult<ClientAssertion?>(null);
                 }
-                
+
                 // JWK is preferred, but if not present, try certificate thumbprint
                 // TODO: Evaluate whether PEM or JWK should have first priority. Most implementations use JWK.
                 if (!string.IsNullOrEmpty(clientAssertionOptions.PrivateJwk))
@@ -55,10 +55,10 @@ namespace Fhi.Authentication.ClientCredentials
                         Value = jwt
                     });
                 }
-                
+
                 if (_certificateKeyHandler != null && !string.IsNullOrEmpty(clientAssertionOptions.CertificateThumbprint))
                 {
-                    var jwk =  _certificateKeyHandler.GetPrivateKeyAsJwk(clientAssertionOptions.CertificateThumbprint);
+                    var jwk = _certificateKeyHandler.GetPrivateKeyAsJwk(clientAssertionOptions.CertificateThumbprint);
                     var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client.ClientId ?? "", jwk);
                     return Task.FromResult<ClientAssertion?>(new ClientAssertion
                     {
