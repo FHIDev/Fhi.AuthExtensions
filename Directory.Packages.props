@@ -11,6 +11,7 @@
     <PackageVersion Include="Duende.AccessTokenManagement.OpenIdConnect" Version="4.0.1" />
     <PackageVersion Include="Duende.AspNetCore.Authentication.JwtBearer" Version="0.2.0" />
     <PackageVersion Include="Duende.IdentityModel" Version="7.1.0" />
+    <PackageVersion Include="Fhi.Security.Cryptography" Version="1.0.0-beta1" />
     <PackageVersion Include="Microsoft.AspNetCore.Authorization" Version="9.0.9" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.5" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
@@ -18,7 +19,7 @@
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.6.0" />
     <PackageVersion Include="Microsoft.IdentityModel.Protocols" Version="8.5.0" />
     <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.5.0" />
-    <PackageVersion Include="Microsoft.IdentityModel.Tokens" Version="8.12.0" />
+    <PackageVersion Include="Microsoft.IdentityModel.Tokens" Version="8.13.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
     <PackageVersion Include="NUnit" Version="4.4.0" />

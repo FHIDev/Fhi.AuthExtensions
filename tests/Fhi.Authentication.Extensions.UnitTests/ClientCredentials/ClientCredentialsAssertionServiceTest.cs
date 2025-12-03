@@ -1,10 +1,10 @@
 ﻿using Duende.AccessTokenManagement;
 using Fhi.Authentication.ClientCredentials;
-using Fhi.Authentication.Tokens;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using NSubstitute;
+using Fhi.Security.Cryptography;
 
 namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
 {
@@ -13,7 +13,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
         [Test]
         public async Task GIVEN_getClientAssertion_WHEN_clientExist_THEN_returnAssertion()
         {
-            var jwk = JwkGenerator.GenerateRsaJwk();
+            var jwk = JWK.Create();
             var clientOptions = Substitute.For<IOptionsMonitor<ClientCredentialsClient>>();
             clientOptions.Get("name").Returns(new ClientCredentialsClient
             {
