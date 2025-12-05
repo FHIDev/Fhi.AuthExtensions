@@ -17,14 +17,17 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
         {
             var thumbprint = Guid.NewGuid().ToString();
             using var rsa = RSA.Create(RsaKeySize);
-            using var certificate = CreateSelfSignedCertificate(TestCertSubject, rsa);
+            var certificate = CreateSelfSignedCertificate(TestCertSubject, rsa);
+            var expectedKeyId = certificate.Thumbprint;
 
             var provider = new FakeCertificateProvider(certificate, rsa, thumbprint);
             var sut = new CertificateKeyHandler(provider);
 
             var jwkJson = sut.GetPrivateKeyAsJwk(thumbprint);
 
-            AssertValidPrivateJwk(jwkJson, certificate.Thumbprint);
+            AssertValidPrivateJwk(jwkJson, expectedKeyId);
+            
+            certificate.Dispose();
         }
 
         [Test]
@@ -36,7 +39,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
             var ex = Assert.Throws<InvalidOperationException>(() => 
                 sut.GetPrivateKeyAsJwk(Guid.NewGuid().ToString()));
 
-            Assert.That(ex.Message, Does.Contain("No certificate found"));
+            Assert.That(ex.Message, Does.Contain("Certificate not found"));
         }
 
         [Test]
@@ -44,15 +47,27 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
         {
             const string thumbprint = "THUMB123";
             using var rsa = RSA.Create(RsaKeySize);
-            using var certificate = CreateSelfSignedCertificate("CN=PublicOnly", rsa);
+            var certWithPrivateKey = CreateSelfSignedCertificate("CN=PublicOnly", rsa);
+            
+            // Export only the public portion to create a certificate without private key
+            var certBytes = certWithPrivateKey.Export(X509ContentType.Cert);
+            certWithPrivateKey.Dispose();
+            
+#if NET9_0_OR_GREATER
+            var publicOnly = X509CertificateLoader.LoadCertificate(certBytes);
+#else
+            var publicOnly = new X509Certificate2(certBytes);
+#endif
 
-            var provider = new FakeCertificateProvider(certificate, null, thumbprint);
+            var provider = new FakeCertificateProvider(publicOnly, null, thumbprint);
             var sut = new CertificateKeyHandler(provider);
 
             var ex = Assert.Throws<InvalidOperationException>(() => 
                 sut.GetPrivateKeyAsJwk(thumbprint));
 
             Assert.That(ex.Message, Does.Contain("has no private key"));
+
+            publicOnly.Dispose();
         }
 
         private static X509Certificate2 CreateSelfSignedCertificate(string subject, RSA rsa)

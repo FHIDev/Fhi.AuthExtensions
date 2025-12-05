@@ -16,19 +16,17 @@ namespace Fhi.Authentication.ClientCredentials
         private readonly ILogger<ClientCredentialsAssertionService> _logger;
         private readonly IOptionsMonitor<ClientAssertionOptions> _clientAssertionOptions;
         private readonly IOptionsMonitor<ClientCredentialsClient> _clientCredentialsClient;
-        private readonly ICertificateKeyHandler? _certificateKeyHandler;
+
 
         /// <inheritdoc/>
         public ClientCredentialsAssertionService(
             ILogger<ClientCredentialsAssertionService> logger,
             IOptionsMonitor<ClientAssertionOptions> clientAssertionOptions,
-            IOptionsMonitor<ClientCredentialsClient> clientCredentialsClient,
-            ICertificateKeyHandler? certificateKeyHandler = null)
+            IOptionsMonitor<ClientCredentialsClient> clientCredentialsClient)
         {
             _logger = logger;
             _clientAssertionOptions = clientAssertionOptions;
             _clientCredentialsClient = clientCredentialsClient;
-            _certificateKeyHandler = certificateKeyHandler;
         }
 
         /// <inheritdoc/>
@@ -43,31 +41,22 @@ namespace Fhi.Authentication.ClientCredentials
                     _logger.LogError("Could not resolve issuer for {clientName}. Missing parameter", clientName);
                     return Task.FromResult<ClientAssertion?>(null);
                 }
-                
-                // JWK is preferred, but if not present, try certificate thumbprint
-                // TODO: Evaluate whether PEM or JWK should have first priority. Most implementations use JWK.
-                if (!string.IsNullOrEmpty(clientAssertionOptions.PrivateJwk))
+
+                if (string.IsNullOrEmpty(clientAssertionOptions.PrivateJwk))
                 {
-                    var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client.ClientId ?? "", clientAssertionOptions.PrivateJwk);
-                    return Task.FromResult<ClientAssertion?>(new ClientAssertion
-                    {
-                        Type = clientAssertionOptions.ClientAssertionType,
-                        Value = jwt
-                    });
+                    _logger.LogError("Could not resolve JWK for {clientName}. Missing parameter", clientName);
+                    return Task.FromResult<ClientAssertion?>(null);
                 }
-                
-                if (_certificateKeyHandler != null && !string.IsNullOrEmpty(clientAssertionOptions.CertificateThumbprint))
+
+                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client?.ClientId ?? "", clientAssertionOptions.PrivateJwk);
+                return Task.FromResult<ClientAssertion?>(new ClientAssertion
                 {
-                    var jwk =  _certificateKeyHandler.GetPrivateKeyAsJwk(clientAssertionOptions.CertificateThumbprint);
-                    var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client.ClientId ?? "", jwk);
-                    return Task.FromResult<ClientAssertion?>(new ClientAssertion
-                    {
-                        Type = clientAssertionOptions.ClientAssertionType,
-                        Value = jwt
-                    });
-                }
+                    Type = clientAssertionOptions.ClientAssertionType,
+                    Value = jwt
+                });
             }
-            _logger.LogError("Could not resolve options for client {clientName}", clientName);
+
+            if (client is null) _logger.LogError("Could not resolve options for client {clientName}", clientName);
             return Task.FromResult<ClientAssertion?>(null);
         }
     }

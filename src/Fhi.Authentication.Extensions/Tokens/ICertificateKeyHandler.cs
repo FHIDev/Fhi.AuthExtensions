@@ -42,15 +42,21 @@ namespace Fhi.Authentication.Tokens
 
             var normalizedThumbprint = NormalizeThumbprint(certificateThumbprint);
 
-            var certificate = _certificateProvider.GetCertificate(normalizedThumbprint);
+            // Get the certificate and ensure it's disposed after use
+            using var certificate = _certificateProvider.GetCertificate(normalizedThumbprint);
             if (certificate == null)
             {
-                throw new InvalidOperationException($"No certificate found for thumbprint: {normalizedThumbprint}. Make sure the certificate is installed in CurrentUser\\My store");
+                throw new InvalidOperationException($"Certificate not found for thumbprint: {normalizedThumbprint}");
             }
 
             ValidateCertificate(certificate);
             
-            using var rsa = _certificateProvider.GetPrivateKey(normalizedThumbprint);
+            // Capture the thumbprint before the certificate is disposed
+            var keyId = certificate.Thumbprint;
+            
+            // Extract the private key from the certificate
+            // The RSA key is independent of the certificate and remains valid after cert disposal
+            using var rsa = certificate.GetRSAPrivateKey();
             if (rsa == null)
             {
                 throw new InvalidOperationException($"Certificate {certificate.Subject} has no private key available");
@@ -59,7 +65,7 @@ namespace Fhi.Authentication.Tokens
             var rsaParameters = rsa.ExportParameters(true);
             var jwk = new RsaSecurityKey(rsaParameters)
             {
-                KeyId = certificate.Thumbprint
+                KeyId = keyId
             };
 
             var jsonWebKey = JsonWebKeyConverter.ConvertFromRSASecurityKey(jwk);

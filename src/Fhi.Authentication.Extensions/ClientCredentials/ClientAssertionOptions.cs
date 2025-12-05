@@ -13,11 +13,6 @@ namespace Fhi.Authentication.ClientCredentials
         public string PrivateJwk { get; set; } = string.Empty;
         
         /// <summary>
-        /// Thumbprint of PEM certificate
-        /// </summary>
-        public string CertificateThumbprint { get; set; } = string.Empty;
-
-        /// <summary>
         /// Client assertion issuer value
         /// </summary>
         public string Issuer { get; set; } = string.Empty;
