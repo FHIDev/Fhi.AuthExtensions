@@ -39,7 +39,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
             var ex = Assert.Throws<InvalidOperationException>(() => 
                 sut.GetPrivateKeyAsJwk(Guid.NewGuid().ToString()));
 
-            Assert.That(ex.Message, Does.Contain("Certificate not found"));
+            Assert.That(ex.Message, Does.Contain("No certificate found"));
         }
 
         [Test]
