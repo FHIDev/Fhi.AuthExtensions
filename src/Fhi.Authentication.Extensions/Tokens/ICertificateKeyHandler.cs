@@ -46,7 +46,7 @@ namespace Fhi.Authentication.Tokens
             using var certificate = _certificateProvider.GetCertificate(normalizedThumbprint);
             if (certificate == null)
             {
-                throw new InvalidOperationException($"Certificate not found for thumbprint: {normalizedThumbprint}");
+                throw new InvalidOperationException($"No certificate found for thumbprint: {normalizedThumbprint}. Make sure the certificate is installed in CurrentUser\\My store");
             }
 
             ValidateCertificate(certificate);
