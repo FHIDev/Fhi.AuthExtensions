@@ -16,17 +16,20 @@ namespace Fhi.Authentication.ClientCredentials
         private readonly ILogger<ClientCredentialsAssertionService> _logger;
         private readonly IOptionsMonitor<ClientAssertionOptions> _clientAssertionOptions;
         private readonly IOptionsMonitor<ClientCredentialsClient> _clientCredentialsClient;
+        private readonly ISecretStoreFactory? _secretStoreFactory;
 
 
         /// <inheritdoc/>
         public ClientCredentialsAssertionService(
             ILogger<ClientCredentialsAssertionService> logger,
             IOptionsMonitor<ClientAssertionOptions> clientAssertionOptions,
-            IOptionsMonitor<ClientCredentialsClient> clientCredentialsClient)
+            IOptionsMonitor<ClientCredentialsClient> clientCredentialsClient,
+            ISecretStoreFactory? secretStoreFactory = null)
         {
             _logger = logger;
             _clientAssertionOptions = clientAssertionOptions;
             _clientCredentialsClient = clientCredentialsClient;
+            _secretStoreFactory = secretStoreFactory;
         }
 
         /// <inheritdoc/>
@@ -42,13 +45,32 @@ namespace Fhi.Authentication.ClientCredentials
                     return Task.FromResult<ClientAssertion?>(null);
                 }
 
-                if (string.IsNullOrEmpty(clientAssertionOptions.PrivateJwk))
+                // Resolve private JWK - try direct configuration first, then factory if available
+                string privateJwk = clientAssertionOptions.PrivateJwk;
+
+                // If PrivateJwk is not directly configured, try the factory (if registered)
+                if (string.IsNullOrEmpty(privateJwk) && _secretStoreFactory != null)
                 {
-                    _logger.LogError("Could not resolve JWK for {clientName}. Missing parameter", clientName);
+                    try
+                    {
+                        var secretStore = _secretStoreFactory.CreateSecretStore(clientName);
+                        privateJwk = secretStore.GetPrivateKeyAsJwk();
+                        _logger.LogInformation("Retrieved private JWK from secret store factory for {clientName}", clientName);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to retrieve private JWK from secret store factory for {clientName}", clientName);
+                        return Task.FromResult<ClientAssertion?>(null);
+                    }
+                }
+
+                if (string.IsNullOrEmpty(privateJwk))
+                {
+                    _logger.LogError("Could not resolve JWK for {clientName}. No PrivateJwk configured and factory unavailable or failed", clientName);
                     return Task.FromResult<ClientAssertion?>(null);
                 }
 
-                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client?.ClientId ?? "", clientAssertionOptions.PrivateJwk);
+                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client?.ClientId ?? "", privateJwk);
                 return Task.FromResult<ClientAssertion?>(new ClientAssertion
                 {
                     Type = clientAssertionOptions.ClientAssertionType,
