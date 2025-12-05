@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// Extension methods for configuring client credentials authentication.
     /// </summary>
     /// <remarks>
-    /// <strong>Which overload to use?</strong>
+    /// Which overload to use?
     /// <list type="bullet">
     /// <item><description><c>AddClientCredentialsClientOptionsWithSecretStore</c> → Multi-environment (dev/prod) with auto-detection ⭐ RECOMMENDED</description></item>
     /// <item><description><c>SharedSecret</c> → Simple client_secret auth</description></item>
@@ -54,10 +54,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Configures OAuth2 client_secret authentication.
         /// </summary>
-        /// <remarks>
-        /// <strong>Use when:</strong> Simple auth, internal APIs, or JWT not required.
-        /// <strong>Security:</strong> Less secure than JWT-based auth (PrivateJwk/Certificate).
-        /// </remarks>
         /// <param name="services">See class remarks for common parameters.</param>
         /// <param name="optionName">See class remarks for common parameters.</param>
         /// <param name="authority">See class remarks for common parameters.</param>
@@ -88,10 +84,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Configures JWT authentication with direct JWK (resolved at startup).
         /// </summary>
-        /// <remarks>
-        /// <strong>Use when:</strong> Dev/testing with user secrets, or simple prod with static JWK.
-        /// <strong>Alternatives:</strong> Use <c>AddClientCredentialsClientOptionsWithSecretStore</c> for environment-based config (dev vs prod).
-        /// </remarks>
         /// <param name="services">See class remarks for common parameters.</param>
         /// <param name="optionName">See class remarks for common parameters.</param>
         /// <param name="authority">See class remarks for common parameters.</param>
@@ -128,10 +120,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Configures JWT authentication with certificate (resolved at startup from cert store or PEM).
         /// </summary>
-        /// <remarks>
-        /// <strong>Use when:</strong> Production with Windows cert store, explicit cert control, single environment.
-        /// <strong>Alternatives:</strong> Use <c>AddClientCredentialsClientOptionsWithSecretStore</c> to switch between cert (prod) and JWK (dev).
-        /// </remarks>
         /// <param name="services">See class remarks for common parameters.</param>
         /// <param name="optionName">See class remarks for common parameters.</param>
         /// <param name="authority">See class remarks for common parameters.</param>
@@ -171,11 +159,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Configures JWT authentication with runtime auto-detection (certificate or JWK based on config). ⭐ RECOMMENDED
         /// </summary>
-        /// <remarks>
-        /// <strong>Use when:</strong> Multi-environment (dev uses JWK, prod uses certificate), config-driven secret selection.
-        /// <strong>Auto-detection:</strong> CertificateThumbprint → cert store, PrivateJwk → file/env var.
-        /// <strong>Example:</strong> Dev: <c>"PrivateJwk": "{...}"</c>, Prod: <c>"Certificate": {"Thumbprint": "ABC..."}</c>
-        /// </remarks>
         /// <param name="services">See class remarks for common parameters.</param>
         /// <param name="optionName">See class remarks for common parameters.</param>
         /// <param name="authority">See class remarks for common parameters.</param>
