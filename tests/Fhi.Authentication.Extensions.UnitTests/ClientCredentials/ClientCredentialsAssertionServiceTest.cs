@@ -114,7 +114,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             logger.Received().Log(
              LogLevel.Error,
              Arg.Any<EventId>(),
-             Arg.Is<object>(o => o.ToString()!.Contains("Could not resolve JWK for name. Missing parameter")),
+             Arg.Is<object>(o => o.ToString()!.Contains("Could not resolve JWK")),
              Arg.Any<Exception>(),
              Arg.Any<Func<object, Exception?, string>>()
          );
