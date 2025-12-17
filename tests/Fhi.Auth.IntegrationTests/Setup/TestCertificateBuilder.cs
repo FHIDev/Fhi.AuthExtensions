@@ -43,12 +43,12 @@ namespace Fhi.Auth.IntegrationTests.Setup
         /// </summary>
         public X509Certificate2 Build()
         {
-            var rsa = RSA.Create(_keySize);
+            using var rsa = RSA.Create(_keySize);
             var req = new CertificateRequest(_subjectName, rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-            var cert = req.CreateSelfSigned(_notBefore, _notAfter);
+            using var cert = req.CreateSelfSigned(_notBefore, _notAfter);
             if (_exportPrivateKey)
             {
-                var certWithKey = cert.HasPrivateKey ? cert : cert.CopyWithPrivateKey(rsa);
+                using var certWithKey = cert.HasPrivateKey ? cert : cert.CopyWithPrivateKey(rsa);
                 // Export to PFX and re-import with PersistKeySet so the key persists when added to store
                 var pfx = certWithKey.Export(X509ContentType.Pfx);
 #if NET9_0_OR_GREATER
@@ -56,29 +56,14 @@ namespace Fhi.Auth.IntegrationTests.Setup
 #else
                 var persistable = new X509Certificate2(pfx, (string?)null, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
 #endif
-                try
-                {
-                    return persistable;
-                }
-                finally
-                {
-                    rsa.Dispose();
-                    certWithKey.Dispose();
-                }
+                try {return persistable;} finally{ persistable.Dispose(); }
             }
 
             var der = cert.Export(X509ContentType.Cert);
             var publicOnly = X509Certificate2.CreateFromPem("-----BEGIN CERTIFICATE-----\n" + Convert.ToBase64String(der, Base64FormattingOptions.InsertLineBreaks) + "\n-----END CERTIFICATE-----\n");
 
             try
-            {
-                return publicOnly;
-            }
-            finally
-            {
-                rsa.Dispose();
-                cert.Dispose();
-            }
+            { return publicOnly; } finally { publicOnly.Dispose(); }
         }
 
         /// <summary>
