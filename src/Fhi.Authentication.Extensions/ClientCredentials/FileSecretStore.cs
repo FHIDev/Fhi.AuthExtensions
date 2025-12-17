@@ -29,12 +29,12 @@ public class FileSecretStore : ISecretStore
     /// <inheritdoc/>
     public PrivateJwk GetPrivateJwk()
     {
-        _logger.LogInformation("FileSecretStore: Retrieving JWK from configuration");
+        _logger.LogDebug("FileSecretStore: Retrieving JWK from configuration");
         
         // Key can be stored as environment variable or in user secret 
         string privateKey = Environment.GetEnvironmentVariable("HelseIdPrivateJwk") ?? _privateJwkJson;
         
-        _logger.LogInformation("Found private key with length: {KeyLength}", privateKey.Length);
+        _logger.LogDebug("Found private key with length: {KeyLength}", privateKey.Length);
         
         return PrivateJwk.ParseFromJson(privateKey);
     }

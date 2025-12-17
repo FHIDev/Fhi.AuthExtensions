@@ -87,7 +87,5 @@ namespace Fhi.Authentication
             return services.AddInMemoryDiscoveryService(
                 authorities.Select(a => new DiscoveryDocumentStoreOptions { Authority = a }));
         }
-
-
     }
 }

@@ -18,7 +18,7 @@ namespace Fhi.Authentication.Tokens
         /// <item><description>JWK JSON string (starts with "{")</description></item>
         /// <item><description>PEM-encoded private key (starts with "-----BEGIN")</description></item>
         /// <item><description>Base64-encoded JWK string</description></item>
-        /// <item><description>Certificate thumbprint (fetches from Windows certificate store)</description></item>
+        /// <item><description>Certificate thumbprint (fetches from certificate store)</description></item>
         /// </list>
         /// </param>
         /// <returns>Private key as JWK JSON string.</returns>
@@ -114,7 +114,7 @@ namespace Fhi.Authentication.Tokens
             using var certificate = _certificateProvider.GetCertificate(normalizedThumbprint);
             if (certificate == null)
             {
-                throw new InvalidOperationException($"No certificate found for thumbprint: {normalizedThumbprint}. Make sure the certificate is installed in CurrentUser\\My store");
+                throw new InvalidOperationException($"No certificate found for thumbprint: {normalizedThumbprint}. Make sure the certificate is installed and accessible.");
             }
 
             ValidateCertificate(certificate);
@@ -135,7 +135,7 @@ namespace Fhi.Authentication.Tokens
         {
             if (certificate is null) throw new ArgumentNullException(nameof(certificate));
 
-            if (certificate.NotAfter < DateTime.UtcNow)
+            if (certificate.NotAfter < DateTime.Now)
             {
                 throw new InvalidOperationException($"Certificate {certificate.Subject} has expired on {certificate.NotAfter}");
             }

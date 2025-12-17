@@ -56,14 +56,29 @@ namespace Fhi.Auth.IntegrationTests.Setup
 #else
                 var persistable = new X509Certificate2(pfx, (string?)null, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
 #endif
-                try { return persistable; } finally { rsa.Dispose(); }
+                try
+                {
+                    return persistable;
+                }
+                finally
+                {
+                    rsa.Dispose();
+                    certWithKey.Dispose();
+                }
             }
 
             var der = cert.Export(X509ContentType.Cert);
             var publicOnly = X509Certificate2.CreateFromPem("-----BEGIN CERTIFICATE-----\n" + Convert.ToBase64String(der, Base64FormattingOptions.InsertLineBreaks) + "\n-----END CERTIFICATE-----\n");
-            
-            try { return publicOnly; } 
-            finally { rsa.Dispose(); }
+
+            try
+            {
+                return publicOnly;
+            }
+            finally
+            {
+                rsa.Dispose();
+                cert.Dispose();
+            }
         }
 
         /// <summary>

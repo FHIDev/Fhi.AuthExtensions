@@ -50,7 +50,7 @@ public class CertificateSecretStore : ISecretStore
             
             if (_certificateManager != null && !string.IsNullOrWhiteSpace(_certificateOptions.Thumbprint))
             {
-                _logger.LogInformation("CertificateSecretStore: Validating certificate with thumbprint: {Thumbprint}", 
+                _logger.LogDebug("CertificateSecretStore: Validating certificate with thumbprint: {Thumbprint}", 
                     _certificateOptions.Thumbprint);
 
                 var certificate = _certificateManager.FindCertificate(_certificateOptions);
@@ -60,12 +60,12 @@ public class CertificateSecretStore : ISecretStore
                         $"Certificate with thumbprint {_certificateOptions.Thumbprint} not found or did not pass validation filters.");
                 }
                 
-                _logger.LogInformation("CertificateSecretStore: Certificate with thumbprint: {Thumbprint} validated", 
+                _logger.LogDebug("CertificateSecretStore: Certificate with thumbprint: {Thumbprint} validated", 
                     _certificateManager.GetCertificateDisplayName(certificate));
             }
             else
             {
-                _logger.LogInformation("CertificateSecretStore: Retrieving certificate/key: {InputType}", 
+                _logger.LogDebug("CertificateSecretStore: Retrieving certificate/key: {InputType}", 
                     !string.IsNullOrWhiteSpace(_certificateOptions.Thumbprint) ? "Thumbprint" : "PEM");
             }
 

@@ -156,7 +156,7 @@ namespace Fhi.Auth.IntegrationTests
         public void GIVEN_EmptyInput_When_GetPrivateJwk_Then_ThrowsArgumentNullException()
         {
             var exception = Assert.Throws<ArgumentNullException>(() => _certificateKeyHandler!.GetPrivateJwk(string.Empty));
-            Assert.That(exception.ParamName, Is.EqualTo("pemOrThumbprint"));
+            Assert.That(exception.ParamName, Is.EqualTo("secretOrThumbprint"));
         }
 
         [Test]

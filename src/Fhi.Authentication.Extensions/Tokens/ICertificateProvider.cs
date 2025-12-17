@@ -94,18 +94,10 @@ namespace Fhi.Authentication.Tokens
         /// </remarks>
         public RSA? GetPrivateKey(string normalizedThumbprint)
         {
-            var cert = GetCertificate(normalizedThumbprint);
+            using var cert = GetCertificate(normalizedThumbprint);
             if (cert == null) return null;
 
-            try
-            {
-                return cert.GetRSAPrivateKey();
-            }
-            finally
-            {
-                // Dispose the certificate after extracting the key
-                cert.Dispose();
-            }
+            return cert.GetRSAPrivateKey();
         }
     }
 }

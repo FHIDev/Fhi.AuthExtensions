@@ -60,7 +60,7 @@ namespace Fhi.Authentication.ClientCredentials
                     {
                         var jwk = _secretStore.GetPrivateJwk();
                         privateJwk = jwk;
-                        _logger.LogInformation("Retrieved private JWK from secret store for {clientName}", clientName);
+                        _logger.LogDebug("Retrieved private JWK from secret store for {clientName}", clientName);
                     }
                     catch (Exception ex)
                     {
@@ -75,7 +75,7 @@ namespace Fhi.Authentication.ClientCredentials
                     return Task.FromResult<ClientAssertion?>(null);
                 }
 
-                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client?.ClientId ?? "", privateJwk);
+                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client.ClientId ?? "", privateJwk);
                 return Task.FromResult<ClientAssertion?>(new ClientAssertion
                 {
                     Type = clientAssertionOptions.ClientAssertionType,

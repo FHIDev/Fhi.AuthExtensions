@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <remarks>
     /// Which overload to use?
     /// <list type="bullet">
-    /// <item><description><c>ISecretStore</c> → Multi-environment (dev/prod) with DI ⭐ RECOMMENDED</description></item>
+    /// <item><description><c>ISecretStore</c> → Multi-environment (dev/prod) with DI - RECOMMENDED</description></item>
     /// <item><description><c>SharedSecret</c> → Simple client_secret auth</description></item>
     /// <item><description><c>PrivateJwk</c> → Direct JWK, dev/testing</description></item>
     /// <item><description><c>CertificateOptions</c> → Explicit cert control, single environment</description></item>
@@ -138,6 +138,11 @@ namespace Microsoft.Extensions.DependencyInjection
             DPoPProofKey? dPoPKey = null)
         {
             services.TryAddTransient<IClientAssertionService, ClientCredentialsAssertionService>();
+            
+            // Ensure IPrivateKeyHandler is registered (required for certificate-to-JWK conversion)
+            services.TryAddTransient<ICertificateProvider>(_ => 
+                new StoreCertificateProvider(certificate.StoreLocation));
+            services.TryAddTransient<IPrivateKeyHandler, PrivateKeyHandler>();
 
             // Configure ClientAssertionOptions using IPrivateKeyHandler for format-flexible JWK resolution
             var clientAssertionBuilder = services
@@ -161,7 +166,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Configures JWT authentication with an <see cref="ISecretStore"/> for runtime JWK resolution. ⭐ RECOMMENDED
+        /// Configures JWT authentication with an <see cref="ISecretStore"/> for runtime JWK resolution - RECOMMENDED
         /// </summary>
         /// <remarks>
         /// This overload allows you to register any implementation of <see cref="ISecretStore"/> in DI and use it for client authentication.
