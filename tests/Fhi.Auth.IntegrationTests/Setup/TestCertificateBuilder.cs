@@ -51,7 +51,11 @@ namespace Fhi.Auth.IntegrationTests.Setup
                 var certWithKey = cert.HasPrivateKey ? cert : cert.CopyWithPrivateKey(rsa);
                 // Export to PFX and re-import with PersistKeySet so the key persists when added to store
                 var pfx = certWithKey.Export(X509ContentType.Pfx);
+#if NET9_0_OR_GREATER
                 var persistable = X509CertificateLoader.LoadPkcs12(pfx, null, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+#else
+                var persistable = new X509Certificate2(pfx, (string?)null, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+#endif
                 try { return persistable; } finally { rsa.Dispose(); }
             }
 
