@@ -54,13 +54,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Configures OAuth2 client_secret authentication.
         /// </summary>
-        /// <param name="services">See class remarks for common parameters.</param>
-        /// <param name="optionName">See class remarks for common parameters.</param>
-        /// <param name="authority">See class remarks for common parameters.</param>
-        /// <param name="clientId">See class remarks for common parameters.</param>
+        /// <param name="services">The service collection to configure.</param>
+        /// <param name="optionName">Unique name for this client configuration.</param>
+        /// <param name="authority">The OAuth2/OIDC authority URL (e.g., "https://login.example.com").</param>
+        /// <param name="clientId">The client identifier registered with the authority.</param>
         /// <param name="sharedSecret">The shared secret for client authentication.</param>
-        /// <param name="scope">See class remarks for common parameters.</param>
-        /// <param name="dPoPKey">See class remarks for common parameters.</param>
+        /// <param name="scope">Optional. The OAuth2 scope(s) to request (space-separated).</param>
+        /// <param name="dPoPKey">Optional. DPoP proof key for Demonstrating Proof-of-Possession.</param>
         /// <returns>A <see cref="ClientCredentialsOptionBuilder"/> for further configuration.</returns>
         public static ClientCredentialsOptionBuilder AddClientCredentialsClientOptions(
             this IServiceCollection services,
@@ -84,13 +84,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Configures JWT authentication with direct JWK (resolved at startup).
         /// </summary>
-        /// <param name="services">See class remarks for common parameters.</param>
-        /// <param name="optionName">See class remarks for common parameters.</param>
-        /// <param name="authority">See class remarks for common parameters.</param>
-        /// <param name="clientId">See class remarks for common parameters.</param>
+        /// <param name="services">The service collection to configure.</param>
+        /// <param name="optionName">Unique name for this client configuration.</param>
+        /// <param name="authority">The OAuth2/OIDC authority URL (e.g., "https://login.example.com").</param>
+        /// <param name="clientId">The client identifier registered with the authority.</param>
         /// <param name="privateJwk">The private JWK for signing client assertions.</param>
-        /// <param name="scope">See class remarks for common parameters.</param>
-        /// <param name="dPoPKey">See class remarks for common parameters.</param>
+        /// <param name="scope">Optional. The OAuth2 scope(s) to request (space-separated).</param>
+        /// <param name="dPoPKey">Optional. DPoP proof key for Demonstrating Proof-of-Possession.</param>
         /// <returns>A <see cref="ClientCredentialsOptionBuilder"/> for further configuration.</returns>
         public static ClientCredentialsOptionBuilder AddClientCredentialsClientOptions(
             this IServiceCollection services,
@@ -120,13 +120,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Configures JWT authentication with certificate (resolved at startup from cert store or PEM).
         /// </summary>
-        /// <param name="services">See class remarks for common parameters.</param>
-        /// <param name="optionName">See class remarks for common parameters.</param>
-        /// <param name="authority">See class remarks for common parameters.</param>
-        /// <param name="clientId">See class remarks for common parameters.</param>
+        /// <param name="services">The service collection to configure.</param>
+        /// <param name="optionName">Unique name for this client configuration.</param>
+        /// <param name="authority">The OAuth2/OIDC authority URL (e.g., "https://login.example.com").</param>
+        /// <param name="clientId">The client identifier registered with the authority.</param>
         /// <param name="certificate">Certificate options (thumbprint or PEM content).</param>
-        /// <param name="scope">See class remarks for common parameters.</param>
-        /// <param name="dPoPKey">See class remarks for common parameters.</param>
+        /// <param name="scope">Optional. The OAuth2 scope(s) to request (space-separated).</param>
+        /// <param name="dPoPKey">Optional. DPoP proof key for Demonstrating Proof-of-Possession.</param>
         /// <returns>A <see cref="ClientCredentialsOptionBuilder"/> for further configuration.</returns>
         public static ClientCredentialsOptionBuilder AddClientCredentialsClientOptions(
             this IServiceCollection services,
@@ -167,12 +167,12 @@ namespace Microsoft.Extensions.DependencyInjection
         /// This overload allows you to register any implementation of <see cref="ISecretStore"/> in DI and use it for client authentication.
         /// Use <see cref="FileSecretStore"/> for file-based secrets or <see cref="CertificateSecretStore"/> for certificate-based secrets.
         /// </remarks>
-        /// <param name="services">See class remarks for common parameters.</param>
-        /// <param name="optionName">See class remarks for common parameters.</param>
-        /// <param name="authority">See class remarks for common parameters.</param>
-        /// <param name="clientId">See class remarks for common parameters.</param>
-        /// <param name="scope">See class remarks for common parameters.</param>
-        /// <param name="dPoPKey">See class remarks for common parameters.</param>
+        /// <param name="services">The service collection to configure.</param>
+        /// <param name="optionName">Unique name for this client configuration.</param>
+        /// <param name="authority">The OAuth2/OIDC authority URL (e.g., "https://login.example.com").</param>
+        /// <param name="clientId">The client identifier registered with the authority.</param>
+        /// <param name="scope">Optional. The OAuth2 scope(s) to request (space-separated).</param>
+        /// <param name="dPoPKey">Optional. DPoP proof key for Demonstrating Proof-of-Possession.</param>
         /// <returns>A <see cref="ClientCredentialsOptionBuilder"/> for further configuration.</returns>
         public static ClientCredentialsOptionBuilder AddClientCredentialsClientOptions(
             this IServiceCollection services,

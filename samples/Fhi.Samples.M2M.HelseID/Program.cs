@@ -114,18 +114,12 @@ public partial class Program
     /// Option 3: Configure authentication using ISecretStore pattern (RECOMMENDED).
     /// This approach allows you to register different ISecretStore implementations in DI
     /// based on your environment or configuration needs.
-    /// </summary>
-    /// <remarks>
-    /// Benefits:
-    /// - Testable: Easy to mock ISecretStore in tests
-    /// - Flexible: Switch implementations based on environment
-    /// - Clean: No factory pattern, just standard DI
-    /// - Runtime resolution: JWK is resolved when needed, not at startup
-    /// 
+    ///
     /// Example implementations:
     /// - FileSecretStore: For JWK from configuration/environment variables
     /// - CertificateSecretStore: For certificates from Windows certificate store
-    /// </remarks>
+    /// </summary>
+    /// 
     private static void ConfigureWithSecretStore(IServiceCollection services, IConfigurationSection apiSection)
     {
         services
