@@ -62,8 +62,7 @@ namespace Fhi.Auth.IntegrationTests.Setup
             var der = cert.Export(X509ContentType.Cert);
             var publicOnly = X509Certificate2.CreateFromPem("-----BEGIN CERTIFICATE-----\n" + Convert.ToBase64String(der, Base64FormattingOptions.InsertLineBreaks) + "\n-----END CERTIFICATE-----\n");
 
-            try
-            { return publicOnly; } finally { publicOnly.Dispose(); }
+            try { return publicOnly; } finally { publicOnly.Dispose(); }
         }
 
         /// <summary>
@@ -76,8 +75,8 @@ namespace Fhi.Auth.IntegrationTests.Setup
             
             using var rsa = RSA.Create(_keySize);
             var req = new CertificateRequest(_subjectName, rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-            var cert = req.CreateSelfSigned(_notBefore, _notAfter);
-            var certWithKey = cert.HasPrivateKey ? cert : cert.CopyWithPrivateKey(rsa);
+            using var cert = req.CreateSelfSigned(_notBefore, _notAfter);
+            using var certWithKey = cert.HasPrivateKey ? cert : cert.CopyWithPrivateKey(rsa);
             return certWithKey.Export(X509ContentType.Pfx, password);
         }
 
