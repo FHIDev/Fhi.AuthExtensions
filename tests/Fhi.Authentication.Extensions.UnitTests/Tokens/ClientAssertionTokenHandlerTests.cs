@@ -1,6 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using Fhi.Authentication.Tokens;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using Fhi.Security.Cryptography;
 
 namespace Fhi.Authentication.Extensions.UnitTests.Tokens
 {
@@ -12,7 +14,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
         [Test]
         public void GenerateKeysAndClientAssertion()
         {
-            var keys = JwkGenerator.GenerateRsaJwk();
+            var keys = JWK.Create();
 
             var assertion = ClientAssertionTokenHandler.CreateJwtToken("http://issuer", "clientId", keys.PrivateKey);
 

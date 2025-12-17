@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<!-- Imports for central package management and build props are now handled by Directory.Build.props -->
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<RootNamespace>Fhi.Authentication</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Duende.AccessTokenManagement.OpenIdConnect" />
+		<PackageReference Include="Fhi.Security.Cryptography" />
 		<PackageReference Include="Microsoft.IdentityModel.Tokens" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
