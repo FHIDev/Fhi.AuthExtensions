@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
-
+using Microsoft.IdentityModel.Tokens;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -38,6 +38,36 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentException("Invalid JWK JSON format.", ex);
             }
             return new PrivateJwk(json.Trim());
+        }
+
+        /// <summary>
+        /// Parses a PEM-encoded RSA private key and converts it to a JWK (JSON Web Key) format.
+        /// </summary>
+        /// <param name="pem">The PEM-encoded RSA private key string. Must not be null or empty.</param>
+        /// <returns>A <see cref="PrivateJwk"/> object initialized with the JWK representation of the key.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="pem"/> is null, empty, or not a valid PEM format.</exception>
+        public static PrivateJwk ParseFromPem(string pem)
+        {
+            if (string.IsNullOrWhiteSpace(pem))
+                throw new ArgumentException("PEM cannot be null or empty.", nameof(pem));
+
+            try
+            {
+                using var rsa = System.Security.Cryptography.RSA.Create();
+                rsa.ImportFromPem(pem);
+                
+                var rsaParameters = rsa.ExportParameters(true);
+                var jwk = new RsaSecurityKey(rsaParameters);
+                
+                var jsonWebKey = JsonWebKeyConverter.ConvertFromRSASecurityKey(jwk);
+                var jwkJson = JsonSerializer.Serialize(jsonWebKey);
+                
+                return new PrivateJwk(jwkJson.Trim());
+            }
+            catch (Exception ex) when (ex is not ArgumentException)
+            {
+                throw new ArgumentException("Invalid PEM format or unable to convert to JWK.", nameof(pem), ex);
+            }
         }
 
         /// <summary>

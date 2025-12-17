@@ -21,7 +21,7 @@ namespace M2M.Host.HelseID
         [Required] public string Scope { get; set; } = string.Empty;
         
         /// <summary>
-        /// Certificate configuration - will be converted to JWK by ICertificateJwkResolver
+        /// Certificate configuration - will be converted to JWK by IPrivateKeyHandler with format auto-detection
         /// </summary>
         [Required] public CertificateOptions Certificate { get; set; } = new();
     }

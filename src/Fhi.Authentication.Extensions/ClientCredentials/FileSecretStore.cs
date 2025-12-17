@@ -1,20 +1,41 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Fhi.Authentication.ClientCredentials;
 
-internal class FileSecretStore(
-    string privateJwk,
-    ILogger<FileSecretStore> logger) : ISecretStore
+/// <summary>
+/// Secret store implementation that retrieves JWK from configuration or environment variables.
+/// </summary>
+public class FileSecretStore : ISecretStore
 {
-    public ILogger<FileSecretStore> Logger { get; } = logger;
-    
-    public string GetPrivateKeyAsJwk()
+    private readonly string _privateJwkJson;
+    private readonly ILogger<FileSecretStore> _logger;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FileSecretStore"/> class.
+    /// </summary>
+    /// <param name="privateJwkJson">The private JWK in JSON format.</param>
+    /// <param name="logger">The logger instance.</param>
+    /// <exception cref="ArgumentNullException">Thrown if privateJwkJson or logger is null.</exception>
+    public FileSecretStore(string privateJwkJson, ILogger<FileSecretStore> logger)
     {
-        Logger.LogInformation("FileSecretStore: Retrieving local secret");
+        if (string.IsNullOrWhiteSpace(privateJwkJson))
+            throw new ArgumentException("Private JWK JSON cannot be null or empty.", nameof(privateJwkJson));
+        
+        _privateJwkJson = privateJwkJson;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    /// <inheritdoc/>
+    public PrivateJwk GetPrivateJwk()
+    {
+        _logger.LogInformation("FileSecretStore: Retrieving JWK from configuration");
+        
         // Key can be stored as environment variable or in user secret 
-        string privateKey = Environment.GetEnvironmentVariable("HelseIdPrivateJwk") ??
-                            privateJwk;
-        Logger.LogInformation("Found private key with length: {KeyLength}", privateKey.Length);
-        return privateKey;
+        string privateKey = Environment.GetEnvironmentVariable("HelseIdPrivateJwk") ?? _privateJwkJson;
+        
+        _logger.LogInformation("Found private key with length: {KeyLength}", privateKey.Length);
+        
+        return PrivateJwk.ParseFromJson(privateKey);
     }
 }

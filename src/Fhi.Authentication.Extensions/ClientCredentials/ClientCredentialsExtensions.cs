@@ -1,8 +1,8 @@
 ﻿using Duende.AccessTokenManagement;
 using Duende.AccessTokenManagement.DPoP;
-using Fhi.Authentication;
 using Fhi.Authentication.ClientCredentials;
 using Fhi.Authentication.OpenIdConnect;
+using Fhi.Authentication.Tokens;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <remarks>
     /// Which overload to use?
     /// <list type="bullet">
-    /// <item><description><c>AddClientCredentialsClientOptionsWithSecretStore</c> → Multi-environment (dev/prod) with auto-detection ⭐ RECOMMENDED</description></item>
+    /// <item><description><c>ISecretStore</c> → Multi-environment (dev/prod) with DI ⭐ RECOMMENDED</description></item>
     /// <item><description><c>SharedSecret</c> → Simple client_secret auth</description></item>
     /// <item><description><c>PrivateJwk</c> → Direct JWK, dev/testing</description></item>
     /// <item><description><c>CertificateOptions</c> → Explicit cert control, single environment</description></item>
@@ -138,17 +138,21 @@ namespace Microsoft.Extensions.DependencyInjection
             DPoPProofKey? dPoPKey = null)
         {
             services.TryAddTransient<IClientAssertionService, ClientCredentialsAssertionService>();
-            services.TryAddSingleton<ICertificateJwkResolver, CertificateJwkResolver>();
 
-            // Configure ClientAssertionOptions using certificate→JWK resolution
+            // Configure ClientAssertionOptions using IPrivateKeyHandler for format-flexible JWK resolution
             var clientAssertionBuilder = services
                 .AddOptions<ClientAssertionOptions>(optionName)
-                .Configure<IDiscoveryDocumentStore, ICertificateJwkResolver>((options, discoveryStore, resolver) =>
+                .Configure<IDiscoveryDocumentStore, IPrivateKeyHandler>((options, discoveryStore, keyHandler) =>
                 {
                     var discoveryDocument = discoveryStore.Get(authority);
                     options.Issuer = discoveryDocument?.Issuer ?? string.Empty;
-                    var jwkJson = resolver.ResolveToJwk(certificate);
-                    options.PrivateJwk = PrivateJwk.ParseFromJson(jwkJson);
+                    
+                    // Use IPrivateKeyHandler with format auto-detection (supports JWK/PEM/Base64/Thumbprint)
+                    var input = certificate.Thumbprint ?? certificate.PemCertificate 
+                        ?? throw new InvalidOperationException("Either Thumbprint or PemCertificate must be provided in CertificateOptions.");
+                    
+                    var jwkString = keyHandler.GetPrivateJwk(input);
+                    options.PrivateJwk = PrivateJwk.ParseFromJson(jwkString);
                 });
 
             var clientCredentialsBuilder = ConfigureClientCredentialsClient(services, optionName, authority, clientId, scope, dPoPKey);
@@ -157,43 +161,40 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Configures JWT authentication with runtime auto-detection (certificate or JWK based on config). ⭐ RECOMMENDED
+        /// Configures JWT authentication with an <see cref="ISecretStore"/> for runtime JWK resolution. ⭐ RECOMMENDED
         /// </summary>
+        /// <remarks>
+        /// This overload allows you to register any implementation of <see cref="ISecretStore"/> in DI and use it for client authentication.
+        /// Use <see cref="FileSecretStore"/> for file-based secrets or <see cref="CertificateSecretStore"/> for certificate-based secrets.
+        /// </remarks>
         /// <param name="services">See class remarks for common parameters.</param>
         /// <param name="optionName">See class remarks for common parameters.</param>
         /// <param name="authority">See class remarks for common parameters.</param>
         /// <param name="clientId">See class remarks for common parameters.</param>
-        /// <param name="configureSecretStore">Delegate to configure secret store (populate PrivateJwk OR CertificateThumbprint+ClientId).</param>
         /// <param name="scope">See class remarks for common parameters.</param>
         /// <param name="dPoPKey">See class remarks for common parameters.</param>
         /// <returns>A <see cref="ClientCredentialsOptionBuilder"/> for further configuration.</returns>
-        public static ClientCredentialsOptionBuilder AddClientCredentialsClientOptionsWithSecretStore(
+        public static ClientCredentialsOptionBuilder AddClientCredentialsClientOptions(
             this IServiceCollection services,
             string optionName,
             string authority,
             string clientId,
-            Action<SecretStoreOptions> configureSecretStore,
             string? scope = null,
             DPoPProofKey? dPoPKey = null)
         {
             if (string.IsNullOrEmpty(optionName))
                 throw new ArgumentException("Option name cannot be null or empty", nameof(optionName));
-            
-            if (configureSecretStore == null)
-                throw new ArgumentNullException(nameof(configureSecretStore));
 
             services.TryAddTransient<IClientAssertionService, ClientCredentialsAssertionService>();
-            
-            services.AddSecretStore(optionName, configureSecretStore);
 
-            // Configure ClientAssertionOptions - leave PrivateJwk empty so factory is used
+            // Configure ClientAssertionOptions - PrivateJwk will be resolved from ISecretStore at runtime
             var clientAssertionBuilder = services
                 .AddOptions<ClientAssertionOptions>(optionName)
                 .Configure<IDiscoveryDocumentStore>((options, discoveryStore) =>
                 {
                     var discoveryDocument = discoveryStore.Get(authority);
                     options.Issuer = discoveryDocument?.Issuer ?? string.Empty;
-                    // PrivateJwk is left empty - factory will be used automatically
+                    // PrivateJwk is left empty - will be resolved from ISecretStore if registered
                 });
 
             var clientCredentialsBuilder = ConfigureClientCredentialsClient(services, optionName, authority, clientId, scope, dPoPKey);

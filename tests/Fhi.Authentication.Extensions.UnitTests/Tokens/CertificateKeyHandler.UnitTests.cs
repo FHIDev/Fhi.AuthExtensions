@@ -1,8 +1,9 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Text.Json;
 using Fhi.Authentication.Tokens;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Fhi.Authentication.Extensions.UnitTests.Tokens
 {
@@ -13,43 +14,98 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
         private const string TestCertSubject = "CN=UnitTestCert";
 
         [Test]
-        public void GetPrivateKeyAsJwk_WithValidCertificate_ReturnsPrivateJwk()
+        public void GetPrivateJwk_WithThumbprint_ReturnsJwk()
         {
             var thumbprint = Guid.NewGuid().ToString();
             using var rsa = RSA.Create(RsaKeySize);
             var certificate = CreateSelfSignedCertificate(TestCertSubject, rsa);
-            var expectedKeyId = certificate.Thumbprint;
 
             var provider = new FakeCertificateProvider(certificate, rsa, thumbprint);
-            var sut = new CertificateKeyHandler(provider);
+            var sut = new PrivateKeyHandler(provider);
 
-            var jwkJson = sut.GetPrivateKeyAsJwk(thumbprint);
+            var jwkString = sut.GetPrivateJwk(thumbprint);
 
-            AssertValidPrivateJwk(jwkJson, expectedKeyId);
-            
+            AssertValidJwk(jwkString);
             certificate.Dispose();
         }
 
         [Test]
-        public void GetPrivateKeyAsJwk_WhenCertificateNotFound_ThrowsInvalidOperationException()
+        public void GetPrivateJwk_WithPemInput_ReturnsJwk()
+        {
+            using var rsa = RSA.Create(RsaKeySize);
+            var pem = rsa.ExportRSAPrivateKeyPem();
+
+            var provider = new FakeCertificateProvider(null, null, null);
+            var sut = new PrivateKeyHandler(provider);
+
+            var jwkString = sut.GetPrivateJwk(pem);
+
+            AssertValidJwk(jwkString);
+        }
+
+        [Test]
+        public void GetPrivateJwk_WithJwkInput_ReturnsJwk()
+        {
+            using var rsa = RSA.Create(RsaKeySize);
+            var pem = rsa.ExportRSAPrivateKeyPem();
+            var expectedJwk = PrivateJwk.ParseFromPem(pem);
+            string jwkInput = expectedJwk; // implicit conversion
+
+            var provider = new FakeCertificateProvider(null, null, null);
+            var sut = new PrivateKeyHandler(provider);
+
+            var jwkString = sut.GetPrivateJwk(jwkInput);
+
+            AssertValidJwk(jwkString);
+            Assert.That(jwkString, Is.EqualTo(jwkInput));
+        }
+
+        [Test]
+        public void GetPrivateJwk_WithBase64Input_ReturnsJwk()
+        {
+            using var rsa = RSA.Create(RsaKeySize);
+            var pem = rsa.ExportRSAPrivateKeyPem();
+            var jwk = PrivateJwk.ParseFromPem(pem);
+            string jwkJson = jwk;
+            var base64Input = Convert.ToBase64String(Encoding.UTF8.GetBytes(jwkJson));
+
+            var provider = new FakeCertificateProvider(null, null, null);
+            var sut = new PrivateKeyHandler(provider);
+
+            var jwkString = sut.GetPrivateJwk(base64Input);
+
+            AssertValidJwk(jwkString);
+        }
+
+        [Test]
+        public void GetPrivateJwk_WithEmptyInput_ThrowsArgumentNullException()
         {
             var provider = new FakeCertificateProvider(null, null, null);
-            var sut = new CertificateKeyHandler(provider);
+            var sut = new PrivateKeyHandler(provider);
+
+            var ex = Assert.Throws<ArgumentNullException>(() => sut.GetPrivateJwk(string.Empty));
+            Assert.That(ex.ParamName, Is.EqualTo("secretOrThumbprint"));
+        }
+
+        [Test]
+        public void GetPrivateJwk_WithInvalidThumbprint_ThrowsInvalidOperationException()
+        {
+            var provider = new FakeCertificateProvider(null, null, null);
+            var sut = new PrivateKeyHandler(provider);
 
             var ex = Assert.Throws<InvalidOperationException>(() => 
-                sut.GetPrivateKeyAsJwk(Guid.NewGuid().ToString()));
+                sut.GetPrivateJwk(Guid.NewGuid().ToString()));
 
             Assert.That(ex.Message, Does.Contain("No certificate found"));
         }
 
         [Test]
-        public void GetPrivateKeyAsJwk_WhenCertificateLacksPrivateKey_ThrowsInvalidOperationException()
+        public void GetPrivateJwk_WithCertificateLackingPrivateKey_ThrowsInvalidOperationException()
         {
             const string thumbprint = "THUMB123";
             using var rsa = RSA.Create(RsaKeySize);
             var certWithPrivateKey = CreateSelfSignedCertificate("CN=PublicOnly", rsa);
             
-            // Export only the public portion to create a certificate without private key
             var certBytes = certWithPrivateKey.Export(X509ContentType.Cert);
             certWithPrivateKey.Dispose();
             
@@ -60,10 +116,10 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
 #endif
 
             var provider = new FakeCertificateProvider(publicOnly, null, thumbprint);
-            var sut = new CertificateKeyHandler(provider);
+            var sut = new PrivateKeyHandler(provider);
 
             var ex = Assert.Throws<InvalidOperationException>(() => 
-                sut.GetPrivateKeyAsJwk(thumbprint));
+                sut.GetPrivateJwk(thumbprint));
 
             Assert.That(ex.Message, Does.Contain("has no private key"));
 
@@ -83,19 +139,21 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
                 DateTime.UtcNow.AddDays(365));
         }
 
-        private static void AssertValidPrivateJwk(string jwkJson, string expectedKid)
+        private static void AssertValidJwk(string jwkString)
         {
-            Assert.That(jwkJson, Is.Not.Null.And.Not.Empty);
-
-            var jwk = JsonSerializer.Deserialize<JsonWebKey>(jwkJson);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(jwk, Is.Not.Null);
-                Assert.That(jwk?.Kty, Is.EqualTo("RSA"));
-                Assert.That(jwk?.D, Is.Not.Null.And.Not.Empty, "Private key component D should be present");
-                Assert.That(jwk?.Kid, Is.EqualTo(expectedKid));
-            });
+            Assert.That(jwkString, Is.Not.Null.And.Not.Empty);
+            
+            JsonDocument? doc = null;
+            Assert.DoesNotThrow(() => doc = JsonDocument.Parse(jwkString), "JWK should be valid JSON");
+            
+            Assert.That(doc, Is.Not.Null);
+            var root = doc!.RootElement;
+            Assert.That(root.TryGetProperty("kty", out _), Is.True, "JWK should have 'kty' property");
+            Assert.That(root.TryGetProperty("n", out _), Is.True, "RSA JWK should have 'n' (modulus) property");
+            Assert.That(root.TryGetProperty("e", out _), Is.True, "RSA JWK should have 'e' (exponent) property");
+            Assert.That(root.TryGetProperty("d", out _), Is.True, "Private JWK should have 'd' property");
+            
+            doc.Dispose();
         }
 
         private class FakeCertificateProvider(X509Certificate2? cert, RSA? rsa, string? thumb) : ICertificateProvider

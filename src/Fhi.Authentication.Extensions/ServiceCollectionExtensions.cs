@@ -38,9 +38,7 @@ namespace Fhi.Authentication
             CertificateStoreLocation storeLocation = CertificateStoreLocation.CurrentUser)
         {
             services.AddTransient<ICertificateProvider>(_ => new StoreCertificateProvider(storeLocation));
-            services.AddTransient<ICertificateKeyHandler, CertificateKeyHandler>();
-            // Non-breaking addition: register certificate-to-JWK resolver for consumers that opt-in
-            services.TryAddSingleton<ICertificateJwkResolver, CertificateJwkResolver>();
+            services.AddTransient<IPrivateKeyHandler, PrivateKeyHandler>();
             return services;
         }
         
@@ -90,58 +88,6 @@ namespace Fhi.Authentication
                 authorities.Select(a => new DiscoveryDocumentStoreOptions { Authority = a }));
         }
 
-        /// <summary>
-        /// Registers the secret store factory for dynamic secret resolution.
-        /// The factory can create either file-based or certificate-based secret stores based on configuration.
-        /// </summary>
-        /// <param name="services">The service collection to configure.</param>
-        /// <returns>The updated service collection.</returns>
-        public static IServiceCollection AddSecretStoreFactory(this IServiceCollection services)
-        {
-            services.TryAddSingleton<ISecretStoreFactory, SecretStoreFactory>();
-            services.TryAddSingleton<ICertificateJwkResolver, CertificateJwkResolver>();
-            return services;
-        }
 
-        /// <summary>
-        /// Configures a named secret store based on the provided options.
-        /// The secret store type is automatically determined by which configuration properties are populated.
-        /// </summary>
-        /// <param name="services">The service collection to configure.</param>
-        /// <param name="clientName">The name of the client configuration.</param>
-        /// <param name="configure">A delegate to configure the secret store options.</param>
-        /// <returns>The updated service collection.</returns>
-        public static IServiceCollection AddSecretStore(
-            this IServiceCollection services,
-            string clientName,
-            Action<SecretStoreOptions> configure)
-        {
-            if (string.IsNullOrEmpty(clientName))
-                throw new ArgumentException("Client name cannot be null or empty", nameof(clientName));
-            
-            if (configure == null)
-                throw new ArgumentNullException(nameof(configure));
-
-            services.AddSecretStoreFactory();
-            
-            services.AddOptions<SecretStoreOptions>(clientName)
-                .Configure(configure)
-                .Validate(opts =>
-                {
-                    if (!string.IsNullOrEmpty(opts.CertificateThumbprint))
-                    {
-                        opts.SecretStoreType = SecretStoreType.Certificate;
-                        return !string.IsNullOrEmpty(opts.ClientId);
-                    }
-                    else if (!string.IsNullOrEmpty(opts.PrivateJwk))
-                    {
-                        opts.SecretStoreType = SecretStoreType.File;
-                        return true;
-                    }
-                    return false;
-                }, "Either CertificateThumbprint (with ClientId) or PrivateJwk must be configured");
-
-            return services;
-        }
     }
 }

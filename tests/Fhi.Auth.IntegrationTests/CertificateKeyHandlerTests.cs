@@ -12,7 +12,7 @@ namespace Fhi.Auth.IntegrationTests
     public class CertificateKeyHandlerTests
     {
         private IServiceProvider? _serviceProvider;
-        private ICertificateKeyHandler? _certificateKeyHandler;
+        private IPrivateKeyHandler? _certificateKeyHandler;
         private readonly List<string> _thumbprintsToCleanup = new();
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Fhi.Auth.IntegrationTests
 
             _serviceProvider = services.BuildServiceProvider();
 
-            _certificateKeyHandler = _serviceProvider.GetRequiredService<ICertificateKeyHandler>();
+            _certificateKeyHandler = _serviceProvider.GetRequiredService<IPrivateKeyHandler>();
         }
 
         [TearDown]
@@ -72,63 +72,116 @@ namespace Fhi.Auth.IntegrationTests
         }
 
         [Test]
-        public void GIVEN_ValidCertificateInStore_When_GetPrivateKeyAsJwk_Then_ReturnsPrivateJwk()
+        public void GIVEN_ValidCertificateInStore_When_GetPrivateJwk_WithThumbprint_Then_ReturnsJwk()
         {
             var cert = CreateAndInstallCertificate();
-            var jwk = _certificateKeyHandler!.GetPrivateKeyAsJwk(cert.Thumbprint);
+            var jwkString = _certificateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(jwk, Is.Not.Null.Or.Empty);
-                TestContext.Progress.WriteLine("Test JWK: " + jwk);
-                Assert.That(jwk, Does.Contain("\"kty\":\"RSA\""));
-                Assert.That(jwk, Does.Contain("\"kid\":"));
-                Assert.That(jwk, Does.Contain("\"d\":"));    
+                Assert.That(jwkString, Is.Not.Null.Or.Empty);
+                TestContext.Progress.WriteLine("Test JWK: " + jwkString);
+                
+                Assert.DoesNotThrow(() => System.Text.Json.JsonDocument.Parse(jwkString));
+                
+                Assert.That(jwkString, Does.Contain("\"kty\""));
+                Assert.That(jwkString, Does.Contain("\"n\""));
+                Assert.That(jwkString, Does.Contain("\"d\""));
             }
 
             cert.Dispose();
         }
 
         [Test]
-        public void GIVEN_MissingCertificate_When_GetPrivateKeyAsJwk_Then_ThrowsException()
+        public void GIVEN_PemString_When_GetPrivateJwk_Then_ReturnsJwk()
+        {
+            var cert = CreateAndInstallCertificate();
+            
+            using var rsa = cert.GetRSAPrivateKey();
+            var pem = rsa!.ExportRSAPrivateKeyPem();
+            
+            var jwkString = _certificateKeyHandler!.GetPrivateJwk(pem);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(jwkString, Is.Not.Null.Or.Empty);
+                Assert.DoesNotThrow(() => System.Text.Json.JsonDocument.Parse(jwkString));
+                Assert.That(jwkString, Does.Contain("\"kty\""));
+            }
+
+            cert.Dispose();
+        }
+
+        [Test]
+        public void GIVEN_JwkString_When_GetPrivateJwk_Then_ReturnsSameJwk()
+        {
+            var cert = CreateAndInstallCertificate();
+
+            var originalJwk = _certificateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
+            var resultJwk = _certificateKeyHandler!.GetPrivateJwk(originalJwk);
+
+            Assert.That(resultJwk, Is.EqualTo(originalJwk));
+
+            cert.Dispose();
+        }
+
+        [Test]
+        public void GIVEN_Base64EncodedJwk_When_GetPrivateJwk_Then_ReturnsDecodedJwk()
+        {
+            var cert = CreateAndInstallCertificate();
+            
+            var jwkString = _certificateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
+            var base64Input = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(jwkString));
+            var resultJwk = _certificateKeyHandler!.GetPrivateJwk(base64Input);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(resultJwk, Is.Not.Null.Or.Empty);
+                Assert.DoesNotThrow(() => System.Text.Json.JsonDocument.Parse(resultJwk));
+            }
+
+            cert.Dispose();
+        }
+
+        [Test]
+        public void GIVEN_MissingCertificate_When_GetPrivateJwk_Then_ThrowsException()
         {
             var missingThumb = Guid.NewGuid().ToString("N");
 
-            var exception = Assert.Throws<InvalidOperationException>(() => _certificateKeyHandler!.GetPrivateKeyAsJwk(missingThumb));
+            var exception = Assert.Throws<InvalidOperationException>(() => _certificateKeyHandler!.GetPrivateJwk(missingThumb));
             Assert.That(exception.Message, Does.Contain("No certificate found"));
         }
 
         [Test]
-        public void GIVEN_EmptyThumbprint_When_GetPrivateKeyAsJwk_Then_ThrowsArgumentNullException()
+        public void GIVEN_EmptyInput_When_GetPrivateJwk_Then_ThrowsArgumentNullException()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => _certificateKeyHandler!.GetPrivateKeyAsJwk(string.Empty));
-            Assert.That(exception.ParamName, Is.EqualTo("certificateThumbprint"));
+            var exception = Assert.Throws<ArgumentNullException>(() => _certificateKeyHandler!.GetPrivateJwk(string.Empty));
+            Assert.That(exception.ParamName, Is.EqualTo("pemOrThumbprint"));
         }
 
         [Test]
-        public void GIVEN_ExpiredCertificateInStore_When_GetPrivateKeyAsJwk_Then_ThrowsException()
+        public void GIVEN_ExpiredCertificate_When_GetPrivateJwk_Then_ThrowsException()
         {
             var cert = CreateAndInstallExpiredCertificate();
 
-            var exception = Assert.Throws<InvalidOperationException>(() => _certificateKeyHandler!.GetPrivateKeyAsJwk(cert.Thumbprint));
+            var exception = Assert.Throws<InvalidOperationException>(() => _certificateKeyHandler!.GetPrivateJwk(cert.Thumbprint));
             Assert.That(exception.Message, Does.Contain("has expired"));
 
             cert.Dispose();
         }
 
         [Test]
-        public void GIVEN_CertificateWithoutPrivateKeyInStore_When_GetPrivateKeyAsJwk_Then_ThrowsException()
+        public void GIVEN_CertificateWithoutPrivateKey_When_GetPrivateJwk_Then_ThrowsException()
         {
             var cert = new TestCertificateBuilder()
                 .WithSubject("CN=PublicOnlyTestCert")
                 .PublicOnly()
                 .Build();
 
-            // install public-only cert (DER) directly
             InstallCertificate(cert);
             _thumbprintsToCleanup.Add(cert.Thumbprint);
 
-            var exception = Assert.Throws<InvalidOperationException>(() => _certificateKeyHandler!.GetPrivateKeyAsJwk(cert.Thumbprint));
+            var exception = Assert.Throws<InvalidOperationException>(() => _certificateKeyHandler!.GetPrivateJwk(cert.Thumbprint));
             Assert.That(exception.Message, Does.Contain("has no private key"));
 
             cert.Dispose();

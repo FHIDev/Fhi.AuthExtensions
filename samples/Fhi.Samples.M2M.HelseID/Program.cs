@@ -1,16 +1,18 @@
 ﻿using Duende.AccessTokenManagement;
 using Fhi.Authentication;
 using Fhi.Authentication.ClientCredentials;
+using Fhi.Authentication.Tokens;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace M2M.Host.HelseID;
 
 /// <summary>
 /// Example showing three different ways to configure client credentials authentication:
-/// 1. Direct JWK configuration
-/// 2. Direct certificate configuration with explicit resolver
-/// 3. Factory pattern with automatic secret type detection (RECOMMENDED)
+/// 1. Direct JWK configuration (simple, resolved at startup)
+/// 2. Direct certificate configuration (explicit control, resolved at startup)
+/// 3. ISecretStore pattern (RECOMMENDED - runtime resolution with DI)
 /// </summary>
 public partial class Program
 {
@@ -30,9 +32,9 @@ public partial class Program
             // Choose configuration approach:
             // Option 1: Direct JWK (simple, good for dev with user secrets)
             // Option 2: Direct certificate (explicit control, more verbose)
-            // Option 3: Factory pattern (RECOMMENDED - config-driven, no manual flags)
+            // Option 3: ISecretStore (RECOMMENDED - flexible, testable, DI-friendly)
             
-            ConfigureWithSecretStoreFactory(services, apiSection);
+            ConfigureWithSecretStore(services, apiSection);
             
             // Alternative options (uncomment to try):
             // ConfigureJwkAuthentication(services, apiSection);
@@ -88,18 +90,15 @@ public partial class Program
 
         var api = apiSection.Get<HelseIdCertificateApiOption>() ?? new HelseIdCertificateApiOption();
         
-        // Create resolver directly for configuration-time use
-        var resolver = new CertificateJwkResolver();
-        
-        // Convert certificate configuration (thumbprint or PEM) to JWK
-        var privateJwkJson = resolver.ResolveToJwk(api.Authentication.Certificate);
+        // Certificate will be resolved at runtime using ICertificateKeyHandler
+        // No need to resolve at configuration time when using certificate-based options
         
         services
             .AddClientCredentialsClientOptions(
                 api.ClientName,
                 api.Authentication.Authority,
                 api.Authentication.ClientId,
-                PrivateJwk.ParseFromJson(privateJwkJson),
+                api.Authentication.Certificate,  // Pass certificate options directly
                 api.Authentication.Scope)
             .AddClientCredentialsHttpClient(client =>
             {
@@ -112,18 +111,22 @@ public partial class Program
     }
 
     /// <summary>
-    /// Option 3: Configure authentication using the SecretStoreFactory pattern (RECOMMENDED).
-    /// The secret type (certificate or file) is automatically detected from configuration.
-    /// No manual flags needed - just populate what's in your appsettings.json!
+    /// Option 3: Configure authentication using ISecretStore pattern (RECOMMENDED).
+    /// This approach allows you to register different ISecretStore implementations in DI
+    /// based on your environment or configuration needs.
     /// </summary>
     /// <remarks>
-    /// Auto-detection logic:
-    /// - If CertificateThumbprint is present → uses CertificateSecretStore
-    /// - If PrivateJwk is present → uses FileSecretStore
-    /// This approach eliminates the need for manual configuration switches and makes
-    /// it easy to switch between dev (PrivateJwk) and prod (Certificate) environments.
+    /// Benefits:
+    /// - Testable: Easy to mock ISecretStore in tests
+    /// - Flexible: Switch implementations based on environment
+    /// - Clean: No factory pattern, just standard DI
+    /// - Runtime resolution: JWK is resolved when needed, not at startup
+    /// 
+    /// Example implementations:
+    /// - FileSecretStore: For JWK from configuration/environment variables
+    /// - CertificateSecretStore: For certificates from Windows certificate store
     /// </remarks>
-    private static void ConfigureWithSecretStoreFactory(IServiceCollection services, IConfigurationSection apiSection)
+    private static void ConfigureWithSecretStore(IServiceCollection services, IConfigurationSection apiSection)
     {
         services
             .AddOptions<HelseIdProtectedApiOption>()
@@ -133,25 +136,42 @@ public partial class Program
 
         var api = apiSection.Get<HelseIdProtectedApiOption>() ?? new HelseIdProtectedApiOption();
 
-        // Use the factory-based extension that auto-detects secret type from configuration
+        // Register the appropriate ISecretStore implementation based on configuration
+        var certificateThumbprint = apiSection.GetValue<string>("Authentication:Certificate:Thumbprint");
+        
+        if (!string.IsNullOrEmpty(certificateThumbprint))
+        {
+            services.AddSingleton<CertificateSecretManager>();
+            
+            services.AddSingleton<ISecretStore>(sp =>
+            {
+                var certificateOptions = new CertificateOptions
+                {
+                    Thumbprint = certificateThumbprint,
+                    StoreLocation = CertificateStoreLocation.CurrentUser
+                };
+                
+                return new CertificateSecretStore(
+                    certificateOptions,
+                    sp.GetRequiredService<IPrivateKeyHandler>(),
+                    sp.GetRequiredService<ILogger<CertificateSecretStore>>(),
+                    sp.GetRequiredService<CertificateSecretManager>()); 
+            });
+        }
+        else if (!string.IsNullOrEmpty(api.Authentication.PrivateJwk))
+        {
+            services.AddSingleton<ISecretStore>(sp =>
+                new FileSecretStore(
+                    api.Authentication.PrivateJwk,
+                    sp.GetRequiredService<ILogger<FileSecretStore>>()));
+        }
+
+        // Configure client credentials using the ISecretStore
         services
-            .AddClientCredentialsClientOptionsWithSecretStore(
+            .AddClientCredentialsClientOptions(
                 api.ClientName,
                 api.Authentication.Authority,
                 api.Authentication.ClientId,
-                secretStore =>
-                {
-                    // Just populate from config - system auto-detects which to use!
-                    // For file-based secrets (dev/testing):
-                    secretStore.PrivateJwk = api.Authentication.PrivateJwk;
-                    
-                    // For certificate-based secrets (production):
-                    secretStore.ClientId = api.Authentication.ClientId;
-                    // Get certificate thumbprint from config if it exists
-                    secretStore.CertificateThumbprint = apiSection.GetValue<string>("Authentication:Certificate:Thumbprint");
-                    
-                    // The factory will automatically choose based on which is populated
-                },
                 api.Authentication.Scope)
             .AddClientCredentialsHttpClient(client =>
             {
