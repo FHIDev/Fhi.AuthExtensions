@@ -1,28 +1,34 @@
 using System.ComponentModel.DataAnnotations;
 using Fhi.Authentication.ClientCredentials;
+using Microsoft.Extensions.Options;
 
-namespace M2M.Host.HelseID
+namespace M2M.Host.HelseID;
+
+/// <summary>
+/// Configuration for HelseID API with certificate-based authentication.
+/// Alternative to HelseIdProtectedApiOption that uses certificate instead of inline JWK.
+/// </summary>
+public record HelseIdCertificateApiOption
 {
-    /// <summary>
-    /// Configuration for HelseID API with certificate-based authentication.
-    /// Alternative to HelseIdProtectedApiOption that uses certificate instead of inline JWK.
-    /// </summary>
-    public class HelseIdCertificateApiOption
-    {
-        [Required] public string BaseAddress { get; set; } = string.Empty;
-        [Required] public HelseIDCertificateAuthentication Authentication { get; set; } = new();
-        public string ClientName => "HelseIdProtectedApi";
-    }
+    [Required] public required string BaseAddress { get; init; }
 
-    public class HelseIDCertificateAuthentication
-    {
-        [Required] public string Authority { get; set; } = string.Empty;
-        [Required] public string ClientId { get; set; } = string.Empty;
-        [Required] public string Scope { get; set; } = string.Empty;
-        
-        /// <summary>
-        /// Certificate configuration - will be converted to JWK by IPrivateKeyHandler with format auto-detection
-        /// </summary>
-        [Required] public CertificateOptions Certificate { get; set; } = new();
-    }
+    [Required]
+    [ValidateObjectMembers]
+    public required HelseIDCertificateAuthentication Authentication { get; init; }
+
+    public const string ClientName = "HelseIdProtectedApi";
+}
+
+public record HelseIDCertificateAuthentication
+{
+    [Required] public required string Authority { get; init; }
+    [Required] public required string ClientId { get; init; }
+    [Required] public required string Scope { get; init; }
+
+    /// <summary>
+    /// Certificate configuration - will be converted to JWK by IPrivateKeyHandler with format auto-detection
+    /// </summary>
+    [Required]
+    [ValidateObjectMembers]
+    public required CertificateOptions Certificate { get; init; }
 }

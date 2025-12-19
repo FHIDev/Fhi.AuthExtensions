@@ -21,7 +21,7 @@ namespace M2M.Host.HelseID
 
         public async Task<string> GetHealthRecords()
         {
-            var client = _httpClientFactory.CreateClient(_protectedApiOption.ClientName);
+            var client = _httpClientFactory.CreateClient(HelseIdProtectedApiOption.ClientName);
             client.BaseAddress = new Uri(_protectedApiOption.BaseAddress!);
             var response = await client.GetAsync("api/v1/integration/health-records/helseid-bearer");
             _logger.LogInformation("Request: {req}", response.RequestMessage);

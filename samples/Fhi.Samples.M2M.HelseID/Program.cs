@@ -28,14 +28,14 @@ public partial class Program
             services.AddTransient<HealthRecordService>();
 
             var apiSection = context.Configuration.GetSection("HelseIdProtectedApi");
-            
+
             // Choose configuration approach:
             // Option 1: Direct JWK (simple, good for dev with user secrets)
             // Option 2: Direct certificate (explicit control, more verbose)
             // Option 3: ISecretStore (RECOMMENDED - flexible, testable, DI-friendly)
-            
+
             ConfigureWithSecretStore(services, apiSection);
-            
+
             // Alternative options (uncomment to try):
             // ConfigureJwkAuthentication(services, apiSection);
             // ConfigureCertificateAuthentication(services, apiSection);
@@ -56,13 +56,13 @@ public partial class Program
             .Bind(apiSection)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
-        var api = apiSection.Get<HelseIdProtectedApiOption>() ?? new HelseIdProtectedApiOption();
+
+        var api = apiSection.Get<HelseIdProtectedApiOption>()!;
 
         // Simple JWK-based authentication
         services
             .AddClientCredentialsClientOptions(
-                api.ClientName,
+                HelseIdProtectedApiOption.ClientName,
                 api.Authentication.Authority,
                 api.Authentication.ClientId,
                 PrivateJwk.ParseFromJson(api.Authentication.PrivateJwk),
@@ -73,7 +73,7 @@ public partial class Program
         services.AddDistributedMemoryCache();
         services.AddClientCredentialsTokenManagement();
         services.AddInMemoryDiscoveryService([api.Authentication.Authority]);
-        
+
     }
 
     /// <summary>
@@ -88,14 +88,14 @@ public partial class Program
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        var api = apiSection.Get<HelseIdCertificateApiOption>() ?? new HelseIdCertificateApiOption();
-        
+        var api = apiSection.Get<HelseIdCertificateApiOption>()!;
+
         // Certificate will be resolved at runtime using ICertificateKeyHandler
         // No need to resolve at configuration time when using certificate-based options
-        
+
         services
             .AddClientCredentialsClientOptions(
-                api.ClientName,
+                HelseIdCertificateApiOption.ClientName,
                 api.Authentication.Authority,
                 api.Authentication.ClientId,
                 api.Authentication.Certificate,  // Pass certificate options directly
@@ -104,7 +104,7 @@ public partial class Program
             {
                 client.BaseAddress = new Uri(api.BaseAddress);
             });
-        
+
         services.AddDistributedMemoryCache();
         services.AddClientCredentialsTokenManagement();
         services.AddInMemoryDiscoveryService([api.Authentication.Authority]);
@@ -128,15 +128,15 @@ public partial class Program
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        var api = apiSection.Get<HelseIdProtectedApiOption>() ?? new HelseIdProtectedApiOption();
+        var api = apiSection.Get<HelseIdProtectedApiOption>()!;
 
         // Register the appropriate ISecretStore implementation based on configuration
         var certificateThumbprint = apiSection.GetValue<string>("Authentication:Certificate:Thumbprint");
-        
+
         if (!string.IsNullOrEmpty(certificateThumbprint))
         {
             services.AddSingleton<CertificateSecretManager>();
-            
+
             services.AddSingleton<ISecretStore>(sp =>
             {
                 var certificateOptions = new CertificateOptions
@@ -144,12 +144,12 @@ public partial class Program
                     Thumbprint = certificateThumbprint,
                     StoreLocation = CertificateStoreLocation.CurrentUser
                 };
-                
+
                 return new CertificateSecretStore(
                     certificateOptions,
                     sp.GetRequiredService<IPrivateKeyHandler>(),
                     sp.GetRequiredService<ILogger<CertificateSecretStore>>(),
-                    sp.GetRequiredService<CertificateSecretManager>()); 
+                    sp.GetRequiredService<CertificateSecretManager>());
             });
         }
         else if (!string.IsNullOrEmpty(api.Authentication.PrivateJwk))
@@ -163,7 +163,7 @@ public partial class Program
         // Configure client credentials using the ISecretStore
         services
             .AddClientCredentialsClientOptions(
-                api.ClientName,
+                HelseIdProtectedApiOption.ClientName,
                 api.Authentication.Authority,
                 api.Authentication.ClientId,
                 api.Authentication.Scope)
