@@ -11,7 +11,7 @@ namespace Fhi.Authentication.ClientCredentials
         /// Client assertion private JWK
         /// </summary>
         public string PrivateJwk { get; set; } = string.Empty;
-
+        
         /// <summary>
         /// Client assertion issuer value
         /// </summary>

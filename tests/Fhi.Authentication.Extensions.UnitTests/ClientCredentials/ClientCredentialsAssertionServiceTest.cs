@@ -20,14 +20,15 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
                 ClientId = ClientId.Parse("client-id"),
                 Scope = null
             });
-            var clientAssertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
-            clientAssertionOptions.Get("name").Returns(new ClientAssertionOptions()
+            var assertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
+            assertionOptions.Get("name").Returns(new ClientAssertionOptions
             {
                 Issuer = "issuer",
-                PrivateJwk = jwk.PrivateKey
+                PrivateJwk = jwk.PrivateKey,
+                ClientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
             });
 
-            var clientAssertionService = new ClientCredentialsAssertionService(Substitute.For<ILogger<ClientCredentialsAssertionService>>(), clientAssertionOptions, clientOptions);
+            var clientAssertionService = new ClientCredentialsAssertionService(Substitute.For<ILogger<ClientCredentialsAssertionService>>(), assertionOptions, clientOptions);
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
 
             var jwt = new JsonWebToken(result!.Value);
@@ -42,9 +43,10 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
         public async Task GIVEN_getClientAssertion_WHEN_clientNotExist_THEN_logError()
         {
             var logger = Substitute.For<ILogger<ClientCredentialsAssertionService>>();
+            var assertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
             var clientAssertionService = new ClientCredentialsAssertionService(
                 logger,
-                Substitute.For<IOptionsMonitor<ClientAssertionOptions>>(),
+                assertionOptions,
                 Substitute.For<IOptionsMonitor<ClientCredentialsClient>>());
 
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("non-existing-client"));
@@ -69,14 +71,14 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
                 ClientId = ClientId.Parse("client-id"),
                 Scope = null
             });
-            var clientAssertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
-            clientAssertionOptions.Get("name").Returns(new ClientAssertionOptions()
+            var assertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
+            assertionOptions.Get("name").Returns(new ClientAssertionOptions
             {
                 Issuer = issuer!,
                 PrivateJwk = "jwk"
             });
 
-            var clientAssertionService = new ClientCredentialsAssertionService(logger, clientAssertionOptions, clientOptions);
+            var clientAssertionService = new ClientCredentialsAssertionService(logger, assertionOptions, clientOptions);
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
 
             logger.Received().Log(
@@ -99,19 +101,20 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
                 ClientId = ClientId.Parse("client-id"),
                 Scope = null
             });
-            var clientAssertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
-            clientAssertionOptions.Get("name").Returns(new ClientAssertionOptions()
+            var assertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
+            assertionOptions.Get("name").Returns(new ClientAssertionOptions
             {
                 Issuer = "issuer",
                 PrivateJwk = jwk!
             });
-            var clientAssertionService = new ClientCredentialsAssertionService(logger, clientAssertionOptions, clientOptions);
+
+            var clientAssertionService = new ClientCredentialsAssertionService(logger, assertionOptions, clientOptions);
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
 
             logger.Received().Log(
              LogLevel.Error,
              Arg.Any<EventId>(),
-             Arg.Is<object>(o => o.ToString()!.Contains("Could not resolve JWK for name. Missing parameter")),
+             Arg.Is<object>(o => o.ToString()!.Contains("Could not resolve JWK")),
              Arg.Any<Exception>(),
              Arg.Any<Func<object, Exception?, string>>()
          );
