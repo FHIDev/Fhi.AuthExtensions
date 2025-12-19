@@ -14,17 +14,23 @@ public class CertificateSecretManager
     /// Logger for certificate discovery and filtering operations.
     /// </summary>
     protected readonly ILogger<CertificateSecretManager> Logger;
-    
+
+    private readonly TimeProvider _timeProvider;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="CertificateSecretManager"/> class.
     /// </summary>
     /// <param name="logger">The logger instance for certificate operations.</param>
+    /// <param name="timeProvider">Optional time provider for testability. Defaults to <see cref="TimeProvider.System"/>.</param>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="logger"/> is null.</exception>
-    public CertificateSecretManager(ILogger<CertificateSecretManager> logger)
+    public CertificateSecretManager(
+        ILogger<CertificateSecretManager> logger,
+        TimeProvider? timeProvider = null)
     {
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _timeProvider = timeProvider ?? TimeProvider.System;
     }
-    
+
     private bool Load(X509Certificate2 certificate)
     {
         ArgumentNullException.ThrowIfNull(certificate);
@@ -36,17 +42,19 @@ public class CertificateSecretManager
             return false;
         }
 
-        if (certificate.NotAfter < DateTime.Now)
+        var utcNow = _timeProvider.GetUtcNow().UtcDateTime;
+
+        if (certificate.NotAfter.ToUniversalTime() < utcNow)
         {
-            Logger.LogWarning("Skipping expired certificate {Thumbprint}, expired on {ExpiryDate}",
-                certificate.Thumbprint, certificate.NotAfter);
+            Logger.LogWarning("Skipping expired certificate {Thumbprint}, expired on {ExpiryDate:u}",
+                certificate.Thumbprint, certificate.NotAfter.ToUniversalTime());
             return false;
         }
 
-        if (certificate.NotBefore > DateTime.Now)
+        if (certificate.NotBefore.ToUniversalTime() > utcNow)
         {
-            Logger.LogWarning("Skipping certificate {Thumbprint}, not valid until {ValidFrom}",
-                certificate.Thumbprint, certificate.NotBefore);
+            Logger.LogWarning("Skipping certificate {Thumbprint}, not valid until {ValidFrom:u}",
+                certificate.Thumbprint, certificate.NotBefore.ToUniversalTime());
             return false;
         }
 

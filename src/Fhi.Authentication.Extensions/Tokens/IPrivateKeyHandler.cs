@@ -1,5 +1,6 @@
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Fhi.Authentication.Tokens
 {
@@ -35,14 +36,23 @@ namespace Fhi.Authentication.Tokens
     public class PrivateKeyHandler : IPrivateKeyHandler
     {
         private readonly ICertificateProvider _certificateProvider;
+        private readonly TimeProvider _timeProvider;
+        private readonly ILogger<PrivateKeyHandler>? _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PrivateKeyHandler"/> class.
         /// </summary>
         /// <param name="certificateProvider">Provider for accessing certificates from certificate stores.</param>
-        public PrivateKeyHandler(ICertificateProvider certificateProvider)
+        /// <param name="timeProvider">Optional time provider for testability. Defaults to <see cref="TimeProvider.System"/>.</param>
+        /// <param name="logger">Optional logger for diagnostic information.</param>
+        public PrivateKeyHandler(
+            ICertificateProvider certificateProvider,
+            TimeProvider? timeProvider = null,
+            ILogger<PrivateKeyHandler>? logger = null)
         {
             _certificateProvider = certificateProvider ?? throw new ArgumentNullException(nameof(certificateProvider));
+            _timeProvider = timeProvider ?? TimeProvider.System;
+            _logger = logger;
         }
 
         /// <inheritdoc/>
@@ -54,15 +64,15 @@ namespace Fhi.Authentication.Tokens
             }
 
             var trimmed = secretOrThumbprint.TrimStart();
-            
+
             // Format Detection: Check input format and route to appropriate parser
-            
+
             // 1. Check if it's already JWK JSON format
-            if (trimmed.StartsWith("{", StringComparison.Ordinal))
+            if (trimmed.StartsWith('{'))
             {
                 // Direct JWK input - validate and return
                 var privateJwk = PrivateJwk.ParseFromJson(secretOrThumbprint);
-                return privateJwk; 
+                return privateJwk;
             }
 
             // 2. Check if it's PEM format
@@ -81,25 +91,26 @@ namespace Fhi.Authentication.Tokens
                     var privateJwk = PrivateJwk.ParseFromBase64Encoded(secretOrThumbprint);
                     return privateJwk; // implicit conversion to string
                 }
-                catch
+                catch (ArgumentException ex)
                 {
-                    // Not valid Base64 JWK, fall through to thumbprint handling
+                    // Input looks like Base64 but is not valid JWK - fall through to thumbprint handling
+                    _logger?.LogDebug(ex, "Input appears to be Base64 but failed to parse as JWK. Falling back to thumbprint lookup.");
                 }
             }
-            
+
             // 4. Default: Treat as certificate thumbprint - fetch certificate, get PEM, convert to JWK
             var pem = GetPrivateKeyAsPemFromThumbprint(secretOrThumbprint);
             var jwk = PrivateJwk.ParseFromPem(pem);
             return jwk; // implicit conversion to string
         }
-        
+
         private static bool IsBase64String(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return false;
-            
+
             value = value.Trim();
-            return (value.Length % 4 == 0) && 
+            return (value.Length % 4 == 0) &&
                    System.Text.RegularExpressions.Regex.IsMatch(value, @"^[a-zA-Z0-9\+/]*={0,2}$");
         }
 
@@ -118,26 +129,33 @@ namespace Fhi.Authentication.Tokens
             }
 
             ValidateCertificate(certificate);
-            
+
             using var rsa = certificate.GetRSAPrivateKey();
             if (rsa == null)
             {
                 throw new InvalidOperationException($"Certificate {certificate.Subject} has no private key available");
             }
-            
+
             return rsa.ExportRSAPrivateKeyPem();
         }
 
         private static string NormalizeThumbprint(string thumbprint) =>
             thumbprint.Replace(" ", string.Empty).ToUpperInvariant();
 
-        private static void ValidateCertificate(X509Certificate2 certificate)
+        private void ValidateCertificate(X509Certificate2 certificate)
         {
             if (certificate is null) throw new ArgumentNullException(nameof(certificate));
 
-            if (certificate.NotAfter < DateTime.Now)
+            var utcNow = _timeProvider.GetUtcNow().UtcDateTime;
+
+            if (certificate.NotBefore.ToUniversalTime() > utcNow)
             {
-                throw new InvalidOperationException($"Certificate {certificate.Subject} has expired on {certificate.NotAfter}");
+                throw new InvalidOperationException($"Certificate {certificate.Subject} is not yet valid. Valid from {certificate.NotBefore.ToUniversalTime():u}");
+            }
+
+            if (certificate.NotAfter.ToUniversalTime() < utcNow)
+            {
+                throw new InvalidOperationException($"Certificate {certificate.Subject} has expired on {certificate.NotAfter.ToUniversalTime():u}");
             }
         }
     }
