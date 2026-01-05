@@ -1,6 +1,9 @@
 ﻿using Fhi.Authentication.OpenIdConnect;
+using Fhi.Authentication.ClientCredentials;
+using Fhi.Authentication.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Fhi.Authentication
@@ -25,6 +28,21 @@ namespace Fhi.Authentication
         }
 
         /// <summary>
+        /// Add handler for certificate store keys. This is used for retrieving keys from the Windows certificate store.
+        /// </summary>
+        /// <param name="services">The service collection to add the handler to.</param>
+        /// <param name="storeLocation">The certificate store location (CurrentUser or LocalMachine). Defaults to CurrentUser.</param>
+        /// <returns>The updated service collection.</returns>
+        public static IServiceCollection AddCertificateStoreKeyHandler(
+            this IServiceCollection services,
+            CertificateStoreLocation storeLocation = CertificateStoreLocation.CurrentUser)
+        {
+            services.AddSingleton<ICertificateProvider>(_ => new StoreCertificateProvider(storeLocation));
+            services.AddTransient<IPrivateKeyHandler, PrivateKeyHandler>();
+            return services;
+        }
+        
+        /// <summary>
         /// Adds an in-memory discovery service for OpenID Connect authorities.
         /// Use IDiscoveryDocumentStore to retrieve discovery documents.
         /// </summary>
@@ -40,10 +58,10 @@ namespace Fhi.Authentication
             foreach (var authority in options)
             {
                 services.AddOptions<DiscoveryDocumentStoreOptions>(authority.Authority)
-                  .Configure(options =>
+                  .Configure(opts =>
                   {
-                      options.Authority = authority.Authority;
-                      options.CacheDuration = authority.CacheDuration;
+                      opts.Authority = authority.Authority;
+                      opts.CacheDuration = authority.CacheDuration;
                   });
             }
 

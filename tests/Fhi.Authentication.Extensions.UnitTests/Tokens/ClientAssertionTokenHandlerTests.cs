@@ -1,9 +1,9 @@
-using Fhi.Authentication.Tokens;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Fhi.Authentication.Tokens;
 using Fhi.Security.Cryptography;
+using Microsoft.IdentityModel.Tokens;
 
-namespace Fhi.Authentication.UnitTests.Tokens
+namespace Fhi.Authentication.Extensions.UnitTests.Tokens
 {
     public class ClientAssertionTokenHandlerTests
     {

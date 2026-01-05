@@ -8,25 +8,33 @@ namespace Fhi.Authentication.ClientCredentials
 {
 
     /// <summary>
-    /// Called from Duende.AccesstokenManagemnt accesstoken delegation handler to generates a client assertion for authenticating the client.
-    /// When this service is addedd to the DI container, Duende.AccessTokenManagement will use this service to get a client assertion
+    /// Called from Duende.AccessTokenManagement accesstoken delegation handler to generate a client assertion for authenticating the client.
+    /// When this service is added to the DI container, Duende.AccessTokenManagement will use this service to get a client assertion.
     /// </summary>
     public class ClientCredentialsAssertionService : IClientAssertionService
     {
         private readonly ILogger<ClientCredentialsAssertionService> _logger;
         private readonly IOptionsMonitor<ClientAssertionOptions> _clientAssertionOptions;
         private readonly IOptionsMonitor<ClientCredentialsClient> _clientCredentialsClient;
+        private readonly ISecretStore? _secretStore;
 
-
-        /// <inheritdoc/>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClientCredentialsAssertionService"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="clientAssertionOptions">The client assertion options.</param>
+        /// <param name="clientCredentialsClient">The client credentials client options.</param>
+        /// <param name="secretStore">Optional. The secret store for retrieving private JWK at runtime.</param>
         public ClientCredentialsAssertionService(
             ILogger<ClientCredentialsAssertionService> logger,
             IOptionsMonitor<ClientAssertionOptions> clientAssertionOptions,
-            IOptionsMonitor<ClientCredentialsClient> clientCredentialsClient)
+            IOptionsMonitor<ClientCredentialsClient> clientCredentialsClient,
+            ISecretStore? secretStore = null)
         {
-            _logger = logger;
-            _clientAssertionOptions = clientAssertionOptions;
-            _clientCredentialsClient = clientCredentialsClient;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _clientAssertionOptions = clientAssertionOptions ?? throw new ArgumentNullException(nameof(clientAssertionOptions));
+            _clientCredentialsClient = clientCredentialsClient ?? throw new ArgumentNullException(nameof(clientCredentialsClient));
+            _secretStore = secretStore;
         }
 
         /// <inheritdoc/>
@@ -42,13 +50,32 @@ namespace Fhi.Authentication.ClientCredentials
                     return Task.FromResult<ClientAssertion?>(null);
                 }
 
-                if (string.IsNullOrEmpty(clientAssertionOptions.PrivateJwk))
+                // Resolve private JWK - try direct configuration first, then secret store if available
+                string privateJwk = clientAssertionOptions.PrivateJwk;
+
+                // If PrivateJwk is not directly configured, try the secret store (if registered)
+                if (string.IsNullOrEmpty(privateJwk) && _secretStore != null)
                 {
-                    _logger.LogError("Could not resolve JWK for {clientName}. Missing parameter", clientName);
+                    try
+                    {
+                        var jwk = _secretStore.GetPrivateJwk();
+                        privateJwk = jwk;
+                        _logger.LogDebug("Retrieved private JWK from secret store for {clientName}", clientName);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to retrieve private JWK from secret store for {clientName}", clientName);
+                        return Task.FromResult<ClientAssertion?>(null);
+                    }
+                }
+
+                if (string.IsNullOrEmpty(privateJwk))
+                {
+                    _logger.LogError("Could not resolve JWK for {clientName}. No PrivateJwk configured and secret store unavailable or failed", clientName);
                     return Task.FromResult<ClientAssertion?>(null);
                 }
 
-                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client?.ClientId ?? "", clientAssertionOptions.PrivateJwk);
+                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client.ClientId ?? "", privateJwk);
                 return Task.FromResult<ClientAssertion?>(new ClientAssertion
                 {
                     Type = clientAssertionOptions.ClientAssertionType,
