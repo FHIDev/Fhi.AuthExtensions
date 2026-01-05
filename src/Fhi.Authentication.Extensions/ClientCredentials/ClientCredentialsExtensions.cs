@@ -140,9 +140,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<IClientAssertionService, ClientCredentialsAssertionService>();
             
             // Ensure IPrivateKeyHandler is registered (required for certificate-to-JWK conversion)
-            services.TryAddTransient<ICertificateProvider>(_ => 
+            services.AddTransient<ICertificateProvider>(_ => 
                 new StoreCertificateProvider(certificate.StoreLocation));
-            services.TryAddTransient<IPrivateKeyHandler, PrivateKeyHandler>();
+            services.AddTransient<IPrivateKeyHandler, PrivateKeyHandler>();
 
             // Configure ClientAssertionOptions using IPrivateKeyHandler for format-flexible JWK resolution
             var clientAssertionBuilder = services
@@ -187,9 +187,6 @@ namespace Microsoft.Extensions.DependencyInjection
             string? scope = null,
             DPoPProofKey? dPoPKey = null)
         {
-            if (string.IsNullOrEmpty(optionName))
-                throw new ArgumentException("Option name cannot be null or empty", nameof(optionName));
-
             services.TryAddTransient<IClientAssertionService, ClientCredentialsAssertionService>();
 
             // Configure ClientAssertionOptions - PrivateJwk will be resolved from ISecretStore at runtime

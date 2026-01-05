@@ -37,7 +37,7 @@ namespace Fhi.Authentication
             this IServiceCollection services,
             CertificateStoreLocation storeLocation = CertificateStoreLocation.CurrentUser)
         {
-            services.AddTransient<ICertificateProvider>(_ => new StoreCertificateProvider(storeLocation));
+            services.AddSingleton<ICertificateProvider>(_ => new StoreCertificateProvider(storeLocation));
             services.AddTransient<IPrivateKeyHandler, PrivateKeyHandler>();
             return services;
         }

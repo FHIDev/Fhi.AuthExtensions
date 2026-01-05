@@ -135,6 +135,7 @@ public partial class Program
 
         if (!string.IsNullOrEmpty(certificateThumbprint))
         {
+            services.AddCertificateStoreKeyHandler();
             services.AddSingleton<CertificateSecretManager>();
 
             services.AddSingleton<ISecretStore>(sp =>
