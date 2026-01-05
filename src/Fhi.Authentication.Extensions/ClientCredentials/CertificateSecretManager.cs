@@ -127,19 +127,5 @@ public class CertificateSecretManager
             throw;
         }
     }
-
-    /// <summary>
-    /// Gets the display name for a certificate (typically the subject name).
-    /// Override this to customize how certificates are identified in logs.
-    /// </summary>
-    /// <param name="certificate">The certificate.</param>
-    /// <returns>A display name for the certificate.</returns>
-    public virtual string GetCertificateDisplayName(X509Certificate2 certificate)
-    {
-        if (certificate == null)
-            throw new ArgumentNullException(nameof(certificate));
-
-        return certificate.Subject;
-    }
 }
 

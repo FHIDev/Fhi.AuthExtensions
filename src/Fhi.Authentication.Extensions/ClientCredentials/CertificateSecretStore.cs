@@ -53,15 +53,14 @@ public class CertificateSecretStore : ISecretStore
                 _logger.LogDebug("CertificateSecretStore: Validating certificate with thumbprint: {Thumbprint}", 
                     _certificateOptions.Thumbprint);
 
-                var certificate = _certificateManager.FindCertificate(_certificateOptions);
+                using var certificate = _certificateManager.FindCertificate(_certificateOptions);
                 if (certificate == null)
                 {
                     throw new InvalidOperationException(
                         $"Certificate with thumbprint {_certificateOptions.Thumbprint} not found or did not pass validation filters.");
                 }
                 
-                _logger.LogDebug("CertificateSecretStore: Certificate with thumbprint: {Thumbprint} validated", 
-                    _certificateManager.GetCertificateDisplayName(certificate));
+                _logger.LogDebug("CertificateSecretStore: Certificate with thumbprint: {Thumbprint} validated", certificate.Subject);
             }
             else
             {
