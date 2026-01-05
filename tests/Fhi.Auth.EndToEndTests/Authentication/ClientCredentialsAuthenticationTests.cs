@@ -24,8 +24,8 @@ namespace Fhi.Auth.EndToEndTests.Authentication
             var clientBuilder = WebApplicationBuilderTestHost
                .CreateWebHostBuilder()
                .WithUrls("http://localhost:7777")
-               .WithUserSecrets("ffb38d7f-f087-47e4-ba0e-4a8d7ec56be6")
-               //.WithAppSettings("Authentication\\appsettings.ClientCredentialsTests.json")
+               //.WithUserSecrets("ffb38d7f-f087-47e4-ba0e-4a8d7ec56be6")
+               .WithAppSettings("Authentication\\appsettings.ClientCredentialsTests.json")
                .WithServices((services, configuration) =>
                {
                    var authority = configuration.GetValue<string>("HelseIdClient:Authority");

@@ -62,7 +62,7 @@ namespace Fhi.Auth.IntegrationTests.Setup
             var der = cert.Export(X509ContentType.Cert);
             var publicOnly = X509Certificate2.CreateFromPem("-----BEGIN CERTIFICATE-----\n" + Convert.ToBase64String(der, Base64FormattingOptions.InsertLineBreaks) + "\n-----END CERTIFICATE-----\n");
 
-            try { return publicOnly; } finally { publicOnly.Dispose(); }
+            return publicOnly; 
         }
 
         /// <summary>

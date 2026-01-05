@@ -8,7 +8,7 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace Fhi.Authentication.Extensions.UnitTests.Tokens
 {
-    public class CertificateKeyHandlerUnitTests
+    public class PrivateKeyHandlerUnitTests
     {
         private const int RsaKeySize = 2048;
         private const string TestCertSubject = "CN=UnitTestCert";
@@ -261,7 +261,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
                 RSASignaturePadding.Pkcs1);
 
             // Use fixed dates for deterministic tests
-            var baseDate = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            var baseDate = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
             return request.CreateSelfSigned(baseDate, baseDate.AddYears(2));
         }
 

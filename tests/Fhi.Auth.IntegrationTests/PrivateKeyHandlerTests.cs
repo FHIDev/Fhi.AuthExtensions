@@ -9,10 +9,10 @@ namespace Fhi.Auth.IntegrationTests
 {
     [TestFixture]
     [Explicit ("Requires Windows and Local Machine Certificate Store access")]
-    public class CertificateKeyHandlerTests
+    public class PrivateKeyHandlerTests
     {
         private IServiceProvider? _serviceProvider;
-        private IPrivateKeyHandler? _certificateKeyHandler;
+        private IPrivateKeyHandler? _privateKeyHandler;
         private readonly List<string> _thumbprintsToCleanup = new();
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Fhi.Auth.IntegrationTests
 
             _serviceProvider = services.BuildServiceProvider();
 
-            _certificateKeyHandler = _serviceProvider.GetRequiredService<IPrivateKeyHandler>();
+            _privateKeyHandler = _serviceProvider.GetRequiredService<IPrivateKeyHandler>();
         }
 
         [TearDown]
@@ -75,11 +75,11 @@ namespace Fhi.Auth.IntegrationTests
         public void GIVEN_ValidCertificateInStore_When_GetPrivateJwk_WithThumbprint_Then_ReturnsJwk()
         {
             var cert = CreateAndInstallCertificate();
-            var jwkString = _certificateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
+            var jwkString = _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(jwkString, Is.Not.Null.Or.Empty);
+                Assert.That(jwkString, Is.Not.Null.And.Not.Empty);
                 TestContext.Progress.WriteLine("Test JWK: " + jwkString);
                 
                 Assert.DoesNotThrow(() => System.Text.Json.JsonDocument.Parse(jwkString));
@@ -100,11 +100,11 @@ namespace Fhi.Auth.IntegrationTests
             using var rsa = cert.GetRSAPrivateKey();
             var pem = rsa!.ExportRSAPrivateKeyPem();
             
-            var jwkString = _certificateKeyHandler!.GetPrivateJwk(pem);
+            var jwkString = _privateKeyHandler!.GetPrivateJwk(pem);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(jwkString, Is.Not.Null.Or.Empty);
+                Assert.That(jwkString, Is.Not.Null.And.Not.Empty);
                 Assert.DoesNotThrow(() => System.Text.Json.JsonDocument.Parse(jwkString));
                 Assert.That(jwkString, Does.Contain("\"kty\""));
             }
@@ -117,8 +117,8 @@ namespace Fhi.Auth.IntegrationTests
         {
             var cert = CreateAndInstallCertificate();
 
-            var originalJwk = _certificateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
-            var resultJwk = _certificateKeyHandler!.GetPrivateJwk(originalJwk);
+            var originalJwk = _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
+            var resultJwk = _privateKeyHandler!.GetPrivateJwk(originalJwk);
 
             Assert.That(resultJwk, Is.EqualTo(originalJwk));
 
@@ -130,13 +130,13 @@ namespace Fhi.Auth.IntegrationTests
         {
             var cert = CreateAndInstallCertificate();
             
-            var jwkString = _certificateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
+            var jwkString = _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
             var base64Input = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(jwkString));
-            var resultJwk = _certificateKeyHandler!.GetPrivateJwk(base64Input);
+            var resultJwk = _privateKeyHandler!.GetPrivateJwk(base64Input);
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(resultJwk, Is.Not.Null.Or.Empty);
+                Assert.That(resultJwk, Is.Not.Null.And.Not.Empty);
                 Assert.DoesNotThrow(() => System.Text.Json.JsonDocument.Parse(resultJwk));
             }
 
@@ -148,14 +148,14 @@ namespace Fhi.Auth.IntegrationTests
         {
             var missingThumb = Guid.NewGuid().ToString("N");
 
-            var exception = Assert.Throws<InvalidOperationException>(() => _certificateKeyHandler!.GetPrivateJwk(missingThumb));
+            var exception = Assert.Throws<InvalidOperationException>(() => _privateKeyHandler!.GetPrivateJwk(missingThumb));
             Assert.That(exception.Message, Does.Contain("No certificate found"));
         }
 
         [Test]
         public void GIVEN_EmptyInput_When_GetPrivateJwk_Then_ThrowsArgumentNullException()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => _certificateKeyHandler!.GetPrivateJwk(string.Empty));
+            var exception = Assert.Throws<ArgumentNullException>(() => _privateKeyHandler!.GetPrivateJwk(string.Empty));
             Assert.That(exception.ParamName, Is.EqualTo("secretOrThumbprint"));
         }
 
@@ -164,7 +164,7 @@ namespace Fhi.Auth.IntegrationTests
         {
             var cert = CreateAndInstallExpiredCertificate();
 
-            var exception = Assert.Throws<InvalidOperationException>(() => _certificateKeyHandler!.GetPrivateJwk(cert.Thumbprint));
+            var exception = Assert.Throws<InvalidOperationException>(() => _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint));
             Assert.That(exception.Message, Does.Contain("has expired"));
 
             cert.Dispose();
@@ -181,7 +181,7 @@ namespace Fhi.Auth.IntegrationTests
             InstallCertificate(cert);
             _thumbprintsToCleanup.Add(cert.Thumbprint);
 
-            var exception = Assert.Throws<InvalidOperationException>(() => _certificateKeyHandler!.GetPrivateJwk(cert.Thumbprint));
+            var exception = Assert.Throws<InvalidOperationException>(() => _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint));
             Assert.That(exception.Message, Does.Contain("has no private key"));
 
             cert.Dispose();
