@@ -75,7 +75,8 @@ namespace Fhi.Authentication.ClientCredentials
                     return Task.FromResult<ClientAssertion?>(null);
                 }
 
-                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client.ClientId ?? "", privateJwk);
+                var expiration = DateTime.UtcNow.AddSeconds(clientAssertionOptions.ExpirationSeconds);
+                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client.ClientId ?? "", privateJwk, expiration);
                 return Task.FromResult<ClientAssertion?>(new ClientAssertion
                 {
                     Type = clientAssertionOptions.ClientAssertionType,

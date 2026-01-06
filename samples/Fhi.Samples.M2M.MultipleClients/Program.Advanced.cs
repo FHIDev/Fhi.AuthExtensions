@@ -77,6 +77,9 @@ public partial class Program
               var discoveryDocument = discoveryStore.Get(helseIdProtectedApi!.Authentication.Authority);
               options.Issuer = discoveryDocument?.Issuer ?? string.Empty;
               options.PrivateJwk = helseIdProtectedApi.Authentication.PrivateJwk;
+              
+              // Optional: Configure custom client assertion expiration (default is 10 seconds)
+              options.ExpirationSeconds = 30;
           });
 
         services

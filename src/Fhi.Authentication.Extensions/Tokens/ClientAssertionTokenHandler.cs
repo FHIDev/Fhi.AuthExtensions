@@ -15,12 +15,13 @@ namespace Fhi.Authentication.Tokens
         /// <param name="issuer">This value is the audience, but should be set as the OIDC issues</param>
         /// <param name="clientId">client identifier</param>
         /// <param name="jwk">json web key string</param>
-        /// <param name="kid">ke identifier</param>
+        /// <param name="expiration">Optional expiration time. If null, defaults to 10 seconds from now.</param>
+        /// <param name="kid">key identifier</param>
         /// <returns></returns>
-        public static string CreateJwtToken(string issuer, string clientId, string jwk, string? kid = null)
+        public static string CreateJwtToken(string issuer, string clientId, string jwk, DateTime? expiration = null, string? kid = null)
         {
             var securityKey = new JsonWebKey(jwk);
-            var token = CreateJwtToken(issuer, clientId, securityKey);
+            var token = CreateJwtToken(issuer, clientId, securityKey, expiration, kid);
 
             return token;
         }

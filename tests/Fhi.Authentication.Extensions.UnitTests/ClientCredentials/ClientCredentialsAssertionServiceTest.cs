@@ -119,5 +119,50 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
              Arg.Any<Func<object, Exception?, string>>()
          );
         }
+
+        [TestCase(null, Description = "Default expiration (10 seconds)")]
+        [TestCase(30, Description = "Custom expiration (30 seconds)")]
+        [TestCase(120, Description = "Custom expiration (120 seconds)")]
+        public async Task GIVEN_getClientAssertion_WHEN_expirationSet_THEN_useCorrectExpiration(int? expirationSeconds)
+        {
+            var jwk = JWK.Create();
+            var clientOptions = Substitute.For<IOptionsMonitor<ClientCredentialsClient>>();
+            clientOptions.Get("name").Returns(new ClientCredentialsClient
+            {
+                ClientId = ClientId.Parse("client-id"),
+                Scope = null
+            });
+            
+            var assertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
+            var options = new ClientAssertionOptions
+            {
+                Issuer = "issuer",
+                PrivateJwk = jwk.PrivateKey,
+                ClientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+            };
+            
+            // Only set ExpirationSeconds if a value is provided (null means use default)
+            if (expirationSeconds.HasValue)
+            {
+                options.ExpirationSeconds = expirationSeconds.Value;
+            }
+            
+            assertionOptions.Get("name").Returns(options);
+
+            var clientAssertionService = new ClientCredentialsAssertionService(
+                Substitute.For<ILogger<ClientCredentialsAssertionService>>(), 
+                assertionOptions, 
+                clientOptions);
+            var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
+
+            var jwt = new JsonWebToken(result!.Value);
+            var expirationTime = jwt.ValidTo;
+            var expectedSeconds = expirationSeconds ?? 10; // Use default of 10 if null
+            var expectedExpiration = DateTime.UtcNow.AddSeconds(expectedSeconds);
+            
+            // Allow 2 second tolerance for test execution time
+            Assert.That(Math.Abs((expirationTime - expectedExpiration).TotalSeconds), Is.LessThanOrEqualTo(2),
+                $"Expected expiration around {expectedSeconds} seconds from now, but got {expirationTime}");
+        }
     }
 }

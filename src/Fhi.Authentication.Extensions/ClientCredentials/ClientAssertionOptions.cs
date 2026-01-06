@@ -21,5 +21,10 @@ namespace Fhi.Authentication.ClientCredentials
         /// The client assertion type
         /// </summary>
         public string ClientAssertionType { get; set; } = ClientAssertionTypes.JwtBearer;
+
+        /// <summary>
+        /// The client assertion expiration time in seconds. Default is 10 seconds.
+        /// </summary>
+        public int ExpirationSeconds { get; set; } = 10;
     }
 }
