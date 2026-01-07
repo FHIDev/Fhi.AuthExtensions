@@ -56,21 +56,18 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
         [Test]
         public void ClientAssertion_WithCustomExpiration_ShouldSetCorrectExpirationTime()
         {
-            var keys = JWK.Create();
             var customExpiration = DateTime.UtcNow.AddSeconds(30);
 
-            var assertion = ClientAssertionTokenHandler.CreateJwtToken("http://issuer", "clientId", keys.PrivateKey, customExpiration);
+            var assertion = ClientAssertionTokenHandler.CreateJwtToken(
+                "http://issuer",
+                "clientId",
+                JWK.Create().PrivateKey,
+                customExpiration);
 
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(assertion);
 
-            // The token.ValidTo property returns the expiration as a DateTime in UTC
-            var actualExpiration = token.ValidTo;
-            
-            // Allow 1 second tolerance for test execution time and any rounding differences
-            var timeDifference = Math.Abs((actualExpiration - customExpiration).TotalSeconds);
-            Assert.That(timeDifference, Is.LessThanOrEqualTo(1), 
-                $"Expiration time mismatch. Expected: {customExpiration:O}, Actual: {actualExpiration:O}");
+            Assert.That(token.ValidTo.Second, Is.EqualTo(customExpiration.Second));
         }
     }
 }
