@@ -1,4 +1,5 @@
-﻿using static Duende.IdentityModel.OidcConstants;
+﻿using System.ComponentModel.DataAnnotations;
+using static Duende.IdentityModel.OidcConstants;
 
 namespace Fhi.Authentication.ClientCredentials
 {
@@ -21,5 +22,12 @@ namespace Fhi.Authentication.ClientCredentials
         /// The client assertion type
         /// </summary>
         public string ClientAssertionType { get; set; } = ClientAssertionTypes.JwtBearer;
+
+        /// <summary>
+        /// The client assertion expiration time in seconds. Default is 10 seconds.
+        /// Must be greater than or equal to 0.
+        /// </summary>
+        [Range(0, int.MaxValue, ErrorMessage = "ExpirationSeconds must be greater than or equal to 0.")]
+        public int ExpirationSeconds { get; set; } = 10;
     }
 }

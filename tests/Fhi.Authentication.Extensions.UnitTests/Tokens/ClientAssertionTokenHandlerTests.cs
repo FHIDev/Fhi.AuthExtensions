@@ -49,5 +49,25 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
                 Assert.That(kid.Value, Is.EqualTo(jwk.Kid));
             });
         }
+
+        /// <summary>
+        /// Verify that custom expiration time is correctly applied to the client assertion token.
+        /// </summary>
+        [Test]
+        public void ClientAssertion_WithCustomExpiration_ShouldSetCorrectExpirationTime()
+        {
+            var customExpiration = DateTime.UtcNow.AddSeconds(30);
+
+            var assertion = ClientAssertionTokenHandler.CreateJwtToken(
+                "http://issuer",
+                "clientId",
+                JWK.Create().PrivateKey,
+                customExpiration);
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(assertion);
+
+            Assert.That(token.ValidTo.Second, Is.EqualTo(customExpiration.Second));
+        }
     }
 }

@@ -23,7 +23,14 @@ namespace BlazorInteractiveServer.Hosting.Authentication
 
             if (discoveryDocument.IsError) throw new Exception(discoveryDocument.Error);
 
-            var clientAssertion = ClientAssertionTokenHandler.CreateJwtToken(discoveryDocument.Issuer!, Options.Value.ClientId, Options.Value.ClientSecret);
+            // Optional: Pass custom expiration time (e.g., 30 seconds from now, default is 10)
+            var expiration = DateTime.UtcNow.AddSeconds(30);
+            
+            var clientAssertion = ClientAssertionTokenHandler.CreateJwtToken(
+                discoveryDocument.Issuer!, 
+                Options.Value.ClientId, 
+                Options.Value.ClientSecret, 
+                expiration);
 
             return new ClientAssertion { Type = OidcConstants.ClientAssertionTypes.JwtBearer, Value = clientAssertion };
         }
