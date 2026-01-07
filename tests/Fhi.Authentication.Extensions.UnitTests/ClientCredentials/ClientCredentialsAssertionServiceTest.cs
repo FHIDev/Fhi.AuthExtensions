@@ -1,10 +1,11 @@
-﻿using Duende.AccessTokenManagement;
+﻿using System.ComponentModel.DataAnnotations;
+using Duende.AccessTokenManagement;
 using Fhi.Authentication.ClientCredentials;
+using Fhi.Security.Cryptography;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using NSubstitute;
-using Fhi.Security.Cryptography;
 
 namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
 {
@@ -120,78 +121,112 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
          );
         }
 
-        [TestCase(null, Description = "Default expiration (10 seconds)")]
-        [TestCase(30, Description = "Custom expiration (30 seconds)")]
-        [TestCase(120, Description = "Custom expiration (120 seconds)")]
-        public async Task GIVEN_getClientAssertion_WHEN_expirationSet_THEN_useCorrectExpiration(int? expirationSeconds)
+        [Test]
+        public async Task GIVEN_getClientAssertion_WHEN_expirationSet_THEN_useCorrectExpiration()
         {
-            var jwk = JWK.Create();
-            var clientOptions = Substitute.For<IOptionsMonitor<ClientCredentialsClient>>();
-            clientOptions.Get("name").Returns(new ClientCredentialsClient
+            var expirationSeconds = 30;
+
+            var clientCredentialsOptionsMonitor = Substitute.For<IOptionsMonitor<ClientCredentialsClient>>();
+            clientCredentialsOptionsMonitor.Get("name").Returns(new ClientCredentialsClient());
+
+            var clientAssertionOptionsMonitor = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
+            var clientAssertionOptions = new ClientAssertionOptions
             {
-                ClientId = ClientId.Parse("client-id"),
-                Scope = null
-            });
-            
+                ExpirationSeconds = expirationSeconds,
+                Issuer = "issuer",
+                PrivateJwk = JWK.Create().PrivateKey
+            };
+
+            clientAssertionOptionsMonitor.Get("name").Returns(clientAssertionOptions);
+
+            var clientAssertionService = new ClientCredentialsAssertionService(
+                Substitute.For<ILogger<ClientCredentialsAssertionService>>(),
+                clientAssertionOptionsMonitor,
+                clientCredentialsOptionsMonitor);
+
+            var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
+
+            var jwt = new JsonWebToken(result!.Value);
+            var expectedExpiration = DateTime.UtcNow.AddSeconds(expirationSeconds);
+
+            // Allow 1 second tolerance for test execution time
+            Assert.That(jwt.ValidTo, Is.EqualTo(expectedExpiration).Within(1).Seconds);
+        }
+
+        [Test]
+        public async Task GIVEN_getClientAssertion_WHEN_expirationIsNotSet_THEN_useDefaultExpiration()
+        {
+            var clientOptions = Substitute.For<IOptionsMonitor<ClientCredentialsClient>>();
+            clientOptions.Get("name").Returns(new ClientCredentialsClient());
+
             var assertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
             var options = new ClientAssertionOptions
             {
                 Issuer = "issuer",
-                PrivateJwk = jwk.PrivateKey,
-                ClientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+                PrivateJwk = JWK.Create().PrivateKey
             };
-            
-            // Only set ExpirationSeconds if a value is provided (null means use default)
-            if (expirationSeconds.HasValue)
-            {
-                options.ExpirationSeconds = expirationSeconds.Value;
-            }
-            
+
             assertionOptions.Get("name").Returns(options);
 
             var clientAssertionService = new ClientCredentialsAssertionService(
-                Substitute.For<ILogger<ClientCredentialsAssertionService>>(), 
-                assertionOptions, 
+                Substitute.For<ILogger<ClientCredentialsAssertionService>>(),
+                assertionOptions,
                 clientOptions);
+
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
 
             var jwt = new JsonWebToken(result!.Value);
-            var expirationTime = jwt.ValidTo;
-            var expectedSeconds = expirationSeconds ?? 10; // Use default of 10 if null
-            var expectedExpiration = DateTime.UtcNow.AddSeconds(expectedSeconds);
-            
-            // Allow 2 second tolerance for test execution time
-            Assert.That(Math.Abs((expirationTime - expectedExpiration).TotalSeconds), Is.LessThanOrEqualTo(2),
-                $"Expected expiration around {expectedSeconds} seconds from now, but got {expirationTime}");
+            var expectedExpiration = DateTime.UtcNow.AddSeconds(options.ExpirationSeconds);
+
+            // Allow 1 second tolerance for test execution time
+            Assert.That(jwt.ValidTo, Is.EqualTo(expectedExpiration).Within(1).Seconds);
         }
 
-        [TestCase(-10, false)]
-        [TestCase(0, true)]
-        [TestCase(10, true)]
-        public void GIVEN_clientAssertionOptions_WHEN_expirationSecondsValidated_THEN_dataAnnotationValidatesCorrectly(int expirationSeconds, bool expectedValid)
+        [TestCase(-10)]
+        public void GIVEN_clientAssertionOptions_WHEN_expirationSecondsAreNotValid_THEN_dataAnnotationValidatesFalse(int expirationSeconds)
         {
             var options = new ClientAssertionOptions
             {
                 Issuer = "issuer",
-                PrivateJwk = "jwk",
+                PrivateJwk = JWK.Create().PrivateKey,
                 ExpirationSeconds = expirationSeconds
             };
 
-            var context = new System.ComponentModel.DataAnnotations.ValidationContext(options);
-            var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
-            var isValid = System.ComponentModel.DataAnnotations.Validator.TryValidateObject(options, context, results, true);
+            var context = new ValidationContext(options);
+            var results = new List<ValidationResult>();
+            var isValid = Validator.TryValidateObject(options, context, results, true);
 
-            Assert.That(isValid, Is.EqualTo(expectedValid), 
-                $"Validation should {(expectedValid ? "succeed" : "fail")} for ExpirationSeconds = {expirationSeconds}");
-            
-            if (!expectedValid)
+            using (Assert.EnterMultipleScope())
             {
+                Assert.That(isValid, Is.False);
                 Assert.That(results, Has.Count.EqualTo(1));
+            }
+
+            using (Assert.EnterMultipleScope())
+            {
                 Assert.That(results[0].ErrorMessage, Does.Contain("ExpirationSeconds must be greater than or equal to 0"));
                 Assert.That(results[0].MemberNames, Does.Contain(nameof(ClientAssertionOptions.ExpirationSeconds)));
             }
-            else
+        }
+
+        [TestCase(0)]
+        [TestCase(10)]
+        public void GIVEN_clientAssertionOptions_WHEN_expirationSecondsIsValid_THEN_dataAnnotationValidatesTrue(int expirationSeconds)
+        {
+            var options = new ClientAssertionOptions
             {
+                Issuer = "issuer",
+                PrivateJwk = JWK.Create().PrivateKey,
+                ExpirationSeconds = expirationSeconds
+            };
+
+            var context = new ValidationContext(options);
+            var results = new List<ValidationResult>();
+            var isValid = Validator.TryValidateObject(options, context, results, true);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(isValid, Is.True);
                 Assert.That(results, Is.Empty);
             }
         }
@@ -199,29 +234,24 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
         [Test]
         public async Task GIVEN_getClientAssertion_WHEN_negativeExpirationSeconds_THEN_logErrorAndReturnNull()
         {
-            var jwk = JWK.Create();
+            var expirationSeconds = -10; // Invalid value
             var logger = Substitute.For<ILogger<ClientCredentialsAssertionService>>();
             var clientOptions = Substitute.For<IOptionsMonitor<ClientCredentialsClient>>();
-            clientOptions.Get("name").Returns(new ClientCredentialsClient
-            {
-                ClientId = ClientId.Parse("client-id"),
-                Scope = null
-            });
-            
+            clientOptions.Get("name").Returns(new ClientCredentialsClient());
+
             var assertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
             var options = new ClientAssertionOptions
             {
                 Issuer = "issuer",
-                PrivateJwk = jwk.PrivateKey,
-                ClientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-                ExpirationSeconds = -10 // Invalid value
+                PrivateJwk = JWK.Create().PrivateKey,
+                ExpirationSeconds = expirationSeconds
             };
-            
+
             assertionOptions.Get("name").Returns(options);
 
             var clientAssertionService = new ClientCredentialsAssertionService(
-                logger, 
-                assertionOptions, 
+                logger,
+                assertionOptions,
                 clientOptions);
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
 
@@ -229,7 +259,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             logger.Received().Log(
                 LogLevel.Error,
                 Arg.Any<EventId>(),
-                Arg.Is<object>(o => o.ToString()!.Contains("Invalid ExpirationSeconds") && o.ToString()!.Contains("-10")),
+                Arg.Is<object>(o => o.ToString()!.Contains("Invalid ExpirationSeconds") && o.ToString()!.Contains($"{expirationSeconds}")),
                 Arg.Any<Exception>(),
                 Arg.Any<Func<object, Exception?, string>>()
             );
