@@ -12,7 +12,7 @@ namespace Fhi.Authentication.Tokens
         /// <summary>
         /// Create a JWT token for client assertion.
         /// </summary>
-        /// <param name="issuer">This value is the audience, but should be set as the OIDC issues</param>
+        /// <param name="issuer">This value is the audience, but should be set as the OIDC issuer</param>
         /// <param name="clientId">client identifier</param>
         /// <param name="jwk">json web key string</param>
         /// <param name="expiration">Optional expiration time. If null, defaults to 10 seconds from now.</param>
@@ -22,7 +22,6 @@ namespace Fhi.Authentication.Tokens
         {
             var securityKey = new JsonWebKey(jwk);
             var token = CreateJwtToken(issuer, clientId, securityKey, expiration, kid);
-
             return token;
         }
 
@@ -30,7 +29,6 @@ namespace Fhi.Authentication.Tokens
         {
             var claims = new List<Claim>
             {
-
                 new(JwtRegisteredClaimNames.Sub, clientId),
                 new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),

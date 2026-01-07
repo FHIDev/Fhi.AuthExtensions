@@ -164,5 +164,75 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             Assert.That(Math.Abs((expirationTime - expectedExpiration).TotalSeconds), Is.LessThanOrEqualTo(2),
                 $"Expected expiration around {expectedSeconds} seconds from now, but got {expirationTime}");
         }
+
+        [TestCase(-10, false)]
+        [TestCase(0, true)]
+        [TestCase(10, true)]
+        public void GIVEN_clientAssertionOptions_WHEN_expirationSecondsValidated_THEN_dataAnnotationValidatesCorrectly(int expirationSeconds, bool expectedValid)
+        {
+            var options = new ClientAssertionOptions
+            {
+                Issuer = "issuer",
+                PrivateJwk = "jwk",
+                ExpirationSeconds = expirationSeconds
+            };
+
+            var context = new System.ComponentModel.DataAnnotations.ValidationContext(options);
+            var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
+            var isValid = System.ComponentModel.DataAnnotations.Validator.TryValidateObject(options, context, results, true);
+
+            Assert.That(isValid, Is.EqualTo(expectedValid), 
+                $"Validation should {(expectedValid ? "succeed" : "fail")} for ExpirationSeconds = {expirationSeconds}");
+            
+            if (!expectedValid)
+            {
+                Assert.That(results, Has.Count.EqualTo(1));
+                Assert.That(results[0].ErrorMessage, Does.Contain("ExpirationSeconds must be greater than or equal to 0"));
+                Assert.That(results[0].MemberNames, Does.Contain(nameof(ClientAssertionOptions.ExpirationSeconds)));
+            }
+            else
+            {
+                Assert.That(results, Is.Empty);
+            }
+        }
+
+        [Test]
+        public async Task GIVEN_getClientAssertion_WHEN_negativeExpirationSeconds_THEN_logErrorAndReturnNull()
+        {
+            var jwk = JWK.Create();
+            var logger = Substitute.For<ILogger<ClientCredentialsAssertionService>>();
+            var clientOptions = Substitute.For<IOptionsMonitor<ClientCredentialsClient>>();
+            clientOptions.Get("name").Returns(new ClientCredentialsClient
+            {
+                ClientId = ClientId.Parse("client-id"),
+                Scope = null
+            });
+            
+            var assertionOptions = Substitute.For<IOptionsMonitor<ClientAssertionOptions>>();
+            var options = new ClientAssertionOptions
+            {
+                Issuer = "issuer",
+                PrivateJwk = jwk.PrivateKey,
+                ClientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                ExpirationSeconds = -10 // Invalid value
+            };
+            
+            assertionOptions.Get("name").Returns(options);
+
+            var clientAssertionService = new ClientCredentialsAssertionService(
+                logger, 
+                assertionOptions, 
+                clientOptions);
+            var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
+
+            Assert.That(result, Is.Null);
+            logger.Received().Log(
+                LogLevel.Error,
+                Arg.Any<EventId>(),
+                Arg.Is<object>(o => o.ToString()!.Contains("Invalid ExpirationSeconds") && o.ToString()!.Contains("-10")),
+                Arg.Any<Exception>(),
+                Arg.Any<Func<object, Exception?, string>>()
+            );
+        }
     }
 }
