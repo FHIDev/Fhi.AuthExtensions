@@ -24,10 +24,10 @@ namespace Fhi.Authentication.ClientCredentials
         public string ClientAssertionType { get; set; } = ClientAssertionTypes.JwtBearer;
 
         /// <summary>
-        /// The client assertion expiration time in seconds. Default is 10 seconds.
-        /// Must be greater than or equal to 0.
+        /// The client assertion expiration time in seconds. Default is 10 seconds, as required by HelseId.
+        /// Must between 1 and 120 seconds.
         /// </summary>
-        [Range(0, int.MaxValue, ErrorMessage = "ExpirationSeconds must be greater than or equal to 0.")]
+        [Range(1, 120, ErrorMessage = "ExpirationSeconds must be between 1 and 120 seconds.")]
         public int ExpirationSeconds { get; set; } = 10;
     }
 }

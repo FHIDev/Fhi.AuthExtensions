@@ -183,6 +183,8 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
         }
 
         [TestCase(-10)]
+        [TestCase(0)]
+        [TestCase(200)]
         public void GIVEN_clientAssertionOptions_WHEN_expirationSecondsAreNotValid_THEN_dataAnnotationValidatesFalse(int expirationSeconds)
         {
             var options = new ClientAssertionOptions
@@ -204,13 +206,15 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(results[0].ErrorMessage, Does.Contain("ExpirationSeconds must be greater than or equal to 0"));
+                Assert.That(results[0].ErrorMessage, Does.Contain("ExpirationSeconds must be between 1 and 120 seconds."));
                 Assert.That(results[0].MemberNames, Does.Contain(nameof(ClientAssertionOptions.ExpirationSeconds)));
             }
         }
 
-        [TestCase(0)]
-        [TestCase(10)]
+
+        [TestCase(1)]
+        [TestCase(120)]
+        [TestCase(60)]
         public void GIVEN_clientAssertionOptions_WHEN_expirationSecondsIsValid_THEN_dataAnnotationValidatesTrue(int expirationSeconds)
         {
             var options = new ClientAssertionOptions
