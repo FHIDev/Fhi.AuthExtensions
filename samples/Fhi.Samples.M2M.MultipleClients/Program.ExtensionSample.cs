@@ -27,7 +27,12 @@ public partial class Program
                        helseIdApi.Authentication.ClientId,
                        PrivateJwk.ParseFromJson(helseIdApi.Authentication.PrivateJwk),
                        helseIdApi.Authentication.Scope,
-                       DPoPProofKey.ParseOrDefault(helseIdApi.Authentication.PrivateJwk))
+                       DPoPProofKey.ParseOrDefault(helseIdApi.Authentication.PrivateJwk));
+               
+               // Optional: Configure custom client assertion expiration (default is 10 seconds)
+               helseIdCredentialsOption.ClientAssertionOptions!.Configure(options => options.ExpirationSeconds = 30);
+               
+               helseIdCredentialsOption
                    .AddClientCredentialsHttpClient(client =>
                        {
                            client.BaseAddress = new Uri(helseIdApi?.BaseAddress!);

@@ -60,14 +60,18 @@ public partial class Program
         var api = apiSection.Get<HelseIdProtectedApiOption>()!;
 
         // Simple JWK-based authentication
-        services
+        var builder = services
             .AddClientCredentialsClientOptions(
                 HelseIdProtectedApiOption.ClientName,
                 api.Authentication.Authority,
                 api.Authentication.ClientId,
                 PrivateJwk.ParseFromJson(api.Authentication.PrivateJwk),
-                api.Authentication.Scope)
-            .AddClientCredentialsHttpClient(client => { client.BaseAddress = new Uri(api.BaseAddress); });
+                api.Authentication.Scope);
+        
+        // Optional: Configure custom client assertion expiration (default is 10 seconds)
+        builder.ClientAssertionOptions!.Configure(options => options.ExpirationSeconds = 30);
+        
+        builder.AddClientCredentialsHttpClient(client => { client.BaseAddress = new Uri(api.BaseAddress); });
 
         // Add token management services
         services.AddDistributedMemoryCache();

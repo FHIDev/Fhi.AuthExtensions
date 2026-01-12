@@ -74,8 +74,16 @@ namespace Fhi.Authentication.ClientCredentials
                     _logger.LogError("Could not resolve JWK for {clientName}. No PrivateJwk configured and secret store unavailable or failed", clientName);
                     return Task.FromResult<ClientAssertion?>(null);
                 }
+                
+                if (clientAssertionOptions.ExpirationSeconds < 1)
+                {
+                    _logger.LogError("Invalid ExpirationSeconds ({ExpirationSeconds}) for {clientName}. Must be greater than or equal to 0", 
+                        clientAssertionOptions.ExpirationSeconds, clientName);
+                    return Task.FromResult<ClientAssertion?>(null);
+                }
 
-                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client.ClientId ?? "", privateJwk);
+                var expiration = DateTime.UtcNow.AddSeconds(clientAssertionOptions.ExpirationSeconds);
+                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client.ClientId ?? "", privateJwk, expiration);
                 return Task.FromResult<ClientAssertion?>(new ClientAssertion
                 {
                     Type = clientAssertionOptions.ClientAssertionType,
