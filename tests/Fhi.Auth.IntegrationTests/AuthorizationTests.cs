@@ -11,7 +11,7 @@ using System.Net;
 
 namespace Fhi.Auth.IntegrationTests
 {
-    public partial class Tests
+    public class AuthorizationTests
     {
         /// <summary>
         /// Verify scope authorization works as expected when endpoint has scope attribute.

@@ -38,7 +38,7 @@ namespace Fhi.Authentication.OpenIdConnect
             }
         }
 
-#if NET9_0
+#if NET9_0 || NET10_0
 
         /// <summary>
         /// This method is used to create a client assertion for the authorization code flow.
