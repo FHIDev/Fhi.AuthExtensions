@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36616.10
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11505.172 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02410E46-D7E9-4870-8BEE-2667E121C388}"
 	ProjectSection(SolutionItems) = preProject
@@ -58,6 +58,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Samples.Angular.BFFApi", "samples\Fhi.Samples.EndUser.AngularBFF\Fhi.Samples.Angular.EndUser.BFFApi\Fhi.Samples.Angular.BFFApi.csproj", "{51511375-7BC3-214E-F679-94106FBFDE96}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Fhi.Samples.Angular.Client", "samples\Fhi.Samples.EndUser.AngularBFF\Fhi.Samples.Angular.EndUser.Client\Fhi.Samples.Angular.Client.esproj", "{06358B45-EFD0-FD65-D50D-DF4C93B679FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Authentication.JwtDPoP", "src\Fhi.Authentication.JwtDPoP\Fhi.Authentication.JwtDPoP.csproj", "{45C5DEB3-70EE-1284-DA27-01E0D03D7513}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +125,10 @@ Global
 		{06358B45-EFD0-FD65-D50D-DF4C93B679FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06358B45-EFD0-FD65-D50D-DF4C93B679FB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{06358B45-EFD0-FD65-D50D-DF4C93B679FB}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{45C5DEB3-70EE-1284-DA27-01E0D03D7513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45C5DEB3-70EE-1284-DA27-01E0D03D7513}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45C5DEB3-70EE-1284-DA27-01E0D03D7513}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45C5DEB3-70EE-1284-DA27-01E0D03D7513}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -145,6 +151,7 @@ Global
 		{1E7B8F3D-0617-8A9E-DCF4-EFF245D35583} = {EA8AA50F-AE10-290C-ABE9-07EF3D2129A5}
 		{51511375-7BC3-214E-F679-94106FBFDE96} = {1E7B8F3D-0617-8A9E-DCF4-EFF245D35583}
 		{06358B45-EFD0-FD65-D50D-DF4C93B679FB} = {1E7B8F3D-0617-8A9E-DCF4-EFF245D35583}
+		{45C5DEB3-70EE-1284-DA27-01E0D03D7513} = {02410E46-D7E9-4870-8BEE-2667E121C388}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {113A468C-B364-454A-BDF5-BE678F61C31A}
