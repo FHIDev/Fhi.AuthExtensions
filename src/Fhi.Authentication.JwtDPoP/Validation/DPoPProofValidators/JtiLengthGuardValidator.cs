@@ -1,0 +1,22 @@
+using Fhi.Authentication.JwtDPoP.Validation;
+using Fhi.Authentication.JwtDPoP.Validation.Models;
+using Microsoft.IdentityModel.JsonWebTokens;
+
+namespace Fhi.Authentication.JwtDPoP.Validators.DPoPProof
+{
+    internal class JtiLengthGuardValidator : IDPoPProofValidators
+    {
+        public Task<DpopValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
+        {
+            var jti = proofToken!.Claims.FirstOrDefault(c => c.Type == DPoPConstants.JwtId)?.Value;
+
+            if (string.IsNullOrEmpty(jti))
+                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaim + " jti"));
+
+            if (jti.Length > context.ValidationParameters.MaxJtiLength)
+                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.JtiTooLong));
+
+            return Task.FromResult(new DpopValidationResult(false));
+        }
+    }
+}
