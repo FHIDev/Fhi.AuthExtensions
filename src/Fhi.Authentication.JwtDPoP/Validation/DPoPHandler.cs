@@ -1,11 +1,9 @@
-using Fhi.Authentication.JwtDPoP.Validation;
 using Fhi.Authentication.JwtDPoP.Validation.Models;
-using Fhi.Authentication.JwtDPoP.Validators.DPoPProof;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Fhi.Authentication.JwtDPoP.Validators
+namespace Fhi.Authentication.JwtDPoP.Validation
 {
     internal interface IDPoPProofHandler
     {
@@ -15,8 +13,8 @@ namespace Fhi.Authentication.JwtDPoP.Validators
 
     internal class DPoPHandler : IDPoPProofHandler
     {
+        private static readonly JsonWebTokenHandler _handler = new();
         private readonly ILogger<DPoPHandler> _logger;
-        private readonly List<IDPoPProofValidators> _steps = new();
         private DPoPProofCompositeValidator _validator;
 
         public DPoPHandler(
@@ -29,7 +27,7 @@ namespace Fhi.Authentication.JwtDPoP.Validators
 
         /// <summary>
         /// Validate DPoP proof jwt see https://www.rfc-editor.org/rfc/rfc9449.html#name-checking-dpop-proofs
-        /// 
+        ///
         /// Header (JOSE) validation: JoseHeaderTypeValidator, AlgorithmPolicyValidator
         /// Http validation: HtmMatchValidator, HtuMatchValidator
         /// Proof lifetime duration: IatLifetimeValidator.
@@ -43,8 +41,7 @@ namespace Fhi.Authentication.JwtDPoP.Validators
             JsonWebToken? token = null;
             try
             {
-                token = new JsonWebTokenHandler().ReadJsonWebToken(context.ProofToken);
-
+                token = _handler.ReadJsonWebToken(context.ProofToken);
 
                 var result = await _validator.ExecuteValidatorsAsync(context, token);
                 if (result.IsError)
@@ -64,18 +61,21 @@ namespace Fhi.Authentication.JwtDPoP.Validators
 
         public Task<DpopValidationResult> ValidateRequest(DPoPProofRequestValidationContext context)
         {
-            context.Request.Headers.TryGetValue(DPoPConstants.DPoPHeaderName, out var token);
-            if (token.FirstOrDefault()?.Length >= context.ValidationParameters.ProofTokenMaxLength)
-            {
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidRequest, "DPoP proof header exceeds maximum length"));
-            }
             if (!context.Request.Headers.ContainsKey(DPoPConstants.DPoPHeaderName))
             {
                 return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidRequest, "Missing DPOP header"));
             }
+
+            context.Request.Headers.TryGetValue(DPoPConstants.DPoPHeaderName, out var token);
+
             if (token.Count > 1)
             {
                 return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidRequest, "Multiple DPoP proof headers present"));
+            }
+
+            if (token.FirstOrDefault()?.Length >= context.ValidationParameters.ProofTokenMaxLength)
+            {
+                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidRequest, "DPoP proof header exceeds maximum length"));
             }
 
             return Task.FromResult(new DpopValidationResult(false));

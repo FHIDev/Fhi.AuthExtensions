@@ -2,8 +2,6 @@ using Fhi.Authentication.JwtDPoP;
 using Fhi.Authentication.JwtDPoP.Validation;
 using Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators;
 using Fhi.Authentication.JwtDPoP.Validation.Models;
-using Fhi.Authentication.JwtDPoP.Validators;
-using Fhi.Authentication.JwtDPoP.Validators.DPoPProof;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -35,7 +33,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.TryAddTransient<JwtSignatureValidator>();
             builder.Services.TryAddTransient<AthMatchValidator>();
-            builder.Services.TryAddTransient<JoseHeaderTypeValidator>();
             builder.Services.TryAddTransient<JoseHeaderAlgorithmPolicyValidator>();
             builder.Services.TryAddTransient<JoseHeaderJwkValidator>();
             builder.Services.TryAddTransient<HttpMethodMatchValidator>();
@@ -69,7 +66,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     {
                         var token = TryGetDPoPAccessToken(context.Request.Headers.Authorization.FirstOrDefault());
                         var validator = context.HttpContext.RequestServices.GetRequiredService<DPoPHandler>();
-                        var result = await validator.ValidateRequest(new DPoPProofRequestValidationContext(context.Request, dpopOptions.DPoPProotTokenValidationParameters));
+                        var result = await validator.ValidateRequest(new DPoPProofRequestValidationContext(context.Request, dpopOptions.DPoPProofTokenValidationParameters));
                         if (result.IsError)
                         {
                             context.Fail(result.ErrorDescription ?? result.Error ?? "DPoP validation failed");
@@ -91,7 +88,7 @@ namespace Microsoft.Extensions.DependencyInjection
                             AccessTokenClaims = context.Principal?.Claims ?? Array.Empty<Claim>(),
                             ExpectedMethod = context.HttpContext.Request.Method,
                             ExpectedUrl = $"{context.HttpContext.Request.Scheme}://{context.HttpContext.Request.Host}{context.HttpContext.Request.PathBase}{context.HttpContext.Request.Path}",
-                            ValidationParameters = dpopOptions.DPoPProotTokenValidationParameters
+                            ValidationParameters = dpopOptions.DPoPProofTokenValidationParameters
                         });
 
                         if (result.IsError)

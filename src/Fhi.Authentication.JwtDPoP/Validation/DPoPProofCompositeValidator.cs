@@ -1,6 +1,5 @@
 using Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators;
 using Fhi.Authentication.JwtDPoP.Validation.Models;
-using Fhi.Authentication.JwtDPoP.Validators.DPoPProof;
 using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Fhi.Authentication.JwtDPoP.Validation
@@ -11,7 +10,6 @@ namespace Fhi.Authentication.JwtDPoP.Validation
 
         public DPoPProofCompositeValidator(
             JwtSignatureValidator signatureValidator,
-            JoseHeaderTypeValidator typ,
             JoseHeaderAlgorithmPolicyValidator alg,
             JoseHeaderJwkValidator keyPresence,
             HttpMethodMatchValidator htm,
@@ -22,7 +20,6 @@ namespace Fhi.Authentication.JwtDPoP.Validation
             JtiLengthGuardValidator jtiLength,
             JtiReplayValidator jtiReplay)
         {
-            // AddValidator(typ);
             AddValidator(signatureValidator);
             AddValidator(alg);
             AddValidator(keyPresence);

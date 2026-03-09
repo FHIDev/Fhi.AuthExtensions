@@ -258,7 +258,7 @@ namespace Fhi.Auth.IntegrationTests
             var client = new DPoPTestServerBuilder()
                 .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options =>
                 {
-                    options.DPoPProotTokenValidationParameters.ValidAlgorithms = new[]
+                    options.DPoPProofTokenValidationParameters.ValidAlgorithms = new[]
                     {
                         SecurityAlgorithms.RsaSha512
                     };
@@ -429,7 +429,7 @@ namespace Fhi.Auth.IntegrationTests
             var client = new DPoPTestServerBuilder()
                 .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options =>
                 {
-                    options.DPoPProotTokenValidationParameters.ProofTokenLifetimeValidationType = ProofLifetimeValidationType.IssuedAt;
+                    options.DPoPProofTokenValidationParameters.ProofTokenLifetimeValidationType = ProofLifetimeValidationType.IssuedAt;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidIssuer = "http://authority",

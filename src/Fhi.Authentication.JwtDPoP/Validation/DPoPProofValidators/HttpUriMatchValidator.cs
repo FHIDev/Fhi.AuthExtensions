@@ -2,7 +2,7 @@ using Fhi.Authentication.JwtDPoP.Validation;
 using Fhi.Authentication.JwtDPoP.Validation.Models;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Fhi.Authentication.JwtDPoP.Validators.DPoPProof
+namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
     internal class HttpUriMatchValidator : IDPoPProofValidators
     {
@@ -11,7 +11,7 @@ namespace Fhi.Authentication.JwtDPoP.Validators.DPoPProof
             var htu = proofToken!.Claims.FirstOrDefault(c => c.Type == DPoPConstants.DPoPHttpUrl)?.Value;
 
             if (string.IsNullOrEmpty(htu))
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaim + " htu"));
+                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaimHtu));
 
             if (!HtuIsValid(context.ExpectedUrl, htu))
                 return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.HtuMismatch));

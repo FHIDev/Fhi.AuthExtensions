@@ -1,9 +1,8 @@
-using Fhi.Authentication.JwtDPoP.Validation;
 using Fhi.Authentication.JwtDPoP.Validation.Models;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Fhi.Authentication.JwtDPoP.Validators.DPoPProof
+namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
     internal class JoseHeaderJwkValidator : IDPoPProofValidators
     {

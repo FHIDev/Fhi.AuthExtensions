@@ -1,7 +1,7 @@
 using Fhi.Authentication.JwtDPoP.Validation.Models;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Fhi.Authentication.JwtDPoP.Validators.DPoPProof
+namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
     internal interface IDPoPProofValidators
     {

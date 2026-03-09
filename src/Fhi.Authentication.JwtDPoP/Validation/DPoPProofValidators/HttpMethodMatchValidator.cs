@@ -2,7 +2,7 @@ using Fhi.Authentication.JwtDPoP.Validation;
 using Fhi.Authentication.JwtDPoP.Validation.Models;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Fhi.Authentication.JwtDPoP.Validators.DPoPProof
+namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
     internal class HttpMethodMatchValidator : IDPoPProofValidators
     {
@@ -11,7 +11,7 @@ namespace Fhi.Authentication.JwtDPoP.Validators.DPoPProof
             var htm = proofToken!.Claims.FirstOrDefault(c => c.Type == DPoPConstants.DPoPHttpMethod)?.Value;
 
             if (string.IsNullOrEmpty(htm))
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaim + " htm"));
+                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaimHtm));
 
             if (!context.ExpectedMethod.Equals(htm, StringComparison.OrdinalIgnoreCase))
                 return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.HtmMismatch));

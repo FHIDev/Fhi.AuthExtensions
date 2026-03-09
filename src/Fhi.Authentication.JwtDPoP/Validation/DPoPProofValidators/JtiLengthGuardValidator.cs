@@ -2,7 +2,7 @@ using Fhi.Authentication.JwtDPoP.Validation;
 using Fhi.Authentication.JwtDPoP.Validation.Models;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Fhi.Authentication.JwtDPoP.Validators.DPoPProof
+namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
     internal class JtiLengthGuardValidator : IDPoPProofValidators
     {
@@ -11,7 +11,7 @@ namespace Fhi.Authentication.JwtDPoP.Validators.DPoPProof
             var jti = proofToken!.Claims.FirstOrDefault(c => c.Type == DPoPConstants.JwtId)?.Value;
 
             if (string.IsNullOrEmpty(jti))
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaim + " jti"));
+                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaimJti));
 
             if (jti.Length > context.ValidationParameters.MaxJtiLength)
                 return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.JtiTooLong));

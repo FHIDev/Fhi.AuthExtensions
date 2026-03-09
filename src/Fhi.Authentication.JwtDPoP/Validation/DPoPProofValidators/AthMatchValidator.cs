@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Fhi.Authentication.JwtDPoP.Validators.DPoPProof
+namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
     internal class AthMatchValidator : IDPoPProofValidators
     {
@@ -13,7 +13,7 @@ namespace Fhi.Authentication.JwtDPoP.Validators.DPoPProof
         {
             var ath = proofToken!.Claims.FirstOrDefault(c => c.Type == DPoPConstants.DPoPAccessTokenHash)?.Value;
             if (string.IsNullOrEmpty(ath))
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaim + " ath"));
+                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaimAth));
 
             var expected = Base64UrlEncoder.Encode(SHA256.HashData(Encoding.UTF8.GetBytes(context.AccessToken)));
             if (expected != ath)

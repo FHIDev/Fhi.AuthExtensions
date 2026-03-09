@@ -3,7 +3,7 @@ using Fhi.Authentication.JwtDPoP.Validation.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Fhi.Authentication.JwtDPoP.Validators.DPoPProof
+namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
     internal class IatLifetimeValidator : IDPoPProofValidators
     {
@@ -20,10 +20,10 @@ namespace Fhi.Authentication.JwtDPoP.Validators.DPoPProof
         {
             var iatClaim = proofToken!.Claims.FirstOrDefault(c => c.Type == DPoPConstants.IssuedAt);
             if (iatClaim == null)
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaim + " iat"));
+                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaimIat));
 
             if (!long.TryParse(iatClaim.Value, out var iat) || iat == 0)
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaim + " iat"));
+                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaimIat));
 
             var now = _timeProvider.GetUtcNow().ToUnixTimeSeconds();
             var skew = (long)context.ValidationParameters.AllowedClockSkew.TotalSeconds;

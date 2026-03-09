@@ -59,7 +59,7 @@ namespace Fhi.Authentication.JwtDPoP
         /// <remarks>Configure this property to specify the validation requirements for DPoP proof tokens,
         /// such as accepted algorithms, clock skew, or other constraints. Proper configuration is essential to ensure
         /// the integrity and authenticity of DPoP tokens during authentication or authorization processes.</remarks>
-        public DPoPProofTokenValidationParameters DPoPProotTokenValidationParameters { get; set; } = new DPoPProofTokenValidationParameters();
+        public DPoPProofTokenValidationParameters DPoPProofTokenValidationParameters { get; set; } = new DPoPProofTokenValidationParameters();
 
         /// <summary>
         /// Gets or sets the OpenID Connect configuration used for authentication.

@@ -1,5 +1,4 @@
 ﻿using Fhi.Authentication.JwtDPoP.Validation.Models;
-using Fhi.Authentication.JwtDPoP.Validators.DPoPProof;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
@@ -7,13 +6,14 @@ namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
     internal class JwtSignatureValidator : IDPoPProofValidators
     {
+        private static readonly JsonWebTokenHandler _handler = new();
+
         public async Task<DpopValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
         {
             var jwk = proofToken?.GetJwk();
             if (jwk != null)
             {
-                var handler = new JsonWebTokenHandler();
-                var tokenResult = await handler.ValidateTokenAsync(proofToken, new TokenValidationParameters
+                var tokenResult = await _handler.ValidateTokenAsync(proofToken, new TokenValidationParameters
                 {
                     RequireSignedTokens = true,
                     ValidateAudience = false,

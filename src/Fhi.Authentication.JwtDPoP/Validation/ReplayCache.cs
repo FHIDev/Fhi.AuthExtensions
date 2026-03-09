@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace Fhi.Authentication.JwtDPoP.Validators
+namespace Fhi.Authentication.JwtDPoP.Validation
 {
     internal interface IReplayCache
     {
