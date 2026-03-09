@@ -25,7 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static AuthenticationBuilder AddJwtDpop(
             this AuthenticationBuilder builder,
             string authenticationScheme,
-            Action<JwtDpopOptions>? configure = null)
+            Action<JwtDPoPOptions>? configure = null)
         {
             builder.Services.AddDistributedMemoryCache();
             builder.Services.TryAddSingleton(TimeProvider.System);
@@ -45,7 +45,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.AddTransient<IDPoPProofHandler, DPoPHandler>();
 
-            var dpopOptions = new JwtDpopOptions();
+            var dpopOptions = new JwtDPoPOptions();
             configure?.Invoke(dpopOptions);
 
             builder.AddJwtBearer(authenticationScheme, jwtOptions =>
@@ -69,8 +69,8 @@ namespace Microsoft.Extensions.DependencyInjection
                         if (result.IsError)
                         {
                             context.Fail(result.ErrorDescription ?? result.Error ?? "DPoP validation failed");
-                            context.HttpContext.Items["dpop_failure_error"] = result.Error;
-                            context.HttpContext.Items["dpop_failure_description"] = result.ErrorDescription;
+                            context.HttpContext.Items[DPoPConstants.ItemPorpertyName.DPoPFailureCode] = result.Error;
+                            context.HttpContext.Items[DPoPConstants.ItemPorpertyName.DPoPFailureDescription] = result.ErrorDescription;
                         }
                         context.Token = TryGetDPoPAccessToken(context.Request.Headers.Authorization.FirstOrDefault());
                     },

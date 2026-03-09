@@ -12,7 +12,7 @@ namespace Fhi.Authentication.JwtDPoP
     /// the authority, audience, and token validation parameters. The options allow control over metadata retrieval,
     /// HTTPS requirements, and whether to persist the validated token. These settings are typically supplied when
     /// adding DPoP authentication to the authentication middleware pipeline.</remarks>
-    public class JwtDpopOptions : AuthenticationSchemeOptions
+    public class JwtDPoPOptions : AuthenticationSchemeOptions
     {
         /// <summary>
         /// Gets or sets the authority that represents the security or identity provider associated with the current

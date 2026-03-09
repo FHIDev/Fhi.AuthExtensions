@@ -35,7 +35,7 @@ namespace Fhi.Auth.IntegrationTests.Setup
         internal TestAuthenticationBuilder AddJwtDpop(
             string authority = "http://authority",
             string audience = "api_audience",
-            Action<JwtDpopOptions>? configure = null)
+            Action<JwtDPoPOptions>? configure = null)
         {
             builder.AddJwtDpop("DPoP", options =>
             {
