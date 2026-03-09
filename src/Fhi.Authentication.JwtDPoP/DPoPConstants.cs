@@ -1,10 +1,11 @@
 namespace Fhi.Authentication.JwtDPoP
 {
-    internal static class DPoPConstants
+    internal static partial class DPoPConstants
     {
         public const string Scheme = "DPoP";
         public const string DPoPHeaderName = "DPoP";
-        public const string DPoPNonceHeaderName = "DPoP-Nonce";
+
+
 
         // JWT claim types
         public const string Confirmation = "cnf";
@@ -24,6 +25,15 @@ namespace Fhi.Authentication.JwtDPoP
         public const string InvalidToken = "invalid_token";
         public const string InvalidDPoPProof = "invalid_dpop_proof";
         public const string InvalidRequest = "invalid_request";
-        //public const string UseDPoPNonce = "use_dpop_nonce";
+        ////public const string UseDPoPNonce = "use_dpop_nonce";
+    }
+
+    internal static partial class DPoPConstants
+    {
+        internal static class ItemPorpertyName
+        {
+            public const string DPoPFailureCode = "dpop_failure_error";
+            public const string DPoPFailureDescription = "dpop_failure_description";
+        }
     }
 }

@@ -4,19 +4,19 @@ using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
-    internal class JtiLengthGuardValidator : IDPoPProofValidators
+    internal class JtiLengthGuardValidator : IDPoPProofValidator
     {
-        public Task<DpopValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
+        public Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
         {
             var jti = proofToken!.Claims.FirstOrDefault(c => c.Type == DPoPConstants.JwtId)?.Value;
 
             if (string.IsNullOrEmpty(jti))
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaimJti));
+                return Task.FromResult(new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaimJti));
 
             if (jti.Length > context.ValidationParameters.MaxJtiLength)
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.JtiTooLong));
+                return Task.FromResult(new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.JtiTooLong));
 
-            return Task.FromResult(new DpopValidationResult(false));
+            return Task.FromResult(new DPoPValidationResult(false));
         }
     }
 }

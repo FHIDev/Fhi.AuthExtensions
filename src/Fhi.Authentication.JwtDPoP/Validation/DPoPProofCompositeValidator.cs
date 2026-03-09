@@ -6,7 +6,7 @@ namespace Fhi.Authentication.JwtDPoP.Validation
 {
     internal class DPoPProofCompositeValidator
     {
-        private readonly List<IDPoPProofValidators> _validators = new();
+        private readonly List<IDPoPProofValidator> _validators = new();
 
         public DPoPProofCompositeValidator(
             JwtSignatureValidator signatureValidator,
@@ -32,12 +32,12 @@ namespace Fhi.Authentication.JwtDPoP.Validation
             AddValidator(jtiReplay);
         }
 
-        private void AddValidator(IDPoPProofValidators step)
+        private void AddValidator(IDPoPProofValidator step)
         {
             _validators.Add(step);
         }
 
-        public async Task<DpopValidationResult> ExecuteValidatorsAsync(
+        public async Task<DPoPValidationResult> ExecuteValidatorsAsync(
             DPoPValidationContext context,
             JsonWebToken proofToken,
             CancellationToken cancellationToken = default)
@@ -48,7 +48,7 @@ namespace Fhi.Authentication.JwtDPoP.Validation
                 if (result.IsError)
                     return result;
             }
-            return new DpopValidationResult(false);
+            return new DPoPValidationResult(false);
         }
 
     }

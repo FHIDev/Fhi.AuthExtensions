@@ -7,8 +7,8 @@ namespace Fhi.Authentication.JwtDPoP.Validation
 {
     internal interface IDPoPProofHandler
     {
-        Task<DpopValidationResult> ValidateRequest(DPoPProofRequestValidationContext context);
-        Task<DpopValidationResult> ValidateDPoPProof(DPoPValidationContext context);
+        Task<DPoPValidationResult> ValidateRequest(DPoPProofRequestValidationContext context);
+        Task<DPoPValidationResult> ValidateDPoPProof(DPoPValidationContext context);
     }
 
     internal class DPoPHandler : IDPoPProofHandler
@@ -36,13 +36,11 @@ namespace Fhi.Authentication.JwtDPoP.Validation
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task<DpopValidationResult> ValidateDPoPProof(DPoPValidationContext context)
+        public async Task<DPoPValidationResult> ValidateDPoPProof(DPoPValidationContext context)
         {
-            JsonWebToken? token = null;
             try
             {
-                token = _handler.ReadJsonWebToken(context.ProofToken);
-
+                var token = _handler.ReadJsonWebToken(context.ProofToken);
                 var result = await _validator.ExecuteValidatorsAsync(context, token);
                 if (result.IsError)
                     _logger.LogDebug("DPoP validation failed: {Error}", result.ErrorDescription ?? result.Error);
@@ -52,33 +50,33 @@ namespace Fhi.Authentication.JwtDPoP.Validation
             catch (Exception e)
             {
                 if (e is SecurityTokenMalformedException)
-                    return new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MalformedJwt);
+                    return new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MalformedJwt);
 
                 _logger.LogDebug("DPoP validation failed: {Error}", e.Message);
-                return new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, "unknown");
+                return new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, "unknown");
             }
         }
 
-        public Task<DpopValidationResult> ValidateRequest(DPoPProofRequestValidationContext context)
+        public Task<DPoPValidationResult> ValidateRequest(DPoPProofRequestValidationContext context)
         {
             if (!context.Request.Headers.ContainsKey(DPoPConstants.DPoPHeaderName))
             {
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidRequest, "Missing DPOP header"));
+                return Task.FromResult(new DPoPValidationResult(true, DPoPConstants.InvalidRequest, "Missing DPOP header"));
             }
 
             context.Request.Headers.TryGetValue(DPoPConstants.DPoPHeaderName, out var token);
 
             if (token.Count > 1)
             {
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidRequest, "Multiple DPoP proof headers present"));
+                return Task.FromResult(new DPoPValidationResult(true, DPoPConstants.InvalidRequest, "Multiple DPoP proof headers present"));
             }
 
             if (token.FirstOrDefault()?.Length >= context.ValidationParameters.ProofTokenMaxLength)
             {
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidRequest, "DPoP proof header exceeds maximum length"));
+                return Task.FromResult(new DPoPValidationResult(true, DPoPConstants.InvalidRequest, "DPoP proof header exceeds maximum length"));
             }
 
-            return Task.FromResult(new DpopValidationResult(false));
+            return Task.FromResult(new DPoPValidationResult(false));
         }
     }
 }

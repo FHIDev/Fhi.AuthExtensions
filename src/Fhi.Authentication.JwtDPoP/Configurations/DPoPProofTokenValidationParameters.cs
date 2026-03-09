@@ -29,10 +29,6 @@ namespace Fhi.Authentication.JwtDPoP
         /// to have significant clock drift.</remarks>
         public TimeSpan AllowedClockSkew { get; set; } = TimeSpan.FromMinutes(5);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public TimeSpan ServerClockSkew { get; set; } = TimeSpan.Zero;
 
         /// <summary>
         /// DPoP token Algoritmepolicy (JOSE)
@@ -56,10 +52,10 @@ namespace Fhi.Authentication.JwtDPoP
         /// renewals.</remarks>
         public TimeSpan ProofTokenLifetimeValidationDuration { get; set; } = TimeSpan.FromSeconds(60);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public ProofLifetimeValidationType ProofTokenLifetimeValidationType { get; set; } = ProofLifetimeValidationType.IssuedAt;
+        ///// <summary>
+        ///// TODO: later when implementing Nonce
+        ///// </summary>
+        ////public ProofLifetimeValidationType ProofTokenLifetimeValidationType { get; set; } = ProofLifetimeValidationType.IssuedAt;
 
         /// <summary>
         /// Gets or sets the maximum allowed length, in characters, for the JSON Web Token Identifier (JTI) value.

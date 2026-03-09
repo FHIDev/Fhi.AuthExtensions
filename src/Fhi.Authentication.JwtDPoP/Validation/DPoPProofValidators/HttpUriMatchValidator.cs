@@ -4,19 +4,19 @@ using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
-    internal class HttpUriMatchValidator : IDPoPProofValidators
+    internal class HttpUriMatchValidator : IDPoPProofValidator
     {
-        public Task<DpopValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
+        public Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
         {
             var htu = proofToken!.Claims.FirstOrDefault(c => c.Type == DPoPConstants.DPoPHttpUrl)?.Value;
 
             if (string.IsNullOrEmpty(htu))
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaimHtu));
+                return Task.FromResult(new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaimHtu));
 
             if (!HtuIsValid(context.ExpectedUrl, htu))
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.HtuMismatch));
+                return Task.FromResult(new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.HtuMismatch));
 
-            return Task.FromResult(new DpopValidationResult(false));
+            return Task.FromResult(new DPoPValidationResult(false));
         }
 
         private static bool HtuIsValid(string expectedUrl, string htu)

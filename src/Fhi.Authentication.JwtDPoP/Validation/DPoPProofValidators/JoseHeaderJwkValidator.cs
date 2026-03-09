@@ -4,17 +4,17 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
-    internal class JoseHeaderJwkValidator : IDPoPProofValidators
+    internal class JoseHeaderJwkValidator : IDPoPProofValidator
     {
-        public Task<DpopValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
+        public Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
         {
             if (proofToken!.SigningKey == null)
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MalformedJwt));
+                return Task.FromResult(new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MalformedJwt));
 
             if (proofToken.SigningKey is JsonWebKey jwk && ContainsPrivateKeyMaterial(jwk))
-                return Task.FromResult(new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.PrivateKeyInJwk));
+                return Task.FromResult(new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.PrivateKeyInJwk));
 
-            return Task.FromResult(new DpopValidationResult(false));
+            return Task.FromResult(new DPoPValidationResult(false));
         }
 
         private static bool ContainsPrivateKeyMaterial(JsonWebKey jwk)

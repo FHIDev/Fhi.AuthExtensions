@@ -43,7 +43,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.TryAddTransient<JtiReplayValidator>();
             builder.Services.TryAddTransient<DPoPProofCompositeValidator>();
 
-            builder.Services.TryAddSingleton<DPoPHandler, DPoPHandler>();
+            builder.Services.AddTransient<IDPoPProofHandler, DPoPHandler>();
 
             var dpopOptions = new JwtDpopOptions();
             configure?.Invoke(dpopOptions);
@@ -64,8 +64,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     OnMessageReceived = async context =>
                     {
-                        var token = TryGetDPoPAccessToken(context.Request.Headers.Authorization.FirstOrDefault());
-                        var validator = context.HttpContext.RequestServices.GetRequiredService<DPoPHandler>();
+                        var validator = context.HttpContext.RequestServices.GetRequiredService<IDPoPProofHandler>();
                         var result = await validator.ValidateRequest(new DPoPProofRequestValidationContext(context.Request, dpopOptions.DPoPProofTokenValidationParameters));
                         if (result.IsError)
                         {
@@ -73,18 +72,16 @@ namespace Microsoft.Extensions.DependencyInjection
                             context.HttpContext.Items["dpop_failure_error"] = result.Error;
                             context.HttpContext.Items["dpop_failure_description"] = result.ErrorDescription;
                         }
-                        context.Token = token;
+                        context.Token = TryGetDPoPAccessToken(context.Request.Headers.Authorization.FirstOrDefault());
                     },
                     OnTokenValidated = async context =>
                     {
-                        var accessToken = TryGetDPoPAccessToken(context.Request.Headers.Authorization.FirstOrDefault());
                         context.Request.Headers.TryGetValue(DPoPConstants.DPoPHeaderName, out var dpopHeader);
-
-                        var validator = context.HttpContext.RequestServices.GetRequiredService<DPoPHandler>();
+                        var validator = context.HttpContext.RequestServices.GetRequiredService<IDPoPProofHandler>();
                         var result = await validator.ValidateDPoPProof(new DPoPValidationContext
                         {
                             ProofToken = dpopHeader.FirstOrDefault() ?? string.Empty,
-                            AccessToken = accessToken ?? string.Empty,
+                            AccessToken = TryGetDPoPAccessToken(context.Request.Headers.Authorization.FirstOrDefault()),
                             AccessTokenClaims = context.Principal?.Claims ?? Array.Empty<Claim>(),
                             ExpectedMethod = context.HttpContext.Request.Method,
                             ExpectedUrl = $"{context.HttpContext.Request.Scheme}://{context.HttpContext.Request.Host}{context.HttpContext.Request.PathBase}{context.HttpContext.Request.Path}",
@@ -94,20 +91,16 @@ namespace Microsoft.Extensions.DependencyInjection
                         if (result.IsError)
                         {
                             context.Fail(result.ErrorDescription ?? result.Error ?? "DPoP validation failed");
-                            context.HttpContext.Items["dpop_failure_error"] = result.Error;
-                            context.HttpContext.Items["dpop_failure_description"] = result.ErrorDescription;
+                            context.HttpContext.Items[DPoPConstants.ItemPorpertyName.DPoPFailureCode] = result.Error;
+                            context.HttpContext.Items[DPoPConstants.ItemPorpertyName.DPoPFailureDescription] = result.ErrorDescription;
                         }
                     },
                     OnChallenge = context =>
                     {
-                        context.Error = context.HttpContext.Items["dpop_failure_error"] as string ?? "invalid_token";
-                        var desc = context.HttpContext.Items["dpop_failure_description"] as string;
+                        context.Error = context.HttpContext.Items[DPoPConstants.ItemPorpertyName.DPoPFailureCode] as string ?? "invalid_token";
+                        var desc = context.HttpContext.Items[DPoPConstants.ItemPorpertyName.DPoPFailureDescription] as string;
                         if (!string.IsNullOrEmpty(desc))
                             context.ErrorDescription = desc;
-                        return Task.CompletedTask;
-                    },
-                    OnAuthenticationFailed = context =>
-                    {
                         return Task.CompletedTask;
                     }
                 };
@@ -116,7 +109,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        private static string? TryGetDPoPAccessToken(string? header)
+        private static string TryGetDPoPAccessToken(string? header)
         {
             var dpopPrefix = $"{DPoPConstants.Scheme} ";
             if (header?.StartsWith(dpopPrefix, StringComparison.OrdinalIgnoreCase) == true)
@@ -124,7 +117,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 return header.Substring(dpopPrefix.Length).Trim();
             }
 
-            return null;
+            return string.Empty;
         }
     }
 }

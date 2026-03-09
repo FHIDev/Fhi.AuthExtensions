@@ -1,4 +1,3 @@
-using Fhi.Authentication.JwtDPoP.Validation;
 using Fhi.Authentication.JwtDPoP.Validation.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -8,7 +7,7 @@ using System.Text;
 
 namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
-    internal class JtiReplayValidator : IDPoPProofValidators
+    internal class JtiReplayValidator : IDPoPProofValidator
     {
         private readonly IReplayCache _replayCache;
         private readonly TimeProvider _timeProvider;
@@ -21,7 +20,7 @@ namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
             _logger = logger;
         }
 
-        public async Task<DpopValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
+        public async Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
         {
             var jti = proofToken!.Claims.FirstOrDefault(c => c.Type == DPoPConstants.JwtId)?.Value;
             if (jti != null)
@@ -32,22 +31,19 @@ namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
                 if (await _replayCache.Exists(tokenIdHash, cancellationToken))
                 {
                     _logger.LogDebug("DPoP jti replay detected.");
-                    return new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.JtiReplay);
+                    return new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.JtiReplay);
                 }
 
                 var options = context.ValidationParameters;
-                var skew = TimeSpan.Zero;
-                skew = options.AllowedClockSkew;
-                skew *= 2;
-
+                var skew = options.AllowedClockSkew * 2;
                 var cacheDuration = options.ProofTokenLifetimeValidationDuration + skew;
                 var expiration = _timeProvider.GetUtcNow().Add(cacheDuration);
                 await _replayCache.Add(tokenIdHash, expiration, cancellationToken);
 
-                return new DpopValidationResult(false);
+                return new DPoPValidationResult(false);
             }
 
-            return new DpopValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaim);
+            return new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaim);
         }
     }
 }

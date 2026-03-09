@@ -1,5 +1,4 @@
 using Fhi.Auth.IntegrationTests.Setup;
-using Fhi.Authentication.JwtDPoP;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.IdentityModel.Tokens;
@@ -429,7 +428,6 @@ namespace Fhi.Auth.IntegrationTests
             var client = new DPoPTestServerBuilder()
                 .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options =>
                 {
-                    options.DPoPProofTokenValidationParameters.ProofTokenLifetimeValidationType = ProofLifetimeValidationType.IssuedAt;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidIssuer = "http://authority",
