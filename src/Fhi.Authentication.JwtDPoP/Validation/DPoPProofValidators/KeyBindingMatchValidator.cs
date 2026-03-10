@@ -15,13 +15,12 @@ namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
             _logger = logger;
         }
 
-        public Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
+        public Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken proofToken, CancellationToken cancellationToken = default)
         {
             var cnf = context.AccessTokenClaims.FirstOrDefault(c => c.Type == DPoPConstants.Confirmation);
 
             if (cnf == null || string.IsNullOrEmpty(cnf.Value))
             {
-                _logger.LogDebug("Missing cnf claim in access token.");
                 return Task.FromResult(new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.KeyBindingMismatch));
             }
 
@@ -35,7 +34,7 @@ namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
                 }
 
                 var accessTokenJkt = jktJson.ToString();
-                var proofJkt = proofToken?.GetJwk()?.ComputeJwkThumbprint();
+                var proofJkt = proofToken.GetJwk()?.ComputeJwkThumbprint();
 
                 if (accessTokenJkt != Base64UrlEncoder.Encode(proofJkt))
                 {

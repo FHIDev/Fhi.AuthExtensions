@@ -1,4 +1,3 @@
-using Fhi.Authentication.JwtDPoP.Validation;
 using Fhi.Authentication.JwtDPoP.Validation.Models;
 using Microsoft.IdentityModel.JsonWebTokens;
 
@@ -6,9 +5,9 @@ namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
     internal class JtiLengthGuardValidator : IDPoPProofValidator
     {
-        public Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
+        public Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken proofToken, CancellationToken cancellationToken = default)
         {
-            var jti = proofToken!.Claims.FirstOrDefault(c => c.Type == DPoPConstants.JwtId)?.Value;
+            var jti = proofToken.Claims.FirstOrDefault(c => c.Type == DPoPConstants.JwtId)?.Value;
 
             if (string.IsNullOrEmpty(jti))
                 return Task.FromResult(new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaimJti));

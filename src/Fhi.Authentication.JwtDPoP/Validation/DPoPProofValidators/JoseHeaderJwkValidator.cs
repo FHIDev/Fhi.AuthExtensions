@@ -6,9 +6,9 @@ namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
     internal class JoseHeaderJwkValidator : IDPoPProofValidator
     {
-        public Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
+        public Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken proofToken, CancellationToken cancellationToken = default)
         {
-            if (proofToken!.SigningKey == null)
+            if (proofToken.SigningKey == null)
                 return Task.FromResult(new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MalformedJwt));
 
             if (proofToken.SigningKey is JsonWebKey jwk && ContainsPrivateKeyMaterial(jwk))

@@ -20,9 +20,9 @@ namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
             _logger = logger;
         }
 
-        public async Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
+        public async Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken proofToken, CancellationToken cancellationToken = default)
         {
-            var jti = proofToken!.Claims.FirstOrDefault(c => c.Type == DPoPConstants.JwtId)?.Value;
+            var jti = proofToken.Claims.FirstOrDefault(c => c.Type == DPoPConstants.JwtId)?.Value;
             if (jti != null)
             {
                 var jtiBytes = Encoding.UTF8.GetBytes(jti);

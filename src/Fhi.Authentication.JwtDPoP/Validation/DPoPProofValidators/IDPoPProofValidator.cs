@@ -5,6 +5,6 @@ namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
 {
     internal interface IDPoPProofValidator
     {
-        Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default);
+        Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken proofToken, CancellationToken cancellationToken = default);
     }
 }

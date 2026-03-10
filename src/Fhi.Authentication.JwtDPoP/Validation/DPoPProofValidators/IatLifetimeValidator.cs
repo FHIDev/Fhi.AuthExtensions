@@ -1,4 +1,3 @@
-using Fhi.Authentication.JwtDPoP.Validation;
 using Fhi.Authentication.JwtDPoP.Validation.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -16,9 +15,9 @@ namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
             _logger = logger;
         }
 
-        public Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
+        public Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken proofToken, CancellationToken cancellationToken = default)
         {
-            var iatClaim = proofToken!.Claims.FirstOrDefault(c => c.Type == DPoPConstants.IssuedAt);
+            var iatClaim = proofToken.Claims.FirstOrDefault(c => c.Type == DPoPConstants.IssuedAt);
             if (iatClaim == null)
                 return Task.FromResult(new DPoPValidationResult(true, DPoPConstants.InvalidDPoPProof, DPoPErrorDescriptions.MissingRequiredClaimIat));
 

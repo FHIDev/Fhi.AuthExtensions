@@ -40,7 +40,7 @@ namespace Fhi.Authentication.JwtDPoP.Validation
         {
             try
             {
-                var token = _handler.ReadJsonWebToken(context.ProofToken);
+                JsonWebToken token = _handler.ReadJsonWebToken(context.ProofToken);
                 var result = await _validator.ExecuteValidatorsAsync(context, token);
                 if (result.IsError)
                     _logger.LogDebug("DPoP validation failed: {Error}", result.ErrorDescription ?? result.Error);

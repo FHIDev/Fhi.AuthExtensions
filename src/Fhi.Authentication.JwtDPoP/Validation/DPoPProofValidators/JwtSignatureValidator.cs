@@ -8,9 +8,9 @@ namespace Fhi.Authentication.JwtDPoP.Validation.DPoPProofValidators
     {
         private static readonly JsonWebTokenHandler _handler = new();
 
-        public async Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken? proofToken, CancellationToken cancellationToken = default)
+        public async Task<DPoPValidationResult> ExecuteAsync(DPoPValidationContext context, JsonWebToken proofToken, CancellationToken cancellationToken = default)
         {
-            var jwk = proofToken?.GetJwk();
+            var jwk = proofToken.GetJwk();
             if (jwk != null)
             {
                 var tokenResult = await _handler.ValidateTokenAsync(proofToken, new TokenValidationParameters
