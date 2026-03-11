@@ -1,0 +1,6 @@
+@Fhi.Samples.EndUser.Angular.BFFApi_HostAddress = http://localhost:5126
+
+GET {{Fhi.Samples.EndUser.Angular.BFFApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
