@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Fhi.Authentication.Extensions\Fhi.Authentication.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\Fhi.Authentication.JwtDPoP\Fhi.Authentication.JwtDPoP.csproj" />
     <ProjectReference Include="..\..\src\Fhi.Authorization.Extensions\Fhi.Authorization.Extensions.csproj" />
   </ItemGroup>
 

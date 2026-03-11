@@ -30,15 +30,14 @@ namespace Fhi.Samples.WorkerServiceMultipleClients.MultipleClientVariant2
                 _logger.LogInformation("Request: {req}", helseIdBearerResponse.RequestMessage);
                 _logger.LogInformation("Response: {response}", helseIdBearerResponse);
 
-                ////TODO: when DPoP is supported
-                ////var api2Client = _factory.CreateClient(xx.ClientName);
-                ////var helseIdDpopResponse = await api2Client.GetAsync("api/v1/integration/health-records/helseid-dpop");
-                ////_logger.LogInformation("Request: {req}", helseIdDpopResponse.RequestMessage);
-                ////_logger.LogInformation("Response: {response}", helseIdDpopResponse);
+                var api2Client = _factory.CreateClient(_helseIdProtectedApiOption.ClientName);
+                var helseIdDpopResponse = await api2Client.GetAsync("api/v1/integration/health-records/helseid-dpop");
+                _logger.LogInformation("Request: {req}", helseIdDpopResponse.RequestMessage);
+                _logger.LogInformation("Response: {response}", helseIdDpopResponse);
 
 
-                var api2Client = _factory.CreateClient(_duendeProtectedApiOption.ClientName);
-                var responseApi2 = await api2Client.GetAsync("api/v1/integration/health-records/duende");
+                var api3Client = _factory.CreateClient(_duendeProtectedApiOption.ClientName);
+                var responseApi2 = await api3Client.GetAsync("api/v1/integration/health-records/duende");
                 _logger.LogInformation("Request: {req}", responseApi2.RequestMessage);
                 _logger.LogInformation("Response: {response}", responseApi2);
 
