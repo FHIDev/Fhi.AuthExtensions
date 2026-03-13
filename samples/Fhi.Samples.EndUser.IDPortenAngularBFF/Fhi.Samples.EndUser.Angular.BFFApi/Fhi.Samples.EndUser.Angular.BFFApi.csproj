@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <ProjectReference Include="..\..\..\src\Fhi.Authentication.JwtDPoP\Fhi.Authentication.JwtDPoP.csproj" />
   </ItemGroup>
 
 </Project>
