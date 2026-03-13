@@ -30,7 +30,7 @@ namespace Fhi.Authentication.JwtDPoP
 
     internal static partial class DPoPConstants
     {
-        internal static class ItemPorpertyName
+        internal static class ItemPropertyName
         {
             public const string DPoPFailureCode = "dpop_failure_error";
             public const string DPoPFailureDescription = "dpop_failure_description";
