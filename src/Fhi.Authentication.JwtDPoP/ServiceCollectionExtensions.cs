@@ -69,8 +69,8 @@ namespace Microsoft.Extensions.DependencyInjection
                         if (result.IsError)
                         {
                             context.Fail(result.ErrorDescription ?? result.Error ?? "DPoP validation failed");
-                            context.HttpContext.Items[DPoPConstants.ItemPorpertyName.DPoPFailureCode] = result.Error;
-                            context.HttpContext.Items[DPoPConstants.ItemPorpertyName.DPoPFailureDescription] = result.ErrorDescription;
+                            context.HttpContext.Items[DPoPConstants.ItemPropertyName.DPoPFailureCode] = result.Error;
+                            context.HttpContext.Items[DPoPConstants.ItemPropertyName.DPoPFailureDescription] = result.ErrorDescription;
                         }
                         context.Token = TryGetDPoPAccessToken(context.Request.Headers.Authorization.FirstOrDefault());
                     },
@@ -91,14 +91,14 @@ namespace Microsoft.Extensions.DependencyInjection
                         if (result.IsError)
                         {
                             context.Fail(result.ErrorDescription ?? result.Error ?? "DPoP validation failed");
-                            context.HttpContext.Items[DPoPConstants.ItemPorpertyName.DPoPFailureCode] = result.Error;
-                            context.HttpContext.Items[DPoPConstants.ItemPorpertyName.DPoPFailureDescription] = result.ErrorDescription;
+                            context.HttpContext.Items[DPoPConstants.ItemPropertyName.DPoPFailureCode] = result.Error;
+                            context.HttpContext.Items[DPoPConstants.ItemPropertyName.DPoPFailureDescription] = result.ErrorDescription;
                         }
                     },
                     OnChallenge = context =>
                     {
-                        context.Error = context.HttpContext.Items[DPoPConstants.ItemPorpertyName.DPoPFailureCode] as string ?? "invalid_token";
-                        var desc = context.HttpContext.Items[DPoPConstants.ItemPorpertyName.DPoPFailureDescription] as string;
+                        context.Error = context.HttpContext.Items[DPoPConstants.ItemPropertyName.DPoPFailureCode] as string ?? "invalid_token";
+                        var desc = context.HttpContext.Items[DPoPConstants.ItemPropertyName.DPoPFailureDescription] as string;
                         if (!string.IsNullOrEmpty(desc))
                             context.ErrorDescription = desc;
                         return Task.CompletedTask;
