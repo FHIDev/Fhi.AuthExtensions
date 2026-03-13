@@ -37,7 +37,7 @@ public partial class Program
             ConfigureWithSecretStore(services, apiSection);
 
             // Alternative options (uncomment to try):
-            // ConfigureJwkAuthentication(services, apiSection);
+            ConfigureJwkAuthentication(services, apiSection);
             // ConfigureCertificateAuthentication(services, apiSection);
         });
 
@@ -67,10 +67,10 @@ public partial class Program
                 api.Authentication.ClientId,
                 PrivateJwk.ParseFromJson(api.Authentication.PrivateJwk),
                 api.Authentication.Scope);
-        
+
         // Optional: Configure custom client assertion expiration (default is 10 seconds)
         builder.ClientAssertionOptions!.Configure(options => options.ExpirationSeconds = 30);
-        
+
         builder.AddClientCredentialsHttpClient(client => { client.BaseAddress = new Uri(api.BaseAddress); });
 
         // Add token management services

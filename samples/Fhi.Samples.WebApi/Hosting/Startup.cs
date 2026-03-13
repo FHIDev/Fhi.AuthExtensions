@@ -37,15 +37,12 @@ namespace Api.WebApi.Hosting
             var helseIdDpopSection = builder.Configuration.GetSection($"AuthenticationSchemes:{AuthenticationSchemes.HelseIdDPoP}");
             var helseIdDpopOptions = helseIdDpopSection.Get<AuthenticationSettings>() ?? new AuthenticationSettings();
             authenticationBuilder
-                .AddJwtBearer(AuthenticationSchemes.HelseIdDPoP, options =>
+                .AddJwtDpop(AuthenticationSchemes.HelseIdDPoP, options =>
                 {
                     options.Audience = helseIdDpopOptions.Audience;
                     options.Authority = helseIdDpopOptions.Authority;
-                    options.Events = new JwtBearerEvents()
-                    {
-                        OnChallenge = OnChallenge(AuthenticationSchemes.HelseIdDPoP)
-                    };
                 });
+
 
             var duendeSection = builder.Configuration.GetSection($"AuthenticationSchemes:{AuthenticationSchemes.Duende}");
             var duendeOptions = duendeSection.Get<AuthenticationSettings>() ?? new AuthenticationSettings();
