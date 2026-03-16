@@ -1,23 +1,20 @@
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Fhi.Samples.EndUser.Angular.BFFApi.Services.DPoP;
 
 namespace Fhi.Samples.EndUser.Angular.BFFApi.HttpHandler
 {
-    public class DPoPHttpMessageHandler : DelegatingHandler
+    public class DPoPHttpMessageHandler(
+        IDPoPKeyStore keyStore,
+        IDPoPProofGenerator proofGen) : DelegatingHandler
     {
-        private readonly IDPoPKeyStore _keyStore;
-        private readonly IDPoPProofGenerator _proofGen;
+        private readonly IDPoPKeyStore _keyStore = keyStore;
+        private readonly IDPoPProofGenerator _proofGen = proofGen;
 
-        public DPoPHttpMessageHandler(
-            IDPoPKeyStore keyStore,
-            IDPoPProofGenerator proofGen)
-        {
-            _keyStore = keyStore;
-            _proofGen = proofGen;
-        }
-
+        /// <summary>
+        /// Overrides the normal HTTP request to attach a new DPoP proof for every request.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken)
