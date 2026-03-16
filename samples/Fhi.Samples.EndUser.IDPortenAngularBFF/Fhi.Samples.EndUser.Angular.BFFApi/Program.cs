@@ -1,5 +1,6 @@
 using Fhi.Samples.EndUser.Angular.BFFApi.Services.DPoP;
 using Fhi.Samples.EndUser.Angular.BFFApi.Services.Tokens;
+using Fhi.Samples.EndUser.Angular.BFFApi.Services.IDPorten;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,6 @@ builder.Services.AddControllers();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
-// In-session memory for lagring av Dpop proofs og tokens
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -21,7 +21,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IDPoPKeyStore, InMemoryDPoPKeyStore>();
 builder.Services.AddSingleton<ITokenStore, SessionTokenStore>();
 builder.Services.AddSingleton<IDPoPProofGenerator, DPoPProofGenerator>();
-
+builder.Services.AddSingleton<IIDPortenService, IDPortenService>();
 
 var app = builder.Build();
 
