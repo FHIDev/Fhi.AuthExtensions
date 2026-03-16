@@ -29,7 +29,14 @@ namespace Fhi.Samples.EndUser.Angular.BFFApi.Services.IDPorten
             _tokenStore = tokenStore;
         }
 
-        public (string Verifier, string Challenge) CreatePkce()
+        /// <summary>
+        /// Generates a PKCE code verifier and code challenge.
+        /// The verifier is stored in the user's session and later used when exchanging
+        /// the authorization code for tokens. The challenge is sent to ID-porten.
+        ///
+        /// PKCE ensures that only this BFF instance can redeem the authorization code.
+        /// </summary>
+        private static (string Verifier, string Challenge) CreatePkce()
         {
             var verifier = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))
                 .TrimEnd('=').Replace('+', '-').Replace('/', '_');
@@ -42,6 +49,13 @@ namespace Fhi.Samples.EndUser.Angular.BFFApi.Services.IDPorten
             return (verifier, challenge);
         }
 
+        /// <summary>
+        /// Builds the authorization URL for ID-porten using PKCE.
+        /// Stores the PKCE verifier in session and returns the URL that the controller
+        /// will redirect the user to.
+        ///
+        /// This is the first step of the login flow.
+        /// </summary>
         public Task<string> CreateAuthorizationUrlAsync(HttpContext context)
         {
             var (verifier, challenge) = CreatePkce();
@@ -58,6 +72,15 @@ namespace Fhi.Samples.EndUser.Angular.BFFApi.Services.IDPorten
             return Task.FromResult(url);
         }
 
+        /// <summary>
+        /// Exchanges the authorization code for tokens using PKCE + DPoP.
+        /// - Reads the PKCE verifier from session
+        /// - Generates a DPoP proof for the token endpoint
+        /// - Sends a token request to ID-porten
+        /// - Stores the resulting token set in the session
+        ///
+        /// This completes the OAuth2/OIDC token exchange.
+        /// </summary>
         public async Task<TokenSet> ExchangeCodeForTokensAsync(HttpContext context, string code)
         {
             var verifier = context.Session.GetString("pkce_verifier")
@@ -90,6 +113,12 @@ namespace Fhi.Samples.EndUser.Angular.BFFApi.Services.IDPorten
             return tokens;
         }
 
+        /// <summary>
+        /// Calls the UserInfo endpoint using the stored access token and a DPoP proof.
+        /// This retrieves the authenticated user's profile information from ID-porten.
+        ///
+        /// The frontend never receives the access token directly — only the BFF calls UserInfo.
+        /// </summary>
         public async Task<string> GetUserInfoAsync(HttpContext context)
         {
             var tokens = await _tokenStore.GetAsync(context)
@@ -108,5 +137,6 @@ namespace Fhi.Samples.EndUser.Angular.BFFApi.Services.IDPorten
 
             return JsonSerializer.Deserialize<string>(json)!;
         }
+
     }
 }

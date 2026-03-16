@@ -1,18 +1,21 @@
-public static class CorsExtensions
+namespace Fhi.Samples.EndUser.Angular.BFFApi.Hosting
 {
-    public static IServiceCollection AddCors(this IServiceCollection services)
+    public static class CorsExtensions
     {
-        services.AddCors(options =>
+        public static IServiceCollection AddCors(this IServiceCollection services)
         {
-            options.AddPolicy("AllowAngular", policy =>
+            services.AddCors(options =>
             {
-                policy.WithOrigins("http://localhost:4200")
-                      .AllowAnyHeader()
-                      .AllowAnyMethod()
-                      .AllowCredentials();
+                options.AddPolicy("AllowAngular", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
             });
-        });
 
-        return services;
+            return services;
+        }
     }
 }
