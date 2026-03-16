@@ -2,7 +2,7 @@ namespace Fhi.Samples.EndUser.Angular.BFFApi.Hosting
 {
     public static class CorsExtensions
     {
-        public static IServiceCollection AddCors(this IServiceCollection services)
+        public static IServiceCollection AddAngularCors(this IServiceCollection services)
         {
             services.AddCors(options =>
             {

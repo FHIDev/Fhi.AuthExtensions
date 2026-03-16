@@ -86,21 +86,19 @@ namespace Fhi.Samples.EndUser.Angular.BFFApi.Services.IDPorten
             var verifier = context.Session.GetString("pkce_verifier")
                 ?? throw new InvalidOperationException("Missing PKCE verifier");
 
-            var keyPair = await _keyStore.GetKeyPairAsync();
-            var dpop = await _proofGen.CreateProofAsync("POST", _cfg["IDPorten:TokenEndpoint"]!, keyPair);
+            var client = _http.CreateClient("dpop"); // DPoP added with http handler
 
-            var client = _http.CreateClient();
-            var req = new HttpRequestMessage(HttpMethod.Post, _cfg["IDPorten:TokenEndpoint"]);
-            req.Headers.Add("DPoP", dpop);
-
-            req.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            var req = new HttpRequestMessage(HttpMethod.Post, _cfg["IDPorten:TokenEndpoint"])
             {
-                ["grant_type"] = "authorization_code",
-                ["code"] = code,
-                ["redirect_uri"] = _cfg["IDPorten:RedirectUri"]!,
-                ["client_id"] = _cfg["IDPorten:ClientId"]!,
-                ["code_verifier"] = verifier
-            });
+                Content = new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    ["grant_type"] = "authorization_code",
+                    ["code"] = code,
+                    ["redirect_uri"] = _cfg["IDPorten:RedirectUri"]!,
+                    ["client_id"] = _cfg["IDPorten:ClientId"]!,
+                    ["code_verifier"] = verifier
+                })
+            };
 
             var res = await client.SendAsync(req);
             var json = await res.Content.ReadAsStringAsync();
@@ -124,19 +122,15 @@ namespace Fhi.Samples.EndUser.Angular.BFFApi.Services.IDPorten
             var tokens = await _tokenStore.GetAsync(context)
                 ?? throw new UnauthorizedAccessException();
 
-            var keyPair = await _keyStore.GetKeyPairAsync();
-            var dpop = await _proofGen.CreateProofAsync("GET", _cfg["IDPorten:UserInfoEndpoint"]!, keyPair); // TODO: fix "!"
+            var client = _http.CreateClient("dpop"); // DPoP added with http handler
 
-            var client = _http.CreateClient();
             var req = new HttpRequestMessage(HttpMethod.Get, _cfg["IDPorten:UserInfoEndpoint"]);
             req.Headers.Add("Authorization", $"DPoP {tokens.AccessToken}");
-            req.Headers.Add("DPoP", dpop);
 
             var res = await client.SendAsync(req);
             var json = await res.Content.ReadAsStringAsync();
 
-            return JsonSerializer.Deserialize<string>(json)!;
+            return json;
         }
-
     }
 }
