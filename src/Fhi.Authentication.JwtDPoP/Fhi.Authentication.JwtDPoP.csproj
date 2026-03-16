@@ -5,8 +5,10 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<!--<FrameworkReference Include="Microsoft.AspNetCore.App" />-->
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="/" />
 	</ItemGroup>
 
 </Project>
