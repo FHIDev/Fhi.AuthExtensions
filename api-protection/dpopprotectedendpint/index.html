@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Protect endpoints with DPoP - FHI authentication and authorization extensions</title>
+    <title>Protect API endpoints with DPoP - FHI authentication and authorization extensions</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -14,7 +14,7 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Protect endpoints with DPoP";
+        var mkdocs_page_name = "Protect API endpoints with DPoP";
         var mkdocs_page_input_path = "api-protection/dpopprotectedendpint.md";
         var mkdocs_page_url = null;
       </script>
@@ -60,8 +60,12 @@
               </ul>
               <p class="caption"><span class="caption-text">Api protection</span></p>
               <ul class="current">
-                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Protect endpoints with DPoP</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Protect API endpoints with DPoP</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#code-sample">Code sample</a>
+    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../protecting-endpoints/">Require authentication by default (in .NET Core)</a>
@@ -136,7 +140,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
           <li class="breadcrumb-item">Api protection</li>
-      <li class="breadcrumb-item active">Protect endpoints with DPoP</li>
+      <li class="breadcrumb-item active">Protect API endpoints with DPoP</li>
     <li class="wy-breadcrumbs-aside">
           <a href="https://github.com/FHIDev/Fhi.AuthExtensions/edit/master/docs/api-protection/dpopprotectedendpint.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
@@ -146,7 +150,39 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="protect-endpoints-with-dpop">Protect endpoints with DPoP</h1>
+                <h1 id="protect-api-endpoints-with-dpop">Protect API endpoints with DPoP</h1>
+<h2 id="introduction">Introduction</h2>
+<p>A DPoP bound token is an OAuth 2.0 token that allows detection of replay attacks. </p>
+<p><em>The primary aim of DPoP is to prevent unauthorized or illegitimate parties from using leaked or stolen access tokens, by binding a token to a public key upon issuance and requiring that the client proves possession of the corresponding private key when using the token.</em><a href="https://www.rfc-editor.org/rfc/rfc9449.html">RFC 9449</a> </p>
+<p>For more information see the <a href="https://www.rfc-editor.org/rfc/rfc9449.html#basic-flow">basic flow</a> described in the <a href="https://www.rfc-editor.org/rfc/rfc9449.html">RFC 9449</a> spesification.</p>
+<h2 id="code-sample">Code sample</h2>
+<p>To protect the API with DPoP token</p>
+<pre><code>builder
+    .Services
+    .AddAuthentication()
+    .AddJwtDpop(&quot;DPOP&quot;, options =&gt;
+    {
+        options.Audience = &quot;fhi:api&quot;;
+        options.Authority = &quot;https://helseid-sts.test.nhn.no&quot;;
+    });
+
+</code></pre>
+<p>Sample with overriding DPoP proof settings</p>
+<pre><code class="language-csharp">
+builder
+    .Services
+    .AddAuthentication()
+    .AddJwtDpop(AuthenticationSchemes.HelseIdDPoP, options =&gt;
+        {
+            options.Audience = &quot;fhi:api&quot;;
+            options.Authority = &quot;https://helseid-sts.test.nhn.no&quot;;
+            options.DPoPProofTokenValidationParameters = new DPoPProofTokenValidationParameters()
+            {
+                    ValidAlgorithms = new[] { &quot;ES256&quot;, &quot;RS256&quot; }
+            };
+        });
+
+</code></pre>
               
             </div>
           </div><footer>
