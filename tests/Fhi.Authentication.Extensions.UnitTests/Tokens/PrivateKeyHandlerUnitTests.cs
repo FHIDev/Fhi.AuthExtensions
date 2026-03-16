@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
-using Fhi.Authentication.Tokens;
+using Fhi.Authentication.Certificate;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 
@@ -21,7 +21,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
             using var certificate = CreateSelfSignedCertificate(TestCertSubject, rsa);
 
             var provider = new FakeCertificateProvider(certificate, rsa, thumbprint);
-            var sut = new PrivateKeyHandler(provider);
+            var sut = new CertificatePrivateJwkHandler(provider);
 
             var jwkString = sut.GetPrivateJwk(thumbprint);
 
@@ -35,7 +35,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
             var pem = rsa.ExportRSAPrivateKeyPem();
 
             var provider = new FakeCertificateProvider(null, null, null);
-            var sut = new PrivateKeyHandler(provider);
+            var sut = new CertificatePrivateJwkHandler(provider);
 
             var jwkString = sut.GetPrivateJwk(pem);
 
@@ -51,7 +51,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
             string jwkInput = expectedJwk; // implicit conversion
 
             var provider = new FakeCertificateProvider(null, null, null);
-            var sut = new PrivateKeyHandler(provider);
+            var sut = new CertificatePrivateJwkHandler(provider);
 
             var jwkString = sut.GetPrivateJwk(jwkInput);
 
@@ -69,7 +69,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
             var base64Input = Convert.ToBase64String(Encoding.UTF8.GetBytes(jwkJson));
 
             var provider = new FakeCertificateProvider(null, null, null);
-            var sut = new PrivateKeyHandler(provider);
+            var sut = new CertificatePrivateJwkHandler(provider);
 
             var jwkString = sut.GetPrivateJwk(base64Input);
 
@@ -80,7 +80,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
         public void GetPrivateJwk_WithEmptyInput_ThrowsArgumentNullException()
         {
             var provider = new FakeCertificateProvider(null, null, null);
-            var sut = new PrivateKeyHandler(provider);
+            var sut = new CertificatePrivateJwkHandler(provider);
 
             var ex = Assert.Throws<ArgumentNullException>(() => sut.GetPrivateJwk(string.Empty));
             Assert.That(ex.ParamName, Is.EqualTo("secretOrThumbprint"));
@@ -90,7 +90,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
         public void GetPrivateJwk_WithInvalidThumbprint_ThrowsInvalidOperationException()
         {
             var provider = new FakeCertificateProvider(null, null, null);
-            var sut = new PrivateKeyHandler(provider);
+            var sut = new CertificatePrivateJwkHandler(provider);
 
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 sut.GetPrivateJwk(Guid.NewGuid().ToString()));
@@ -114,7 +114,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
 #endif
 
             var provider = new FakeCertificateProvider(publicOnly, null, thumbprint);
-            var sut = new PrivateKeyHandler(provider);
+            var sut = new CertificatePrivateJwkHandler(provider);
 
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 sut.GetPrivateJwk(thumbprint));
@@ -134,7 +134,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
                 notBefore: new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
                 notAfter: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero));
             var provider = new FakeCertificateProvider(expiredCert, rsa, thumbprint);
-            var sut = new PrivateKeyHandler(provider, fakeTime);
+            var sut = new CertificatePrivateJwkHandler(provider, fakeTime);
 
             var ex = Assert.Throws<InvalidOperationException>(() => sut.GetPrivateJwk(thumbprint));
 
@@ -153,7 +153,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
                 notBefore: new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero),
                 notAfter: new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
             var provider = new FakeCertificateProvider(notYetValidCert, rsa, thumbprint);
-            var sut = new PrivateKeyHandler(provider, fakeTime);
+            var sut = new CertificatePrivateJwkHandler(provider, fakeTime);
 
             var ex = Assert.Throws<InvalidOperationException>(() => sut.GetPrivateJwk(thumbprint));
 
@@ -172,7 +172,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
                 notBefore: new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
                 notAfter: new DateTimeOffset(2025, 12, 31, 23, 59, 59, TimeSpan.Zero));
             var provider = new FakeCertificateProvider(validCert, rsa, thumbprint);
-            var sut = new PrivateKeyHandler(provider, fakeTime);
+            var sut = new CertificatePrivateJwkHandler(provider, fakeTime);
 
             var jwkString = sut.GetPrivateJwk(thumbprint);
 
@@ -191,7 +191,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
                 notBefore: new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
                 notAfter: new DateTimeOffset(2024, 12, 31, 23, 59, 59, TimeSpan.Zero));
             var provider = new FakeCertificateProvider(cert, rsa, thumbprint);
-            var sut = new PrivateKeyHandler(provider, fakeTime);
+            var sut = new CertificatePrivateJwkHandler(provider, fakeTime);
 
             var jwkString = sut.GetPrivateJwk(thumbprint);
             AssertValidJwk(jwkString);
@@ -215,7 +215,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
         {
             // We need to test the private method indirectly through GetPrivateJwk behavior
             // For this test, we'll use reflection to access the private method
-            var method = typeof(PrivateKeyHandler).GetMethod("IsBase64String",
+            var method = typeof(CertificatePrivateJwkHandler).GetMethod("IsBase64String",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 
             Assert.That(method, Is.Not.Null, "IsBase64String method should exist");
@@ -231,7 +231,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
             var invalidJsonBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(notJsonText));
             Assert.That(invalidJsonBase64.Length, Is.GreaterThan(100), "Test setup: Base64 should be > 100 chars");
             var provider = new FakeCertificateProvider(null, null, null);
-            var sut = new PrivateKeyHandler(provider);
+            var sut = new CertificatePrivateJwkHandler(provider);
 
             var ex = Assert.Throws<InvalidOperationException>(() => sut.GetPrivateJwk(invalidJsonBase64));
 
@@ -245,7 +245,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
             var validBase64ValidJson = Convert.ToBase64String(Encoding.UTF8.GetBytes(validJson));
             Assert.That(validBase64ValidJson.Length, Is.GreaterThan(100), "Test setup: Base64 should be > 100 chars");
             var provider = new FakeCertificateProvider(null, null, null);
-            var sut = new PrivateKeyHandler(provider);
+            var sut = new CertificatePrivateJwkHandler(provider);
 
             var result = sut.GetPrivateJwk(validBase64ValidJson);
 

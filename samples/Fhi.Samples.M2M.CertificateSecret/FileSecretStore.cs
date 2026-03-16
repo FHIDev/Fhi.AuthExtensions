@@ -1,3 +1,4 @@
+using Fhi.Authentication.SecretStore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -6,7 +7,7 @@ namespace Fhi.Authentication.ClientCredentials;
 /// <summary>
 /// Secret store implementation that retrieves JWK from configuration or environment variables.
 /// </summary>
-public class FileSecretStore : ISecretStore
+public class FileSecretStore : IPrivateJwkStore
 {
     private readonly string _privateJwkJson;
     private readonly ILogger<FileSecretStore> _logger;

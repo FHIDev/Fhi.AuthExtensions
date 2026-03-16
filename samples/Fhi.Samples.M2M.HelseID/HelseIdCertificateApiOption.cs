@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Fhi.Authentication.ClientCredentials;
+using Fhi.Authentication.Certificate;
 using Microsoft.Extensions.Options;
 
 namespace M2M.Host.HelseID;

@@ -12,7 +12,7 @@ namespace Fhi.Auth.IntegrationTests
     public class PrivateKeyHandlerTests
     {
         private IServiceProvider? _serviceProvider;
-        private IPrivateKeyHandler? _privateKeyHandler;
+        private IPrivateJwkKeyHandler? _privateKeyHandler;
         private readonly List<string> _thumbprintsToCleanup = new();
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Fhi.Auth.IntegrationTests
 
             _serviceProvider = services.BuildServiceProvider();
 
-            _privateKeyHandler = _serviceProvider.GetRequiredService<IPrivateKeyHandler>();
+            _privateKeyHandler = _serviceProvider.GetRequiredService<IPrivateJwkKeyHandler>();
         }
 
         [TearDown]

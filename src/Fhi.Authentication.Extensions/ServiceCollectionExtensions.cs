@@ -1,9 +1,6 @@
 ﻿using Fhi.Authentication.OpenIdConnect;
-using Fhi.Authentication.ClientCredentials;
-using Fhi.Authentication.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Fhi.Authentication
@@ -27,21 +24,21 @@ namespace Fhi.Authentication
             return services;
         }
 
-        /// <summary>
-        /// Add handler for certificate store keys. This is used for retrieving keys from the Windows certificate store.
-        /// </summary>
-        /// <param name="services">The service collection to add the handler to.</param>
-        /// <param name="storeLocation">The certificate store location (CurrentUser or LocalMachine). Defaults to CurrentUser.</param>
-        /// <returns>The updated service collection.</returns>
-        public static IServiceCollection AddCertificateStoreKeyHandler(
-            this IServiceCollection services,
-            CertificateStoreLocation storeLocation = CertificateStoreLocation.CurrentUser)
-        {
-            services.AddSingleton<ICertificateProvider>(_ => new StoreCertificateProvider(storeLocation));
-            services.AddTransient<IPrivateKeyHandler, PrivateKeyHandler>();
-            return services;
-        }
-        
+        ///// <summary>
+        ///// Add handler for certificate store keys. This is used for retrieving keys from the Windows certificate store.
+        ///// </summary>
+        ///// <param name="services">The service collection to add the handler to.</param>
+        ///// <param name="storeLocation">The certificate store location (CurrentUser or LocalMachine). Defaults to CurrentUser.</param>
+        ///// <returns>The updated service collection.</returns>
+        //public static IServiceCollection AddCertificateStoreKeyHandler(
+        //    this IServiceCollection services,
+        //    CertificateStoreLocation storeLocation = CertificateStoreLocation.CurrentUser)
+        //{
+        //    services.AddSingleton<ICertificateProvider>(_ => new StoreCertificateProvider(storeLocation));
+        //    services.AddTransient<IPrivateJwkKeyHandler, PrivateJwkCertificateStore>();
+        //    return services;
+        //}
+
         /// <summary>
         /// Adds an in-memory discovery service for OpenID Connect authorities.
         /// Use IDiscoveryDocumentStore to retrieve discovery documents.
@@ -49,8 +46,6 @@ namespace Fhi.Authentication
         /// <param name="services"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException"></exception>
         public static IServiceCollection AddInMemoryDiscoveryService(
            this IServiceCollection services,
            IEnumerable<DiscoveryDocumentStoreOptions> options)
