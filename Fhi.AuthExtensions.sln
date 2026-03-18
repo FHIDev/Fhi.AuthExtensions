@@ -61,7 +61,7 @@ Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Fhi.Samples.Angular.Client"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Authentication.JwtDPoP", "src\Fhi.Authentication.JwtDPoP\Fhi.Authentication.JwtDPoP.csproj", "{45C5DEB3-70EE-1284-DA27-01E0D03D7513}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "M2M.Host.CertificateSecret", "samples\Fhi.Samples.M2M.CertificateSecret\M2M.Host.CertificateSecret.csproj", "{8138ED56-312F-0671-DF36-CDCB6A558655}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "M2M.Host.WithPrivateJwkCertificateStore", "samples\Fhi.Samples.M2M.CertificateSecret\M2M.Host.WithPrivateJwkCertificateStore.csproj", "{8138ED56-312F-0671-DF36-CDCB6A558655}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

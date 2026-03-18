@@ -1,257 +1,257 @@
-using System.Security.Cryptography.X509Certificates;
-using Fhi.Auth.IntegrationTests.Setup;
-using Fhi.Authentication;
-using Fhi.Authentication.Tokens;
-using Microsoft.Extensions.DependencyInjection;
+//using System.Security.Cryptography.X509Certificates;
+//using Fhi.Auth.IntegrationTests.Setup;
+//using Fhi.Authentication;
+//using Fhi.Authentication.Tokens;
+//using Microsoft.Extensions.DependencyInjection;
 
-#if NET9_0_OR_GREATER
-namespace Fhi.Auth.IntegrationTests
-{
-    [TestFixture]
-    [Explicit ("Requires Windows and Local Machine Certificate Store access")]
-    public class PrivateKeyHandlerTests
-    {
-        private IServiceProvider? _serviceProvider;
-        private IPrivateJwkKeyHandler? _privateKeyHandler;
-        private readonly List<string> _thumbprintsToCleanup = new();
+//#if NET9_0_OR_GREATER
+//namespace Fhi.Auth.IntegrationTests
+//{
+//    [TestFixture]
+//    [Explicit ("Requires Windows and Local Machine Certificate Store access")]
+//    public class PrivateKeyHandlerTests
+//    {
+//        private IServiceProvider? _serviceProvider;
+//        private IPrivateJwkKeyHandler? _privateKeyHandler;
+//        private readonly List<string> _thumbprintsToCleanup = new();
 
-        /// <summary>
-        /// Clean up any leftover test certificates from previous test runs (in case tests crashed or were interrupted).
-        /// </summary>
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            CleanupTestCertificates();
-        }
+//        /// <summary>
+//        /// Clean up any leftover test certificates from previous test runs (in case tests crashed or were interrupted).
+//        /// </summary>
+//        [OneTimeSetUp]
+//        public void OneTimeSetUp()
+//        {
+//            CleanupTestCertificates();
+//        }
 
-        [SetUp]
-        public void Setup()
-        {
-            var services = new ServiceCollection();
-            services.AddLogging();
-            services.AddCertificateStoreKeyHandler();
+//        [SetUp]
+//        public void Setup()
+//        {
+//            var services = new ServiceCollection();
+//            services.AddLogging();
+//            services.AddCertificateStoreKeyHandler();
 
-            _serviceProvider = services.BuildServiceProvider();
+//            _serviceProvider = services.BuildServiceProvider();
 
-            _privateKeyHandler = _serviceProvider.GetRequiredService<IPrivateJwkKeyHandler>();
-        }
+//            _privateKeyHandler = _serviceProvider.GetRequiredService<IPrivateJwkKeyHandler>();
+//        }
 
-        [TearDown]
-        public void TearDown()
-        {
-            try
-            {
-                using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-                store.Open(OpenFlags.ReadWrite);
+//        [TearDown]
+//        public void TearDown()
+//        {
+//            try
+//            {
+//                using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+//                store.Open(OpenFlags.ReadWrite);
 
-                foreach (var thumb in _thumbprintsToCleanup)
-                {
-                    var found = store.Certificates.Find(X509FindType.FindByThumbprint, thumb, false);
-                    foreach (var c in found)
-                    {
-                        try { store.Remove(c); } catch { /* best-effort cleanup */ }
-                    }
-                }
+//                foreach (var thumb in _thumbprintsToCleanup)
+//                {
+//                    var found = store.Certificates.Find(X509FindType.FindByThumbprint, thumb, false);
+//                    foreach (var c in found)
+//                    {
+//                        try { store.Remove(c); } catch { /* best-effort cleanup */ }
+//                    }
+//                }
 
-                store.Close();
-            }
-            finally
-            {
-                (_serviceProvider as IDisposable)?.Dispose();
-                _thumbprintsToCleanup.Clear();
-            }
-        }
+//                store.Close();
+//            }
+//            finally
+//            {
+//                (_serviceProvider as IDisposable)?.Dispose();
+//                _thumbprintsToCleanup.Clear();
+//            }
+//        }
 
-        /// <summary>
-        /// Clean up all test certificates from the store (ensures leftover certs from crashed tests are removed).
-        /// </summary>
-        [OneTimeTearDown]
-        public void OneTimeTearDown()
-        {
-            CleanupTestCertificates();
-        }
+//        /// <summary>
+//        /// Clean up all test certificates from the store (ensures leftover certs from crashed tests are removed).
+//        /// </summary>
+//        [OneTimeTearDown]
+//        public void OneTimeTearDown()
+//        {
+//            CleanupTestCertificates();
+//        }
 
-        [Test]
-        public void GIVEN_ValidCertificateInStore_When_GetPrivateJwk_WithThumbprint_Then_ReturnsJwk()
-        {
-            var cert = CreateAndInstallCertificate();
-            var jwkString = _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
+//        [Test]
+//        public void GIVEN_ValidCertificateInStore_When_GetPrivateJwk_WithThumbprint_Then_ReturnsJwk()
+//        {
+//            var cert = CreateAndInstallCertificate();
+//            var jwkString = _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
 
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(jwkString, Is.Not.Null.And.Not.Empty);
-                TestContext.Progress.WriteLine("Test JWK: " + jwkString);
-                
-                Assert.DoesNotThrow(() => System.Text.Json.JsonDocument.Parse(jwkString));
-                
-                Assert.That(jwkString, Does.Contain("\"kty\""));
-                Assert.That(jwkString, Does.Contain("\"n\""));
-                Assert.That(jwkString, Does.Contain("\"d\""));
-            }
+//            using (Assert.EnterMultipleScope())
+//            {
+//                Assert.That(jwkString, Is.Not.Null.And.Not.Empty);
+//                TestContext.Progress.WriteLine("Test JWK: " + jwkString);
 
-            cert.Dispose();
-        }
+//                Assert.DoesNotThrow(() => System.Text.Json.JsonDocument.Parse(jwkString));
 
-        [Test]
-        public void GIVEN_PemString_When_GetPrivateJwk_Then_ReturnsJwk()
-        {
-            var cert = CreateAndInstallCertificate();
-            
-            using var rsa = cert.GetRSAPrivateKey();
-            var pem = rsa!.ExportRSAPrivateKeyPem();
-            
-            var jwkString = _privateKeyHandler!.GetPrivateJwk(pem);
+//                Assert.That(jwkString, Does.Contain("\"kty\""));
+//                Assert.That(jwkString, Does.Contain("\"n\""));
+//                Assert.That(jwkString, Does.Contain("\"d\""));
+//            }
 
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(jwkString, Is.Not.Null.And.Not.Empty);
-                Assert.DoesNotThrow(() => System.Text.Json.JsonDocument.Parse(jwkString));
-                Assert.That(jwkString, Does.Contain("\"kty\""));
-            }
+//            cert.Dispose();
+//        }
 
-            cert.Dispose();
-        }
+//        [Test]
+//        public void GIVEN_PemString_When_GetPrivateJwk_Then_ReturnsJwk()
+//        {
+//            var cert = CreateAndInstallCertificate();
 
-        [Test]
-        public void GIVEN_JwkString_When_GetPrivateJwk_Then_ReturnsSameJwk()
-        {
-            var cert = CreateAndInstallCertificate();
+//            using var rsa = cert.GetRSAPrivateKey();
+//            var pem = rsa!.ExportRSAPrivateKeyPem();
 
-            var originalJwk = _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
-            var resultJwk = _privateKeyHandler!.GetPrivateJwk(originalJwk);
+//            var jwkString = _privateKeyHandler!.GetPrivateJwk(pem);
 
-            Assert.That(resultJwk, Is.EqualTo(originalJwk));
+//            using (Assert.EnterMultipleScope())
+//            {
+//                Assert.That(jwkString, Is.Not.Null.And.Not.Empty);
+//                Assert.DoesNotThrow(() => System.Text.Json.JsonDocument.Parse(jwkString));
+//                Assert.That(jwkString, Does.Contain("\"kty\""));
+//            }
 
-            cert.Dispose();
-        }
+//            cert.Dispose();
+//        }
 
-        [Test]
-        public void GIVEN_Base64EncodedJwk_When_GetPrivateJwk_Then_ReturnsDecodedJwk()
-        {
-            var cert = CreateAndInstallCertificate();
-            
-            var jwkString = _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
-            var base64Input = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(jwkString));
-            var resultJwk = _privateKeyHandler!.GetPrivateJwk(base64Input);
+//        [Test]
+//        public void GIVEN_JwkString_When_GetPrivateJwk_Then_ReturnsSameJwk()
+//        {
+//            var cert = CreateAndInstallCertificate();
 
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(resultJwk, Is.Not.Null.And.Not.Empty);
-                Assert.DoesNotThrow(() => System.Text.Json.JsonDocument.Parse(resultJwk));
-            }
+//            var originalJwk = _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
+//            var resultJwk = _privateKeyHandler!.GetPrivateJwk(originalJwk);
 
-            cert.Dispose();
-        }
+//            Assert.That(resultJwk, Is.EqualTo(originalJwk));
 
-        [Test]
-        public void GIVEN_MissingCertificate_When_GetPrivateJwk_Then_ThrowsException()
-        {
-            var missingThumb = Guid.NewGuid().ToString("N");
+//            cert.Dispose();
+//        }
 
-            var exception = Assert.Throws<InvalidOperationException>(() => _privateKeyHandler!.GetPrivateJwk(missingThumb));
-            Assert.That(exception.Message, Does.Contain("No certificate found"));
-        }
+//        [Test]
+//        public void GIVEN_Base64EncodedJwk_When_GetPrivateJwk_Then_ReturnsDecodedJwk()
+//        {
+//            var cert = CreateAndInstallCertificate();
 
-        [Test]
-        public void GIVEN_EmptyInput_When_GetPrivateJwk_Then_ThrowsArgumentNullException()
-        {
-            var exception = Assert.Throws<ArgumentNullException>(() => _privateKeyHandler!.GetPrivateJwk(string.Empty));
-            Assert.That(exception.ParamName, Is.EqualTo("secretOrThumbprint"));
-        }
+//            var jwkString = _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint);
+//            var base64Input = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(jwkString));
+//            var resultJwk = _privateKeyHandler!.GetPrivateJwk(base64Input);
 
-        [Test]
-        public void GIVEN_ExpiredCertificate_When_GetPrivateJwk_Then_ThrowsException()
-        {
-            var cert = CreateAndInstallExpiredCertificate();
+//            using (Assert.EnterMultipleScope())
+//            {
+//                Assert.That(resultJwk, Is.Not.Null.And.Not.Empty);
+//                Assert.DoesNotThrow(() => System.Text.Json.JsonDocument.Parse(resultJwk));
+//            }
 
-            var exception = Assert.Throws<InvalidOperationException>(() => _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint));
-            Assert.That(exception.Message, Does.Contain("has expired"));
+//            cert.Dispose();
+//        }
 
-            cert.Dispose();
-        }
+//        [Test]
+//        public void GIVEN_MissingCertificate_When_GetPrivateJwk_Then_ThrowsException()
+//        {
+//            var missingThumb = Guid.NewGuid().ToString("N");
 
-        [Test]
-        public void GIVEN_CertificateWithoutPrivateKey_When_GetPrivateJwk_Then_ThrowsException()
-        {
-            var cert = new TestCertificateBuilder()
-                .WithSubject("CN=PublicOnlyTestCert")
-                .PublicOnly()
-                .Build();
+//            var exception = Assert.Throws<InvalidOperationException>(() => _privateKeyHandler!.GetPrivateJwk(missingThumb));
+//            Assert.That(exception.Message, Does.Contain("No certificate found"));
+//        }
 
-            InstallCertificate(cert);
-            _thumbprintsToCleanup.Add(cert.Thumbprint);
+//        [Test]
+//        public void GIVEN_EmptyInput_When_GetPrivateJwk_Then_ThrowsArgumentNullException()
+//        {
+//            var exception = Assert.Throws<ArgumentNullException>(() => _privateKeyHandler!.GetPrivateJwk(string.Empty));
+//            Assert.That(exception.ParamName, Is.EqualTo("secretOrThumbprint"));
+//        }
 
-            var exception = Assert.Throws<InvalidOperationException>(() => _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint));
-            Assert.That(exception.Message, Does.Contain("has no private key"));
+//        [Test]
+//        public void GIVEN_ExpiredCertificate_When_GetPrivateJwk_Then_ThrowsException()
+//        {
+//            var cert = CreateAndInstallExpiredCertificate();
 
-            cert.Dispose();
-        }
+//            var exception = Assert.Throws<InvalidOperationException>(() => _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint));
+//            Assert.That(exception.Message, Does.Contain("has expired"));
 
-        // Helpers
-        private void CleanupTestCertificates()
-        {
-            try
-            {
-                using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-                store.Open(OpenFlags.ReadWrite);
+//            cert.Dispose();
+//        }
 
-                // Remove all test certificates by looking for known test subject names
-                var testSubjects = new[] { "CN=TestCert", "CN=PublicOnlyTestCert", "CN=ExpiredTestCert" };
-                
-                foreach (var subject in testSubjects)
-                {
-                    var found = store.Certificates.Find(X509FindType.FindBySubjectDistinguishedName, subject, false);
-                    foreach (var cert in found)
-                    {
-                        try
-                        {
-                            store.Remove(cert);
-                            TestContext.Progress.WriteLine($"Cleaned up leftover test certificate: {cert.Subject} (Thumbprint: {cert.Thumbprint})");
-                        }
-                        catch (Exception ex)
-                        {
-                            TestContext.Progress.WriteLine($"Failed to remove certificate {cert.Subject}: {ex.Message}");
-                        }
-                    }
-                }
+//        [Test]
+//        public void GIVEN_CertificateWithoutPrivateKey_When_GetPrivateJwk_Then_ThrowsException()
+//        {
+//            var cert = new TestCertificateBuilder()
+//                .WithSubject("CN=PublicOnlyTestCert")
+//                .PublicOnly()
+//                .Build();
 
-                store.Close();
-            }
-            catch (Exception ex)
-            {
-                TestContext.Progress.WriteLine($"Error during test certificate cleanup: {ex.Message}");
-            }
-        }
+//            InstallCertificate(cert);
+//            _thumbprintsToCleanup.Add(cert.Thumbprint);
 
-        private X509Certificate2 CreateAndInstallCertificate()
-        {
-            var builder = new TestCertificateBuilder().WithSubject("CN=TestCert");
+//            var exception = Assert.Throws<InvalidOperationException>(() => _privateKeyHandler!.GetPrivateJwk(cert.Thumbprint));
+//            Assert.That(exception.Message, Does.Contain("has no private key"));
 
-            var cert = builder.Build();
-            InstallCertificate(cert);
-            _thumbprintsToCleanup.Add(cert.Thumbprint);
-            return cert;
-        }
-        
-        private X509Certificate2 CreateAndInstallExpiredCertificate()
-        {
-            var builder = new TestCertificateBuilder()
-                .WithSubject("CN=ExpiredTestCert")
-                .Expired();
+//            cert.Dispose();
+//        }
 
-            var cert = builder.Build();
-            InstallCertificate(cert);
-            _thumbprintsToCleanup.Add(cert.Thumbprint);
-            return cert;
-        }
+//        // Helpers
+//        private void CleanupTestCertificates()
+//        {
+//            try
+//            {
+//                using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+//                store.Open(OpenFlags.ReadWrite);
 
-        private void InstallCertificate(X509Certificate2 cert)
-        {
-            using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            store.Open(OpenFlags.ReadWrite);
-            store.Add(cert);
-            store.Close();
-        }
-    }
-}
-#endif
+//                // Remove all test certificates by looking for known test subject names
+//                var testSubjects = new[] { "CN=TestCert", "CN=PublicOnlyTestCert", "CN=ExpiredTestCert" };
+
+//                foreach (var subject in testSubjects)
+//                {
+//                    var found = store.Certificates.Find(X509FindType.FindBySubjectDistinguishedName, subject, false);
+//                    foreach (var cert in found)
+//                    {
+//                        try
+//                        {
+//                            store.Remove(cert);
+//                            TestContext.Progress.WriteLine($"Cleaned up leftover test certificate: {cert.Subject} (Thumbprint: {cert.Thumbprint})");
+//                        }
+//                        catch (Exception ex)
+//                        {
+//                            TestContext.Progress.WriteLine($"Failed to remove certificate {cert.Subject}: {ex.Message}");
+//                        }
+//                    }
+//                }
+
+//                store.Close();
+//            }
+//            catch (Exception ex)
+//            {
+//                TestContext.Progress.WriteLine($"Error during test certificate cleanup: {ex.Message}");
+//            }
+//        }
+
+//        private X509Certificate2 CreateAndInstallCertificate()
+//        {
+//            var builder = new TestCertificateBuilder().WithSubject("CN=TestCert");
+
+//            var cert = builder.Build();
+//            InstallCertificate(cert);
+//            _thumbprintsToCleanup.Add(cert.Thumbprint);
+//            return cert;
+//        }
+
+//        private X509Certificate2 CreateAndInstallExpiredCertificate()
+//        {
+//            var builder = new TestCertificateBuilder()
+//                .WithSubject("CN=ExpiredTestCert")
+//                .Expired();
+
+//            var cert = builder.Build();
+//            InstallCertificate(cert);
+//            _thumbprintsToCleanup.Add(cert.Thumbprint);
+//            return cert;
+//        }
+
+//        private void InstallCertificate(X509Certificate2 cert)
+//        {
+//            using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+//            store.Open(OpenFlags.ReadWrite);
+//            store.Add(cert);
+//            store.Close();
+//        }
+//    }
+//}
+//#endif

@@ -1,5 +1,6 @@
 ﻿using M2M.Host.CertificateSecret;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 public partial class Program
@@ -7,82 +8,42 @@ public partial class Program
     public static async Task Main(string[] args)
     {
         var builder = Host.CreateDefaultBuilder(args);
-        builder.ConfigureAppConfiguration((_, config) =>
+        builder.ConfigureAppConfiguration((context, config) =>
         {
-            config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            var buildConfig = config.Build();
+            var apiOption = buildConfig.GetSection("Api").Get<ApiOption>();
+
+            //TODO: when Fhi.Security.Cryptography supports parsing private key from certificate
+            /***************************************************************** 
+             * For privateKey stored in certificate we need to resolve the certificate at startup to extract 
+             * the private key from Windows certificate store.
+             * ***************************************************************/
+            //config.AddCertificateStorePrivateKey(
+            //    "Api:Pem", //Name of the configuration key to store the resolved private JWK
+            //    apiOption!.Authentication.CertificateThumbprint,
+            //    apiOption.Authentication.CertificateStoreLocation);
+
         });
+
         builder.ConfigureServices((context, services) =>
         {
-            var apiSection = context.Configuration.GetSection("HelseIdProtectedApi");
-            var api = apiSection.Get<HelseIdProtectedApiOption>();
-
-            //services
-            //.AddClientCredentialsClientOptions(
-            //    "clientName",
-            //    api.Authentication.Authority,
-            //    api.Authentication.ClientId,
-            //    api.Authentication.CertificateThumbprint,
-            //    api.Authentication.Scope)
-            //.AddClientCredentialsHttpClient(client =>
-            //{
-            //    client.BaseAddress = new Uri(api.BaseAddress);
-            //});
+            services.AddHostedService<BackgroundServiceCallingAPI>();
+            var apiOption = context.Configuration.GetSection("Api").Get<ApiOption>();
+            var jwk = context.Configuration["Api:Pem"] ?? string.Empty;
+            services
+            .AddClientCredentialsClientOptions(
+                        ApiOption.ClientName,
+                        apiOption!.Authentication.Authority,
+                        apiOption.Authentication.ClientId,
+                        PrivateJwk.ParseFromPem(jwk),
+                        apiOption.Authentication.Scope)
+                    .AddClientCredentialsHttpClient(client =>
+                    {
+                        client.BaseAddress = new Uri(apiOption.BaseAddress);
+                    });
         });
 
         var app = builder.Build();
         await app.StartAsync();
     }
-
-    //private static void ConfigureWithSecretStore(IServiceCollection services, IConfigurationSection apiSection)
-    //{
-    //    var api = apiSection.Get<HelseIdProtectedApiOption>()!;
-
-    //    // Register the appropriate ISecretStore implementation based on configuration
-    //    var certificateThumbprint = apiSection.GetValue<string>("Authentication:Certificate:Thumbprint");
-
-    //    if (!string.IsNullOrEmpty(certificateThumbprint))
-    //    {
-    //        services.AddCertificateStoreKeyHandler();
-    //        services.AddSingleton<CertificateSecretManager>();
-
-    //        services.AddSingleton<ISecretStore>(sp =>
-    //        {
-    //            var certificateOptions = new CertificateOptions
-    //            {
-    //                Thumbprint = certificateThumbprint,
-    //                StoreLocation = CertificateStoreLocation.CurrentUser
-    //            };
-
-    //            return new CertificateSecretStore(
-    //                certificateOptions,
-    //                sp.GetRequiredService<IPrivateKeyHandler>(),
-    //                sp.GetRequiredService<ILogger<CertificateSecretStore>>(),
-    //                sp.GetRequiredService<CertificateSecretManager>());
-    //        });
-    //    }
-    //    else if (!string.IsNullOrEmpty(api.Authentication.PrivateJwk))
-    //    {
-    //        services.AddSingleton<ISecretStore>(sp =>
-    //            new FileSecretStore(
-    //                api.Authentication.PrivateJwk,
-    //                sp.GetRequiredService<ILogger<FileSecretStore>>()));
-    //    }
-
-    //    // Configure client credentials using the ISecretStore
-    //    services
-    //        .AddClientCredentialsClientOptions(
-    //            HelseIdProtectedApiOption.ClientName,
-    //            api.Authentication.Authority,
-    //            api.Authentication.ClientId,
-    //            api.Authentication.Scope)
-    //        .AddClientCredentialsHttpClient(client =>
-    //        {
-    //            client.BaseAddress = new Uri(api.BaseAddress);
-    //        });
-
-    //    // Add token management services
-    //    services.AddDistributedMemoryCache();
-    //    services.AddClientCredentialsTokenManagement();
-    //    services.AddInMemoryDiscoveryService([api.Authentication.Authority]);
-    //}
 }

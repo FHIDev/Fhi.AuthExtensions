@@ -24,21 +24,6 @@ namespace Fhi.Authentication
             return services;
         }
 
-        ///// <summary>
-        ///// Add handler for certificate store keys. This is used for retrieving keys from the Windows certificate store.
-        ///// </summary>
-        ///// <param name="services">The service collection to add the handler to.</param>
-        ///// <param name="storeLocation">The certificate store location (CurrentUser or LocalMachine). Defaults to CurrentUser.</param>
-        ///// <returns>The updated service collection.</returns>
-        //public static IServiceCollection AddCertificateStoreKeyHandler(
-        //    this IServiceCollection services,
-        //    CertificateStoreLocation storeLocation = CertificateStoreLocation.CurrentUser)
-        //{
-        //    services.AddSingleton<ICertificateProvider>(_ => new StoreCertificateProvider(storeLocation));
-        //    services.AddTransient<IPrivateJwkKeyHandler, PrivateJwkCertificateStore>();
-        //    return services;
-        //}
-
         /// <summary>
         /// Adds an in-memory discovery service for OpenID Connect authorities.
         /// Use IDiscoveryDocumentStore to retrieve discovery documents.
