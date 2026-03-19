@@ -63,6 +63,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Authentication.JwtDPoP"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Authentication.JwtDPoP.Tests", "tests\Fhi.Authentication.JwtDPoP.Tests\Fhi.Authentication.JwtDPoP.Tests.csproj", "{6C3C4A81-3574-427F-8D64-D78E6D21FB7C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "M2M.Host.WithPrivateJwkCertificateStore", "samples\Fhi.Samples.M2M.CertificateSecret\M2M.Host.WithPrivateJwkCertificateStore.csproj", "{8138ED56-312F-0671-DF36-CDCB6A558655}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +137,10 @@ Global
 		{6C3C4A81-3574-427F-8D64-D78E6D21FB7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C3C4A81-3574-427F-8D64-D78E6D21FB7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C3C4A81-3574-427F-8D64-D78E6D21FB7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8138ED56-312F-0671-DF36-CDCB6A558655}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8138ED56-312F-0671-DF36-CDCB6A558655}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8138ED56-312F-0671-DF36-CDCB6A558655}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8138ED56-312F-0671-DF36-CDCB6A558655}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -159,6 +165,7 @@ Global
 		{06358B45-EFD0-FD65-D50D-DF4C93B679FB} = {1E7B8F3D-0617-8A9E-DCF4-EFF245D35583}
 		{45C5DEB3-70EE-1284-DA27-01E0D03D7513} = {02410E46-D7E9-4870-8BEE-2667E121C388}
 		{6C3C4A81-3574-427F-8D64-D78E6D21FB7C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{8138ED56-312F-0671-DF36-CDCB6A558655} = {EA8AA50F-AE10-290C-ABE9-07EF3D2129A5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {113A468C-B364-454A-BDF5-BE678F61C31A}

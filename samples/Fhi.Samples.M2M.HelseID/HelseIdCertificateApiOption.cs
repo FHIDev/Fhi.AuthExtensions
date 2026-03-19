@@ -1,6 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-using Fhi.Authentication.ClientCredentials;
 using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
 
 namespace M2M.Host.HelseID;
 
@@ -24,11 +23,4 @@ public record HelseIDCertificateAuthentication
     [Required] public required string Authority { get; init; }
     [Required] public required string ClientId { get; init; }
     [Required] public required string Scope { get; init; }
-
-    /// <summary>
-    /// Certificate configuration - will be converted to JWK by IPrivateKeyHandler with format auto-detection
-    /// </summary>
-    [Required]
-    [ValidateObjectMembers]
-    public required CertificateOptions Certificate { get; init; }
 }
