@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Duende.AccessTokenManagement;
+﻿using Duende.AccessTokenManagement;
 using Fhi.Authentication.ClientCredentials;
 using Fhi.Security.Cryptography;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using NSubstitute;
+using System.ComponentModel.DataAnnotations;
 
 namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
 {
@@ -110,15 +110,8 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             });
 
             var clientAssertionService = new ClientCredentialsAssertionService(logger, assertionOptions, clientOptions);
-            var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
-
-            logger.Received().Log(
-             LogLevel.Error,
-             Arg.Any<EventId>(),
-             Arg.Is<object>(o => o.ToString()!.Contains("Could not resolve JWK")),
-             Arg.Any<Exception>(),
-             Arg.Any<Func<object, Exception?, string>>()
-         );
+            var ex = Assert.ThrowsAsync<ArgumentNullException>(async () => await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name")));
+            Assert.That(ex.Message, Does.Contain("IDX10000: The parameter 'json' cannot be a 'null'"));
         }
 
         [Test]
@@ -250,23 +243,14 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
                 PrivateJwk = JWK.Create().PrivateKey,
                 ExpirationSeconds = expirationSeconds
             };
-
             assertionOptions.Get("name").Returns(options);
 
             var clientAssertionService = new ClientCredentialsAssertionService(
                 logger,
                 assertionOptions,
                 clientOptions);
-            var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
-
-            Assert.That(result, Is.Null);
-            logger.Received().Log(
-                LogLevel.Error,
-                Arg.Any<EventId>(),
-                Arg.Is<object>(o => o.ToString()!.Contains("Invalid ExpirationSeconds") && o.ToString()!.Contains($"{expirationSeconds}")),
-                Arg.Any<Exception>(),
-                Arg.Any<Func<object, Exception?, string>>()
-            );
+            var ex = Assert.ThrowsAsync<ArgumentException>(async () => await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name")));
+            Assert.That(ex.Message, Does.Contain("IDX12401: Expires: "));
         }
     }
 }

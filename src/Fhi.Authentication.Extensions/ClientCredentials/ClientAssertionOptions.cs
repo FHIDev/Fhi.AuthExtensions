@@ -12,7 +12,7 @@ namespace Fhi.Authentication.ClientCredentials
         /// Client assertion private JWK
         /// </summary>
         public string PrivateJwk { get; set; } = string.Empty;
-        
+
         /// <summary>
         /// Client assertion issuer value
         /// </summary>
@@ -24,7 +24,7 @@ namespace Fhi.Authentication.ClientCredentials
         public string ClientAssertionType { get; set; } = ClientAssertionTypes.JwtBearer;
 
         /// <summary>
-        /// The client assertion expiration time in seconds. Default is 10 seconds, as required by HelseId.
+        /// The client assertion expiration time in seconds. Default is 10 seconds
         /// Must between 1 and 120 seconds.
         /// </summary>
         [Range(1, 120, ErrorMessage = "ExpirationSeconds must be between 1 and 120 seconds.")]

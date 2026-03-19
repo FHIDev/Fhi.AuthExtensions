@@ -108,7 +108,6 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             Assert.That(jsonWebKey.Kid, Is.EqualTo("authextension.sample"));
         }
 
-
         private static IServiceCollection CreateServiceCollectionWithDiscoveryStoreMock()
         {
             var services = new ServiceCollection();
