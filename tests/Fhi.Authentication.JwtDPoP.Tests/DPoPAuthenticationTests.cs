@@ -1,6 +1,7 @@
-using Fhi.Auth.IntegrationTests.Setup;
+using Fhi.Authentication.JwtDPoP.Tests.Setup;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -22,7 +23,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_valid_DPoP_token_and_proof_THEN_returns_200()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "http://authority",
                     ValidAudience = "api_audience",
@@ -45,7 +46,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_no_token_THEN_returns_401_with_DPoP_challenge()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop())
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop())
                 .AppPipeline(app => app.MapGet("/api/dpopEndpoint", [Authorize(AuthenticationSchemes = "DPoP")] () => "Successful access"))
                 .Start();
 
@@ -59,7 +60,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_invalid_authentication_scheme_THEN_returns_401_with_DPoP_challenge()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop())
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop())
                 .AppPipeline(app => app.MapGet("/api/dpopEndpoint", [Authorize(AuthenticationSchemes = "DPoP")] () => "Successful access"))
                 .Start();
 
@@ -77,7 +78,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_Bearer_protected_endpoint_WHEN_using_DPoP_valid_token_THEN_returns_401_with_Bearer_challenge()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth
+                .AddServiceConfiguration(services => services.AddAuthentication()
                     .AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidIssuer = "http://authority",
@@ -116,7 +117,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_no_DPoP_proof_header_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop())
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop())
                 .AppPipeline(app => app.MapGet("/api/dpopEndpoint", [Authorize(AuthenticationSchemes = "DPoP")] () => "Successful access"))
                 .Start();
 
@@ -136,7 +137,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_multiple_DPoP_headers_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "http://authority",
                     ValidAudience = "api_audience",
@@ -164,7 +165,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_DPoP_proof_is_malformed_JWT_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "http://authority",
                     ValidAudience = "api_audience",
@@ -194,7 +195,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_proof_missing_required_claim_THEN_returns_401(string missingClaim)
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "http://authority",
                     ValidAudience = "api_audience",
@@ -228,7 +229,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_dpopProof_has_wrong_typ_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-               .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+               .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                {
                    ValidIssuer = "http://authority",
                    ValidAudience = "api_audience",
@@ -255,7 +256,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_invalid_dpop_jwk_algorithm_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options =>
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options =>
                 {
                     options.DPoPProofTokenValidationParameters.ValidAlgorithms = new[]
                     {
@@ -288,7 +289,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_DPoPProof_invalid_signature_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "http://authority",
                     ValidAudience = "api_audience",
@@ -315,7 +316,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_dpopProof_contains_private_key_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "http://authority",
                     ValidAudience = "api_audience",
@@ -342,7 +343,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_proof_htm_does_not_match_request_method_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "http://authority",
                     ValidAudience = "api_audience",
@@ -369,7 +370,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_htu_host_does_not_match_request_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "http://authority",
                     ValidAudience = "api_audience",
@@ -395,7 +396,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_require_nonce_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options =>
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options =>
                 {
                     //options.DPoPProotTokenValidationParameters.ProofTokenLifetimeValidationType = ProofLifetimeValidationType.Nonce;
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -426,7 +427,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_proof_iat_is_expired_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options =>
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -455,7 +456,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_proof_ath_does_not_match_access_token_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "http://authority",
                     ValidAudience = "api_audience",
@@ -481,7 +482,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_ath_claim_not_mathing_access_token_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "http://authority",
                     ValidAudience = "api_audience",
@@ -512,7 +513,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_invalid_token_binding_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = false,
                     ValidAudience = "api_audience",
@@ -544,7 +545,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_invalid_audience_or_issuer_THEN_returns_401(string issuer, string audience)
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "http://authority",
                     ValidAudience = "api_audience",
@@ -569,7 +570,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_issuer_validation_off_THEN_returns_200()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = false,
                     ValidAudience = "api_audience",
@@ -597,7 +598,7 @@ namespace Fhi.Auth.IntegrationTests
         public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_jti_replayed_THEN_returns_401()
         {
             var client = new DPoPTestServerBuilder()
-                .AddServiceConfiguration(auth => auth.AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "http://authority",
                     ValidAudience = "api_audience",

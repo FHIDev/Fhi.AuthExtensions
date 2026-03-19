@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Fhi.Auth.IntegrationTests.Setup
+namespace Fhi.Authentication.JwtDPoP.Tests.Setup
 {
     public static class FakeDPoPTokenBuilder
     {
