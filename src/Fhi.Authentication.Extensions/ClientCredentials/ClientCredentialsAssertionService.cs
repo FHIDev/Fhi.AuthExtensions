@@ -6,34 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace Fhi.Authentication.ClientCredentials
 {
-    internal class DefaultClientCredentialsAssertionService(
-        IOptionsMonitor<ClientAssertionOptions> ClientAssertionOption,
-        IOptionsMonitor<ClientCredentialsClient> ClientCredentialsOption) : IClientAssertionService
-    {
-        public Task<ClientAssertion?> GetClientAssertionAsync(ClientCredentialsClientName? clientName = null, TokenRequestParameters? parameters = null, CancellationToken ct = default)
-        {
-            var client = ClientCredentialsOption.Get(clientName);
-            if (client != null && client.ClientSecret == null)
-            {
-                var clientAssertionOptions = ClientAssertionOption.Get(clientName);
-                if (string.IsNullOrEmpty(clientAssertionOptions.Issuer))
-                {
-                    return Task.FromResult<ClientAssertion?>(null);
-                }
-
-                var expiration = DateTime.UtcNow.AddSeconds(clientAssertionOptions.ExpirationSeconds);
-                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client.ClientId ?? "", clientAssertionOptions.PrivateJwk, expiration);
-                return Task.FromResult<ClientAssertion?>(new ClientAssertion
-                {
-                    Type = clientAssertionOptions.ClientAssertionType,
-                    Value = jwt
-                });
-            }
-
-            return Task.FromResult<ClientAssertion?>(null);
-        }
-    }
-
     /// <summary>
     /// Called from Duende.AccessTokenManagement accesstoken delegation handler to generate a client assertion for authenticating the client.
     /// When this service is added to the DI container, Duende.AccessTokenManagement will use this service to get a client assertion.

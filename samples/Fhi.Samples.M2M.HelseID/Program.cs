@@ -26,16 +26,7 @@ public partial class Program
 
             var apiSection = context.Configuration.GetSection("HelseIdProtectedApi");
 
-            // Choose configuration approach:
-            // Option 1: Direct JWK (simple, good for dev with user secrets)
-            // Option 2: Direct certificate (explicit control, more verbose)
-            // Option 3: ISecretStore (RECOMMENDED - flexible, testable, DI-friendly)
-
-            //ConfigureWithSecretStore(services, apiSection);
-
-            // Alternative options (uncomment to try):
             ConfigureJwkAuthentication(services, apiSection);
-            // ConfigureCertificateAuthentication(services, apiSection);
         });
 
         var app = builder.Build();
@@ -77,106 +68,5 @@ public partial class Program
 
     }
 
-    /// <summary>
-    /// Option 2: Configure certificate-based authentication
-    /// Demonstrates explicit control over certificate retrieval and JWK conversion.
-    /// </summary>
-    //private static void ConfigureCertificateAuthentication(IServiceCollection services, IConfigurationSection apiSection)
-    //{
-    //    services
-    //        .AddOptions<HelseIdCertificateApiOption>()
-    //        .Bind(apiSection)
-    //        .ValidateDataAnnotations()
-    //        .ValidateOnStart();
 
-    //    var api = apiSection.Get<HelseIdCertificateApiOption>()!;
-
-    //    // Certificate will be resolved at runtime using ICertificateKeyHandler
-    //    // No need to resolve at configuration time when using certificate-based options
-
-    //    services
-    //        .AddClientCredentialsClientOptions(
-    //            HelseIdCertificateApiOption.ClientName,
-    //            api.Authentication.Authority,
-    //            api.Authentication.ClientId,
-    //            api.Authentication.Certificate,  // Pass certificate options directly
-    //            api.Authentication.Scope)
-    //        .AddClientCredentialsHttpClient(client =>
-    //        {
-    //            client.BaseAddress = new Uri(api.BaseAddress);
-    //        });
-
-    //    services.AddDistributedMemoryCache();
-    //    services.AddClientCredentialsTokenManagement();
-    //    services.AddInMemoryDiscoveryService([api.Authentication.Authority]);
-    //}
-
-    /// <summary>
-    /// Option 3: Configure authentication using ISecretStore pattern (RECOMMENDED).
-    /// This approach allows you to register different ISecretStore implementations in DI
-    /// based on your environment or configuration needs.
-    ///
-    /// Example implementations:
-    /// - FileSecretStore: For JWK from configuration/environment variables
-    /// - CertificateSecretStore: For certificates from Windows certificate store
-    /// </summary>
-    /// 
-    //private static void ConfigureWithSecretStore(IServiceCollection services, IConfigurationSection apiSection)
-    //{
-    //    services
-    //        .AddOptions<HelseIdProtectedApiOption>()
-    //        .Bind(apiSection)
-    //        .ValidateDataAnnotations()
-    //        .ValidateOnStart();
-
-    //    var api = apiSection.Get<HelseIdProtectedApiOption>()!;
-
-    //    // Register the appropriate ISecretStore implementation based on configuration
-    //    var certificateThumbprint = apiSection.GetValue<string>("Authentication:Certificate:Thumbprint");
-
-    //    if (!string.IsNullOrEmpty(certificateThumbprint))
-    //    {
-    //        services.AddCertificateStoreKeyHandler();
-    //        services.AddSingleton<CertificateSecretManager>();
-
-    //        services.AddSingleton<IPrivateJwkStore>(sp =>
-    //        {
-    //            var certificateOptions = new CertificateOptions
-    //            {
-    //                Thumbprint = certificateThumbprint,
-    //                StoreLocation = CertificateStoreLocation.CurrentUser
-    //            };
-
-    //            return new CertificateSecretStore(
-    //                certificateOptions,
-    //                sp.GetRequiredService<IPrivateJwkKeyHandler>(),
-    //                sp.GetRequiredService<ILogger<PrivateJwkCertificateStore>>(),
-    //                sp.GetRequiredService<CertificateSecretManager>());
-    //        });
-    //    }
-    //    else if (!string.IsNullOrEmpty(api.Authentication.PrivateJwk))
-    //    {
-    //        services.AddSingleton<IPrivateJwkStore>(sp =>
-    //            new FileSecretStore(
-    //                api.Authentication.PrivateJwk,
-    //                sp.GetRequiredService<ILogger<FileSecretStore>>()));
-    //    }
-
-    //    // Configure client credentials using the ISecretStore
-    //    services
-    //        .AddClientCredentialsClientOptions(
-    //            HelseIdProtectedApiOption.ClientName,
-    //            api.Authentication.Authority,
-    //            api.Authentication.ClientId,
-    //            api.Authentication.Scope)
-    //        .AddClientCredentialsHttpClient(client =>
-    //        {
-    //            client.BaseAddress = new Uri(api.BaseAddress);
-    //        });
-
-    //    // Add token management services
-    //    services.AddDistributedMemoryCache();
-    //    services.AddClientCredentialsTokenManagement();
-    //    services.AddInMemoryDiscoveryService([api.Authentication.Authority]);
-    //}
 }
