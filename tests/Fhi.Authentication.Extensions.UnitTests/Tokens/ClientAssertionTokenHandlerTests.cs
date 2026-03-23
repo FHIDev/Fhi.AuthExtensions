@@ -1,7 +1,7 @@
-using System.IdentityModel.Tokens.Jwt;
 using Fhi.Authentication.Tokens;
-using Fhi.Security.Cryptography;
+using Fhi.Security.Cryptography.Jwks;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Fhi.Authentication.Extensions.UnitTests.Tokens
 {

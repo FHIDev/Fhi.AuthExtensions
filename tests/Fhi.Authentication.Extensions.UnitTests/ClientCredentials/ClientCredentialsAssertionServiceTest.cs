@@ -1,6 +1,6 @@
 ﻿using Duende.AccessTokenManagement;
 using Fhi.Authentication.ClientCredentials;
-using Fhi.Security.Cryptography;
+using Fhi.Security.Cryptography.Jwks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;

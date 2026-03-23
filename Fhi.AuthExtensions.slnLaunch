@@ -3,15 +3,15 @@
     "Name": "AngularBFF and API",
     "Projects": [
       {
-        "Path": "samples\\Fhi.Samples.AngularBFF\\Fhi.Samples.Angular.BFFApi\\Fhi.Samples.Angular.BFFApi.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "samples\\Fhi.Samples.AngularBFF\\Fhi.Samples.Angular.Client\\Fhi.Samples.Angular.Client.esproj",
-        "Action": "Start"
-      },
-      {
         "Path": "samples\\Fhi.Samples.WebApi\\Api.WebApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "samples\\Fhi.Samples.EndUser.AngularBFF\\Fhi.Samples.Angular.EndUser.BFFApi\\Fhi.Samples.Angular.BFFApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "samples\\Fhi.Samples.EndUser.AngularBFF\\Fhi.Samples.Angular.EndUser.Client\\Fhi.Samples.Angular.Client.esproj",
         "Action": "Start"
       }
     ]
@@ -22,11 +22,6 @@
       {
         "Path": "samples\\Fhi.Samples.WebApi\\Api.WebApi.csproj",
         "Action": "Start"
-      },
-      {
-        "Path": "samples\\Fhi.Samples.ClientCredentialsWorker\\M2M.Host.MultipleClients.csproj",
-        "Action": "Start",
-        "DebugTarget": "MultipleClientVariant1"
       }
     ]
   }
