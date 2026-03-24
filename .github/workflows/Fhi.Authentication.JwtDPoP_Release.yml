@@ -1,6 +1,5 @@
 name: Release Fhi.Authentication.JwtDPoP
-description: |
-  This workflow tags, packs and publish the NuGet package and creates a draft release for the Fhi.Authentication.JwtDPoP project.
+# This workflow tags, packs and publish the NuGet package and creates a draft release for the Fhi.Authentication.JwtDPoP project.
 
 on:
   workflow_dispatch:
@@ -15,23 +14,29 @@ on:
         required: false
         default: true
         type: boolean
+permissions:
+  contents: write
+
 jobs:
   release-authentication-jwtdpop:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: |
           9.0.x
           10.0.x
+        cache: true
 
     - name: Set version and tag variables
+      env:
+        INPUT_VERSION: ${{ github.event.inputs.version }}
       run: |
-        echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-        echo "TAG=authentication-jwtdpop-${{ github.event.inputs.version }}" >> $GITHUB_ENV
+        echo "VERSION=$INPUT_VERSION" >> $GITHUB_ENV
+        echo "TAG=authentication-jwtdpop-$INPUT_VERSION" >> $GITHUB_ENV
 
     - name: Create git tag
       run: |
@@ -63,7 +68,7 @@ jobs:
         tag_name: ${{ env.TAG }}
         name: Release Fhi.Authentication.JwtDPoP ${{ env.VERSION }}
         draft: true
-        prerelease: github.event.inputs.prerelease
+        prerelease: ${{ github.event.inputs.prerelease }}
         files: nuget-packages/*.nupkg
         body: |
           **NuGet Package**: [Fhi.Authentication.JwtDPoP](https://www.nuget.org/packages/Fhi.Authentication.JwtDPoP/${{ env.VERSION }})
