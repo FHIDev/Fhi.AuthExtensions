@@ -1,25 +1,34 @@
 name: Documentation
+
 on:
   push:
-      branches:
-        - main
+    branches:
+      - main
   workflow_dispatch:
+
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
+
       - name: Install dependencies
         run: |
           pip install mkdocs-jupyter
           pip install mkdocs-mermaid2-plugin
+
       - name: Build MkDocs site
         run: mkdocs build
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
