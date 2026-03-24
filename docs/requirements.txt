@@ -1,0 +1,2 @@
+mkdocs-jupyter==0.25.1 # 0.26.0 is broken: https://github.com/danielfrg/mkdocs-jupyter/issues/269
+mkdocs-mermaid2-plugin==1.2.3
