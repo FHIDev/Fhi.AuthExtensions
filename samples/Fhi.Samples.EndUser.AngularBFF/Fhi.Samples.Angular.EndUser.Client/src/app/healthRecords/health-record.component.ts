@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { NgIf, NgFor } from '@angular/common';
+
 import { map, catchError, of } from 'rxjs';
 
 interface Record {
@@ -12,7 +12,7 @@ interface Record {
 @Component({
     selector: 'healthrecord-component',
     templateUrl: 'health-record.component.html',
-    imports: [NgIf, NgFor]
+    imports: []
 })
 
 export class HealthRecordComponent implements OnInit{

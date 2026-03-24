@@ -4,7 +4,7 @@ import { withInterceptorsFromDi, provideHttpClient, HTTP_INTERCEPTORS } from '@a
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
-import { importProvidersFrom, inject, provideAppInitializer } from '@angular/core';
+import { importProvidersFrom, inject, provideAppInitializer, provideZoneChangeDetection } from '@angular/core';
 import { AuthenticationService } from './app/services/authentication.service';
 import { firstValueFrom } from 'rxjs';
 import { AuthInterceptor } from './app/interceptors/auth.interseptor';
@@ -28,7 +28,7 @@ export function initializeApp(): () => Promise<void> {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideAppInitializer(() => {
+    provideZoneChangeDetection(),provideAppInitializer(() => {
         const initializerFn = (initializeApp)();
         return initializerFn();
       }),
