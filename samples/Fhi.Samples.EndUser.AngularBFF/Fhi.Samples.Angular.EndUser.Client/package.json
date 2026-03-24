@@ -36,7 +36,6 @@
   },
   "overrides": {
     "tar": ">=7.5.11",
-    "serialize-javascript": ">=7.0.3",
     "piscina": "5.1.4",
     "sass": "1.98.0"
   },
