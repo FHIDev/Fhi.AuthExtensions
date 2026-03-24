@@ -5,24 +5,28 @@
 
   <button (click)="getRecords()">GetcRecord Data</button>
 
-  <p *ngIf="!records"><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationangular">https://aka.ms/jspsintegrationangular</a> for more details.</em></p>
-
-  <table *ngIf="records">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>CreatedAt</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let record of records">
-        <td>{{ record.name }}</td>
-        <td>{{ record.description }}</td>
-        <td>{{ record.createdAt }}</td>
-      </tr>
-    </tbody>
-  </table>
+  @if (records) {
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>CreatedAt</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (record of records; track record) {
+          <tr>
+            <td>{{ record.name }}</td>
+            <td>{{ record.description }}</td>
+            <td>{{ record.createdAt }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationangular">https://aka.ms/jspsintegrationangular</a> for more details.</em></p>
+  }
 
 </ng-container>
 
