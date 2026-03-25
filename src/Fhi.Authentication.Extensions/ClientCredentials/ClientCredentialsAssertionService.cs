@@ -15,6 +15,7 @@ namespace Fhi.Authentication.ClientCredentials
         private readonly ILogger<ClientCredentialsAssertionService> _logger;
         private readonly IOptionsMonitor<ClientAssertionOptions> _clientAssertionOptions;
         private readonly IOptionsMonitor<ClientCredentialsClient> _clientCredentialsClient;
+        private readonly TimeProvider _timeProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientCredentialsAssertionService"/> class.
@@ -26,10 +27,25 @@ namespace Fhi.Authentication.ClientCredentials
             ILogger<ClientCredentialsAssertionService> logger,
             IOptionsMonitor<ClientAssertionOptions> clientAssertionOptions,
             IOptionsMonitor<ClientCredentialsClient> clientCredentialsClient)
+            : this(logger, clientAssertionOptions, clientCredentialsClient, TimeProvider.System) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClientCredentialsAssertionService"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="clientAssertionOptions">The client assertion options.</param>
+        /// <param name="clientCredentialsClient">The client credentials client options.</param>
+        /// <param name="timeProvider">The time provider for generating expiration timestamps.</param>
+        public ClientCredentialsAssertionService(
+            ILogger<ClientCredentialsAssertionService> logger,
+            IOptionsMonitor<ClientAssertionOptions> clientAssertionOptions,
+            IOptionsMonitor<ClientCredentialsClient> clientCredentialsClient,
+            TimeProvider timeProvider)
         {
             _logger = logger;
             _clientAssertionOptions = clientAssertionOptions;
             _clientCredentialsClient = clientCredentialsClient;
+            _timeProvider = timeProvider;
         }
 
         /// <inheritdoc/>
@@ -46,8 +62,9 @@ namespace Fhi.Authentication.ClientCredentials
                 }
 
                 string privateJwk = clientAssertionOptions.PrivateJwk;
-                var expiration = DateTime.UtcNow.AddSeconds(clientAssertionOptions.ExpirationSeconds);
-                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client.ClientId ?? "", privateJwk, expiration);
+                var utcNow = _timeProvider.GetUtcNow();
+                var expiration = utcNow.AddSeconds(clientAssertionOptions.ExpirationSeconds).UtcDateTime;
+                var jwt = ClientAssertionTokenHandler.CreateJwtToken(clientAssertionOptions.Issuer, client.ClientId ?? "", privateJwk, expiration, utcNow: utcNow);
                 return Task.FromResult<ClientAssertion?>(new ClientAssertion
                 {
                     Type = clientAssertionOptions.ClientAssertionType,

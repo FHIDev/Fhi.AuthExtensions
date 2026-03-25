@@ -68,6 +68,7 @@ namespace Microsoft.Extensions.DependencyInjection
             string? scope = null,
             DPoPProofKey? dPoPKey = null)
         {
+            services.TryAddSingleton(TimeProvider.System);
             services.TryAddTransient<IClientAssertionService, ClientCredentialsAssertionService>();
 
             var clientAssertionBuilder = services
