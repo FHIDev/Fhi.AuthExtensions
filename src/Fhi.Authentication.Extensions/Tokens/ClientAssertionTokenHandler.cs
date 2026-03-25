@@ -15,25 +15,26 @@ namespace Fhi.Authentication.Tokens
         /// <param name="issuer">This value is the audience, but should be set as the OIDC issuer</param>
         /// <param name="clientId">client identifier</param>
         /// <param name="jwk">json web key string</param>
-        /// <param name="expiration">Optional expiration time. If null, defaults to 10 seconds from now.</param>
+        /// <param name="expiration">Optional expiration time. If null, defaults to 10 seconds from <paramref name="utcNow"/>.</param>
         /// <param name="kid">key identifier</param>
+        /// <param name="utcNow">Optional current UTC time used for iat, nbf, and default exp claims. If null, defaults to <see cref="DateTimeOffset.UtcNow"/>.</param>
         /// <returns></returns>
-        public static string CreateJwtToken(string issuer, string clientId, string jwk, DateTime? expiration = null, string? kid = null)
+        public static string CreateJwtToken(string issuer, string clientId, string jwk, DateTime? expiration = null, string? kid = null, DateTimeOffset? utcNow = null)
         {
             var securityKey = new JsonWebKey(jwk);
-            var token = CreateJwtToken(issuer, clientId, securityKey, expiration, kid);
+            var token = CreateJwtToken(issuer, clientId, securityKey, utcNow ?? DateTimeOffset.UtcNow, expiration, kid);
             return token;
         }
 
-        private static string CreateJwtToken(string issuer, string clientId, JsonWebKey securityKey, DateTime? expiration = null, string? kid = null)
+        private static string CreateJwtToken(string issuer, string clientId, JsonWebKey securityKey, DateTimeOffset utcNow, DateTime? expiration = null, string? kid = null)
         {
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub, clientId),
-                new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
+                new(JwtRegisteredClaimNames.Iat, utcNow.ToUnixTimeSeconds().ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
             };
-            var payload = new JwtPayload(clientId, issuer, claims, DateTime.UtcNow, expiration ?? DateTime.UtcNow.AddSeconds(10));
+            var payload = new JwtPayload(clientId, issuer, claims, utcNow.UtcDateTime, expiration ?? utcNow.AddSeconds(10).UtcDateTime);
 
             if (string.IsNullOrEmpty(securityKey.Alg))
                 securityKey.Alg = SecurityAlgorithms.RsaSha256;
