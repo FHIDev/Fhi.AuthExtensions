@@ -27,6 +27,12 @@ namespace Fhi.Authentication.Tokens
 
         private static string CreateJwtToken(string issuer, string clientId, JsonWebKey securityKey, DateTimeOffset utcNow, DateTime? expiration = null, string? kid = null)
         {
+            // JsonWebTokenHandler does not validate that Expires > NotBefore (unlike the old JwtSecurityTokenHandler which threw IDX12401).
+            // We validate explicitly since ExpirationSeconds is user-configurable.
+            var expires = expiration ?? utcNow.AddSeconds(10).UtcDateTime;
+            if (expires <= utcNow.UtcDateTime)
+                throw new ArgumentException($"Expiration ({expires:O}) must be after the current time ({utcNow.UtcDateTime:O}).", nameof(expiration));
+
             if (string.IsNullOrEmpty(securityKey.Alg))
                 securityKey.Alg = SecurityAlgorithms.RsaSha256;
             securityKey.KeyId = kid ?? securityKey.Kid;
@@ -36,7 +42,7 @@ namespace Fhi.Authentication.Tokens
                 Issuer = clientId,
                 Audience = issuer,
                 NotBefore = utcNow.UtcDateTime,
-                Expires = expiration ?? utcNow.AddSeconds(10).UtcDateTime,
+                Expires = expires,
                 SigningCredentials = new SigningCredentials(securityKey, securityKey.Alg),
                 Claims = new Dictionary<string, object>
                 {
