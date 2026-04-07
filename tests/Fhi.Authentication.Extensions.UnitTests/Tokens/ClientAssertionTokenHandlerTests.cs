@@ -1,7 +1,8 @@
+using System.IdentityModel.Tokens.Jwt;
 using Fhi.Authentication.Tokens;
 using Fhi.Security.Cryptography.Jwks;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace Fhi.Authentication.Extensions.UnitTests.Tokens
 {
@@ -48,6 +49,27 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
                 var kid = token.Header.SingleOrDefault(x => x.Key == "kid");
                 Assert.That(kid.Value, Is.EqualTo(jwk.Kid));
             });
+        }
+
+        [Test]
+        public async Task CreateJwtToken_ShouldProduceValidSignature()
+        {
+            var keys = JWK.Create();
+
+            var assertion = ClientAssertionTokenHandler.CreateJwtToken(
+                "http://issuer", "clientId", keys.PrivateKey);
+
+            var handler = new JsonWebTokenHandler();
+            var validationResult = await handler.ValidateTokenAsync(assertion,
+                new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = false,
+                    IssuerSigningKey = new JsonWebKey(keys.PublicKey),
+                });
+
+            Assert.That(validationResult.IsValid, Is.True);
         }
 
         /// <summary>

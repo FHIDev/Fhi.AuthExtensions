@@ -1,4 +1,5 @@
 ﻿using Duende.AccessTokenManagement;
+using Duende.AccessTokenManagement.DPoP;
 using Fhi.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +32,12 @@ public partial class Program
 
         var app = builder.Build();
         await app.StartAsync();
+
+        var service = app.Services.GetRequiredService<HealthRecordService>();
+        var result = await service.GetHealthRecords();
+        Console.WriteLine(result);
+
+        await app.StopAsync();
     }
 
     /// <summary>
@@ -54,7 +61,8 @@ public partial class Program
                 api.Authentication.Authority,
                 api.Authentication.ClientId,
                 PrivateJwk.ParseFromJson(api.Authentication.PrivateJwk),
-                api.Authentication.Scope);
+                api.Authentication.Scope,
+                DPoPProofKey.ParseOrDefault(api.Authentication.PrivateJwk));
 
         // Optional: Configure custom client assertion expiration (default is 10 seconds)
         builder.ClientAssertionOptions!.Configure(options => options.ExpirationSeconds = 30);
