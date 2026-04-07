@@ -1,4 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
 using Fhi.Authentication.Tokens;
 using Fhi.Security.Cryptography.Jwks;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -18,36 +17,25 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
 
             var assertion = ClientAssertionTokenHandler.CreateJwtToken("http://issuer", "clientId", keys.PrivateKey);
 
-            var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(assertion);
+            var handler = new JsonWebTokenHandler();
+            var token = handler.ReadJsonWebToken(assertion);
 
             Assert.Multiple(() =>
             {
                 Assert.That(token.Issuer, Is.EqualTo("clientId"), "Issuer mismatch");
-                Assert.That(token.Claims.Count, Is.EqualTo(7), "Unexpected claim count");
 
-                var audClaim = token.Claims.SingleOrDefault(x => x.Type == "aud");
-                Assert.That(audClaim, Is.Not.Null, "Missing 'aud' claim");
-                Assert.That(audClaim!.Value, Is.EqualTo("http://issuer"), "Invalid 'aud' claim value");
+                Assert.That(token.GetClaim("aud").Value, Is.EqualTo("http://issuer"), "Invalid 'aud' claim value");
+                Assert.That(token.GetClaim("sub").Value, Is.EqualTo("clientId"), "Invalid 'sub' claim value");
+                Assert.That(token.TryGetClaim("jti", out _), Is.True, "Missing 'jti' claim");
+                Assert.That(token.TryGetClaim("nbf", out _), Is.True, "Missing 'nbf' claim");
+                Assert.That(token.TryGetClaim("iat", out _), Is.True, "Missing 'iat' claim");
+                Assert.That(token.TryGetClaim("exp", out _), Is.True, "Missing 'exp' claim");
 
-                var subClaim = token.Claims.SingleOrDefault(x => x.Type == "sub");
-                Assert.That(subClaim, Is.Not.Null, "Missing 'sub' claim");
-                Assert.That(subClaim!.Value, Is.EqualTo("clientId"), "Invalid 'sub' claim value");
-
-                Assert.That(token.Claims.Any(x => x.Type == "jti"), Is.True, "Missing 'jit' claim");
-                Assert.That(token.Claims.Any(x => x.Type == "nbf"), Is.True, "Missing 'nbf' claim");
-                Assert.That(token.Claims.Any(x => x.Type == "iat"), Is.True, "Missing 'iat' claim");
-                Assert.That(token.Claims.Any(x => x.Type == "exp"), Is.True, "Missing 'exp' claim");
-
-                var typ = token.Header.SingleOrDefault(x => x.Key == "typ");
-                Assert.That(typ.Value, Is.EqualTo("client-authentication+jwt"));
-
-                var alg = token.Header.SingleOrDefault(x => x.Key == "alg");
-                Assert.That(alg.Value, Is.EqualTo(SecurityAlgorithms.RsaSha512));
+                Assert.That(token.Typ, Is.EqualTo("client-authentication+jwt"));
+                Assert.That(token.Alg, Is.EqualTo(SecurityAlgorithms.RsaSha512));
 
                 var jwk = new JsonWebKey(keys.PrivateKey);
-                var kid = token.Header.SingleOrDefault(x => x.Key == "kid");
-                Assert.That(kid.Value, Is.EqualTo(jwk.Kid));
+                Assert.That(token.Kid, Is.EqualTo(jwk.Kid));
             });
         }
 
@@ -86,8 +74,8 @@ namespace Fhi.Authentication.Extensions.UnitTests.Tokens
                 JWK.Create().PrivateKey,
                 customExpiration);
 
-            var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(assertion);
+            var handler = new JsonWebTokenHandler();
+            var token = handler.ReadJsonWebToken(assertion);
 
             Assert.That(token.ValidTo.Second, Is.EqualTo(customExpiration.Second));
         }
