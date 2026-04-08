@@ -260,7 +260,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
                 clientOptions,
                 TimeProvider.System);
             var ex = Assert.ThrowsAsync<ArgumentException>(async () => await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name")));
-            Assert.That(ex.Message, Does.Contain("IDX12401: Expires: "));
+            Assert.That(ex.Message, Does.Contain("Expiration"));
         }
     }
 }

@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "M2M: HelseID",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/samples/Fhi.Samples.M2M.HelseID/M2M.Host.HelseID.csproj"
+        },
+        {
+            "name": "M2M: CertificateSecret",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/samples/Fhi.Samples.M2M.CertificateSecret/M2M.Host.WithPrivateJwkCertificateStore.csproj"
+        },
+        {
+            "name": "WebApi",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/samples/Fhi.Samples.WebApi/Api.WebApi.csproj"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "M2M: HelseID + WebApi",
+            "configurations": ["WebApi", "M2M: HelseID"]
+        }
+    ]
+}
