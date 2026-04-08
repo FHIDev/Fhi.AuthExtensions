@@ -1,11 +1,12 @@
-﻿using Duende.AccessTokenManagement;
+﻿using System.ComponentModel.DataAnnotations;
+using Duende.AccessTokenManagement;
 using Fhi.Authentication.ClientCredentials;
 using Fhi.Security.Cryptography.Jwks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.IdentityModel.JsonWebTokens;
 using NSubstitute;
-using System.ComponentModel.DataAnnotations;
 
 namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
 {
@@ -29,7 +30,11 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
                 ClientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
             });
 
-            var clientAssertionService = new ClientCredentialsAssertionService(Substitute.For<ILogger<ClientCredentialsAssertionService>>(), assertionOptions, clientOptions);
+            var clientAssertionService = new ClientCredentialsAssertionService(
+                Substitute.For<ILogger<ClientCredentialsAssertionService>>(),
+                assertionOptions,
+                clientOptions,
+                TimeProvider.System);
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
 
             var jwt = new JsonWebToken(result!.Value);
@@ -48,7 +53,8 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             var clientAssertionService = new ClientCredentialsAssertionService(
                 logger,
                 assertionOptions,
-                Substitute.For<IOptionsMonitor<ClientCredentialsClient>>());
+                Substitute.For<IOptionsMonitor<ClientCredentialsClient>>(),
+                TimeProvider.System);
 
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("non-existing-client"));
 
@@ -79,7 +85,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
                 PrivateJwk = "jwk"
             });
 
-            var clientAssertionService = new ClientCredentialsAssertionService(logger, assertionOptions, clientOptions);
+            var clientAssertionService = new ClientCredentialsAssertionService(logger, assertionOptions, clientOptions, TimeProvider.System);
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
 
             logger.Received().Log(
@@ -109,7 +115,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
                 PrivateJwk = jwk!
             });
 
-            var clientAssertionService = new ClientCredentialsAssertionService(logger, assertionOptions, clientOptions);
+            var clientAssertionService = new ClientCredentialsAssertionService(logger, assertionOptions, clientOptions, TimeProvider.System);
             var ex = Assert.ThrowsAsync<ArgumentNullException>(async () => await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name")));
             Assert.That(ex.Message, Does.Contain("IDX10000: The parameter 'json' cannot be a 'null'"));
         }
@@ -118,6 +124,7 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
         public async Task GIVEN_getClientAssertion_WHEN_expirationSet_THEN_useCorrectExpiration()
         {
             var expirationSeconds = 30;
+            var fakeTime = new FakeTimeProvider(new DateTimeOffset(2025, 6, 15, 12, 0, 0, TimeSpan.Zero));
 
             var clientCredentialsOptionsMonitor = Substitute.For<IOptionsMonitor<ClientCredentialsClient>>();
             clientCredentialsOptionsMonitor.Get("name").Returns(new ClientCredentialsClient());
@@ -135,20 +142,22 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             var clientAssertionService = new ClientCredentialsAssertionService(
                 Substitute.For<ILogger<ClientCredentialsAssertionService>>(),
                 clientAssertionOptionsMonitor,
-                clientCredentialsOptionsMonitor);
+                clientCredentialsOptionsMonitor,
+                fakeTime);
 
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
 
             var jwt = new JsonWebToken(result!.Value);
-            var expectedExpiration = DateTime.UtcNow.AddSeconds(expirationSeconds);
+            var expectedExpiration = fakeTime.GetUtcNow().AddSeconds(expirationSeconds).UtcDateTime;
 
-            // Allow 1 second tolerance for test execution time
-            Assert.That(jwt.ValidTo, Is.EqualTo(expectedExpiration).Within(1).Seconds);
+            Assert.That(jwt.ValidTo, Is.EqualTo(expectedExpiration));
         }
 
         [Test]
         public async Task GIVEN_getClientAssertion_WHEN_expirationIsNotSet_THEN_useDefaultExpiration()
         {
+            var fakeTime = new FakeTimeProvider(new DateTimeOffset(2025, 6, 15, 12, 0, 0, TimeSpan.Zero));
+
             var clientOptions = Substitute.For<IOptionsMonitor<ClientCredentialsClient>>();
             clientOptions.Get("name").Returns(new ClientCredentialsClient());
 
@@ -164,15 +173,15 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             var clientAssertionService = new ClientCredentialsAssertionService(
                 Substitute.For<ILogger<ClientCredentialsAssertionService>>(),
                 assertionOptions,
-                clientOptions);
+                clientOptions,
+                fakeTime);
 
             var result = await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name"));
 
             var jwt = new JsonWebToken(result!.Value);
-            var expectedExpiration = DateTime.UtcNow.AddSeconds(options.ExpirationSeconds);
+            var expectedExpiration = fakeTime.GetUtcNow().AddSeconds(options.ExpirationSeconds).UtcDateTime;
 
-            // Allow 1 second tolerance for test execution time
-            Assert.That(jwt.ValidTo, Is.EqualTo(expectedExpiration).Within(1).Seconds);
+            Assert.That(jwt.ValidTo, Is.EqualTo(expectedExpiration));
         }
 
         [TestCase(-10)]
@@ -248,9 +257,10 @@ namespace Fhi.Authentication.Extensions.UnitTests.ClientCredentials
             var clientAssertionService = new ClientCredentialsAssertionService(
                 logger,
                 assertionOptions,
-                clientOptions);
+                clientOptions,
+                TimeProvider.System);
             var ex = Assert.ThrowsAsync<ArgumentException>(async () => await clientAssertionService.GetClientAssertionAsync(ClientCredentialsClientName.Parse("name")));
-            Assert.That(ex.Message, Does.Contain("IDX12401: Expires: "));
+            Assert.That(ex.Message, Does.Contain("Expiration"));
         }
     }
 }
