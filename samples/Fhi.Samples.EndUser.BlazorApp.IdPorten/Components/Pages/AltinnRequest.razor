@@ -1,0 +1,94 @@
+@page "/altinn-request"
+@rendermode InteractiveServer
+@using BlazorApp.IdPorten.Services
+@inject ApiRequestService ApiRequestService
+
+<PageTitle>Altinn Authorization</PageTitle>
+
+<h1>Altinn Authorization</h1>
+
+<p>
+    This page calls the ID-Porten-protected API endpoint <code>GET /v1/api-request</code> using the
+    ID-Porten access token. The API exchanges the token with Altinn, checks the user's authorization
+    against the configured resource, and returns the decision together with user claims and request headers.
+</p>
+
+<button class="btn btn-primary" @onclick="LoadData" disabled="@isLoading">
+    @(isLoading ? "Loading..." : "Call API")
+</button>
+
+@if (result is not null)
+{
+    <h2>Request</h2>
+
+    @if (result.Raw.RequestMessage is { } req)
+    {
+        <p><strong>URI:</strong> <code>@req.RequestUri</code></p>
+        <p><strong>Authorization:</strong> <code style="word-break: break-all;">@(req.Headers.Authorization?.ToString() ?? "")</code></p>
+    }
+
+    <h2>Response</h2>
+
+    @if (result.IsError)
+    {
+        <div class="alert alert-danger">
+            <p><strong>Status:</strong> <code>@((int)result.Raw.StatusCode) @result.Raw.StatusCode</code></p>
+            @if (result.Raw.Headers.WwwAuthenticate.Count > 0)
+            {
+                <p><strong>WWW-Authenticate:</strong> <code>@string.Join(", ", result.Raw.Headers.WwwAuthenticate)</code></p>
+            }
+        </div>
+    }
+    else if (result.Data is { } responseData)
+    {
+        <h3>Authentication Scheme</h3>
+        <p><code>@responseData.AuthenticationScheme</code></p>
+
+        <h3>Altinn Authorization Decision</h3>
+        <div class="alert @(responseData.AltinnAuthorization.Decision == "Permit" ? "alert-success" : responseData.AltinnAuthorization.Decision == "Deny" ? "alert-danger" : "alert-warning")">
+            <strong>Decision:</strong> <code>@responseData.AltinnAuthorization.Decision</code>
+            @if (!string.IsNullOrEmpty(responseData.AltinnAuthorization.Message))
+            {
+                <br /><small>@responseData.AltinnAuthorization.Message</small>
+            }
+        </div>
+
+        <h3>User Claims</h3>
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in responseData.UserClaims)
+                {
+                    <tr>
+                        <td><code>@claim.Type</code></td>
+                        <td>@claim.Value</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    private bool isLoading = false;
+    private ServiceResult<ApiRequestInfo>? result;
+
+    private async Task LoadData()
+    {
+        try
+        {
+            isLoading = true;
+            result = await ApiRequestService.GetApiRequestInfo();
+            isLoading = false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+}
