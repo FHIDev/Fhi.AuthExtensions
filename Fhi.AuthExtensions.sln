@@ -65,6 +65,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fhi.Authentication.JwtDPoP.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "M2M.Host.WithPrivateJwkCertificateStore", "samples\Fhi.Samples.M2M.CertificateSecret\M2M.Host.WithPrivateJwkCertificateStore.csproj", "{8138ED56-312F-0671-DF36-CDCB6A558655}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.WebApi.DPoPProtected", "samples\Fhi.Samples.WebApi.DPoPProtected\Api.WebApi.DPoPProtected.csproj", "{7A945424-9479-4594-8583-25FE5AC57331}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndUser.BlazorApp.HelseId", "samples\Fhi.Samples.EndUser.BlazorApp.HelseId\EndUser.BlazorApp.HelseId.csproj", "{CF5F864F-AA9A-59BB-3B2E-5A462DDCE299}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndUser.BlazorApp.IdPorten", "samples\Fhi.Samples.EndUser.BlazorApp.IdPorten\EndUser.BlazorApp.IdPorten.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.WebApi.IdPorten", "samples\Fhi.Samples.WebApi.IdPorten\Api.WebApi.IdPorten.csproj", "{B2C3D4E5-F6A7-8901-BCDE-F12345678901}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +149,22 @@ Global
 		{8138ED56-312F-0671-DF36-CDCB6A558655}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8138ED56-312F-0671-DF36-CDCB6A558655}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8138ED56-312F-0671-DF36-CDCB6A558655}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A945424-9479-4594-8583-25FE5AC57331}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A945424-9479-4594-8583-25FE5AC57331}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A945424-9479-4594-8583-25FE5AC57331}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A945424-9479-4594-8583-25FE5AC57331}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF5F864F-AA9A-59BB-3B2E-5A462DDCE299}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF5F864F-AA9A-59BB-3B2E-5A462DDCE299}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF5F864F-AA9A-59BB-3B2E-5A462DDCE299}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF5F864F-AA9A-59BB-3B2E-5A462DDCE299}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2C3D4E5-F6A7-8901-BCDE-F12345678901}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2C3D4E5-F6A7-8901-BCDE-F12345678901}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2C3D4E5-F6A7-8901-BCDE-F12345678901}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2C3D4E5-F6A7-8901-BCDE-F12345678901}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -166,6 +190,10 @@ Global
 		{45C5DEB3-70EE-1284-DA27-01E0D03D7513} = {02410E46-D7E9-4870-8BEE-2667E121C388}
 		{6C3C4A81-3574-427F-8D64-D78E6D21FB7C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{8138ED56-312F-0671-DF36-CDCB6A558655} = {EA8AA50F-AE10-290C-ABE9-07EF3D2129A5}
+		{7A945424-9479-4594-8583-25FE5AC57331} = {EABD670A-AAEF-5194-AABE-BF5B7070E21E}
+		{CF5F864F-AA9A-59BB-3B2E-5A462DDCE299} = {EA8AA50F-AE10-290C-ABE9-07EF3D2129A5}
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890} = {EA8AA50F-AE10-290C-ABE9-07EF3D2129A5}
+		{B2C3D4E5-F6A7-8901-BCDE-F12345678901} = {EABD670A-AAEF-5194-AABE-BF5B7070E21E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {113A468C-B364-454A-BDF5-BE678F61C31A}

@@ -1,0 +1,93 @@
+@page "/"
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Http
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IHttpContextAccessor HttpContextAccessor
+
+<PageTitle>Home</PageTitle>
+
+<h1>Blazor ID-Porten app</h1>
+
+The application uses Interactive serverside rendering. This will use SignalR for communication with the server.
+
+<h2>User Claims</h2>
+
+<pre>User authenticated: @IsloggedIn</pre>
+
+@if (claims.Any())
+{
+    <ul>
+        @foreach (var claim in claims)
+        {
+            <li><b>@claim.Type:</b> @claim.Value</li>
+        }
+    </ul>
+}
+
+<h3>Access Token</h3>
+
+@if (token is not null)
+{
+    <pre>@token</pre>
+}
+
+<h3>Id Token</h3>
+
+@if (idToken is not null)
+{
+    <pre>@idToken</pre>
+}
+
+<h3>Refresh Token</h3>
+
+@if (refreshToken is not null)
+{
+    <pre>@refreshToken</pre>
+}
+
+@code {
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+    private string? token;
+    private string? idToken;
+    private string? refreshToken;
+    private bool? IsloggedIn;
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthState { get; set; }
+
+    /// <summary>
+    /// It uses HttpContextAccessor to get the access token and id token. The HttpContext is only available in on initialize and pre-rendering.
+    /// Should not be used in the OnAfterRenderAsync, OnAfterRender method or events like @onclick.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        claims = authState.User.Claims;
+
+        var user = authState.User;
+        IsloggedIn = user.Identity?.IsAuthenticated;
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            token = await GetAccessTokenAsync();
+            idToken = await GetIdTokenAsync();
+            refreshToken = await GetRefreshTokenAsync();
+        }
+    }
+
+    private async Task<string?> GetAccessTokenAsync()
+    {
+        return await HttpContextAccessor.HttpContext!.GetTokenAsync("access_token");
+    }
+
+    private async Task<string?> GetIdTokenAsync()
+    {
+        return await HttpContextAccessor.HttpContext!.GetTokenAsync("id_token");
+    }
+
+    private async Task<string?> GetRefreshTokenAsync()
+    {
+        return await HttpContextAccessor.HttpContext!.GetTokenAsync("refresh_token");
+    }
+}
