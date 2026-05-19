@@ -1,10 +1,35 @@
-<ng-container>
+<h1 class="page-title">User tokens</h1>
+<p class="page-lede">
+  Inspect the decoded JWT header and payload for each token issued in this
+  session. The raw token string is collapsed by default — expand it when you
+  need to copy the full JWT into a debugger.
+</p>
 
+@let list = tokens();
 
-  <b>Access Token:</b> {{tokenInformation?.accessToken}}
-  <br/>
-  <b>Decoded Access Token:</b> {{tokenInformation?.accessTokenJwt}}
-  <br/>
-  <b>Id Token:</b> {{tokenInformation?.idToken}}
-  <b>Decoded Id Token:</b> {{tokenInformation?.idTokenJwt}}
-</ng-container>
+@if (list) {
+  <div class="token-list">
+    @for (token of list; track token.label) {
+      <article class="token-card">
+        <h2 class="token-card__title">{{ token.label }}</h2>
+
+        <section class="token-card__section">
+          <h3 class="token-card__section-title">Header</h3>
+          <pre class="code-block"><code>{{ token.header }}</code></pre>
+        </section>
+
+        <section class="token-card__section">
+          <h3 class="token-card__section-title">Payload</h3>
+          <pre class="code-block"><code>{{ token.payload }}</code></pre>
+        </section>
+
+        <details class="token-card__raw">
+          <summary>Show raw JWT</summary>
+          <pre class="code-block code-block--wrap"><code>{{ token.raw }}</code></pre>
+        </details>
+      </article>
+    }
+  </div>
+} @else {
+  <p class="token-list__placeholder"><em>Loading user tokens…</em></p>
+}

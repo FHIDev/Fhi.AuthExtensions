@@ -3,10 +3,10 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <SpaRoot>..\Angular.Client</SpaRoot>
-    <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
-    <SpaProxyServerUrl>https://localhost:4200</SpaProxyServerUrl>
-    <AssemblyName>AngularBFF.Net8</AssemblyName>
+    <SpaRoot>..\Fhi.Samples.Angular.EndUser.Client</SpaRoot>
+    <SpaProxyLaunchCommand>pnpm start</SpaProxyLaunchCommand>
+    <SpaProxyServerUrl>https://localhost:4201</SpaProxyServerUrl>
+    <AssemblyName>AngularBFF.Net9</AssemblyName>
     <UserSecretsId>4d7997c1-404b-4d77-92a7-bf7736f01966</UserSecretsId>
   </PropertyGroup>
 

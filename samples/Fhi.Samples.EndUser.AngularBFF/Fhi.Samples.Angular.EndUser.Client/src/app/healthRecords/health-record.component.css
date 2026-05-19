@@ -1,0 +1,27 @@
+.error-banner {
+  display: flex;
+  gap: var(--fhi-spacing-150);
+  margin-top: var(--fhi-spacing-300);
+  padding: var(--fhi-spacing-200);
+  background-color: var(--fhi-color-danger-background-default);
+  border: var(--fhi-dimension-border-width) solid var(--fhi-color-danger-border-default);
+  border-radius: var(--fhi-border-radius-100);
+  color: var(--fhi-color-danger-text-default);
+}
+
+.error-banner__icon {
+  flex-shrink: 0;
+  margin-top: var(--fhi-spacing-050);
+}
+
+.error-banner__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fhi-spacing-050);
+  min-width: 0;
+}
+
+.error-banner__detail {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

@@ -1,32 +1,52 @@
-<ng-container>
-  <h1 id="tableLabel">Health records</h1>
+<h1 id="tableLabel">Health records</h1>
 
-  <p>This component demonstrates fetching data from the server.</p>
+<p>This component demonstrates fetching data from the server.</p>
 
-  <button (click)="getRecords()">GetcRecord Data</button>
+<fhi-button type="button" (click)="getRecords()">Get record data</fhi-button>
 
-  @if (records) {
-    <table>
-      <thead>
+@let rows = records();
+@let errorMessage = error();
+
+@if (errorMessage) {
+  <div role="alert" class="error-banner">
+    <fhi-icon-triangle-alert
+      class="error-banner__icon"
+      color="var(--fhi-color-danger-text-default)"
+    ></fhi-icon-triangle-alert>
+    <div class="error-banner__content">
+      <fhi-headline
+        level="3"
+        size="small"
+        color="var(--fhi-color-danger-text-default)"
+      >Could not load health records</fhi-headline>
+      <fhi-body
+        size="small"
+        class="error-banner__detail"
+        color="var(--fhi-color-danger-text-default)"
+      >{{ errorMessage }}</fhi-body>
+    </div>
+  </div>
+} @else if (rows && rows.length > 0) {
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>CreatedAt</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (record of rows; track record.name) {
         <tr>
-          <th>Name</th>
-          <th>Description</th>
-          <th>CreatedAt</th>
+          <td>{{ record.name }}</td>
+          <td>{{ record.description }}</td>
+          <td>{{ record.createdAt }}</td>
         </tr>
-      </thead>
-      <tbody>
-        @for (record of records; track record) {
-          <tr>
-            <td>{{ record.name }}</td>
-            <td>{{ record.description }}</td>
-            <td>{{ record.createdAt }}</td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  } @else {
-    <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationangular">https://aka.ms/jspsintegrationangular</a> for more details.</em></p>
-  }
-
-</ng-container>
-
+      }
+    </tbody>
+  </table>
+} @else if (rows) {
+  <p><em>No records returned.</em></p>
+} @else {
+  <p><em>Click the button to load records.</em></p>
+}

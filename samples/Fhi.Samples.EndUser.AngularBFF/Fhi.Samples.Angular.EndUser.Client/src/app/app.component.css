@@ -1,1 +1,21 @@
-﻿
+:host {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100svh;
+}
+
+.app-main {
+  padding-block: var(--fhi-spacing-500);
+}
+
+.app-container {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: var(--fhi-spacing-300);
+}
+
+/* Remove focus outline from the main landmark itself —
+   it only needs tabindex="-1" so the skip-link can move focus here. */
+.app-main:focus {
+  outline: none;
+}

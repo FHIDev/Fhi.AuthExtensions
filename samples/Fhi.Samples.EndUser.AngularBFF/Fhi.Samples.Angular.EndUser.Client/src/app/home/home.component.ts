@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
-
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
-    selector: 'home-component',
-    template: '<h1>Welcome</h1>',
-    imports: []
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink],
 })
-
-export class HomeComponent{};
+export class HomeComponent {}

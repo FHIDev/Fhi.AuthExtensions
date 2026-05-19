@@ -27,7 +27,6 @@
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
-              "zone.js",
               "@angular/localize/init"
             ],
             "tsConfig": "tsconfig.app.json",
@@ -38,8 +37,8 @@
               }
             ],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "src/styles.scss"
+              "@folkehelseinstituttet/designsystem/theme/default.css",
+              "src/styles.css"
             ],
             "scripts": []
           },
@@ -48,8 +47,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "3MB",
+                  "maximumError": "6MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -79,6 +78,7 @@
           },
           "defaultConfiguration": "development",
           "options": {
+            "port": 4201,
             "proxyConfig": "src/proxy.conf.js"
           }
         },
@@ -101,7 +101,7 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.css"
             ],
             "scripts": [],
             "karmaConfig": "karma.conf.js"
