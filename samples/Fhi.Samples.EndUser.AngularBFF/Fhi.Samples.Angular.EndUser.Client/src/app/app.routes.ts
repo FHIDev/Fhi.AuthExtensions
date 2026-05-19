@@ -1,19 +1,27 @@
 import { Routes } from '@angular/router';
-import { UserSessionComponent } from './user-token/user-token.component';
-import { HealthRecordComponent } from './healthRecords/health-record.component';
-import { HomeComponent } from './home/home.component';
 
 export const routes: Routes = [
-  { 
-    path: '', 
-    component: HomeComponent 
+  {
+    path: '',
+    pathMatch: 'full',
+    title: 'Home — FHI Sample BFF',
+    loadComponent: () =>
+      import('./home/home.component').then((m) => m.HomeComponent),
   },
-  { 
-    path: 'tokens', 
-    component: UserSessionComponent 
+  {
+    path: 'tokens',
+    title: 'User tokens — FHI Sample BFF',
+    loadComponent: () =>
+      import('./user-token/user-token.component').then(
+        (m) => m.UserSessionComponent,
+      ),
   },
-  { 
-    path: 'health-records', 
-    component: HealthRecordComponent 
-  }
+  {
+    path: 'health-records',
+    title: 'Health records — FHI Sample BFF',
+    loadComponent: () =>
+      import('./healthRecords/health-record.component').then(
+        (m) => m.HealthRecordComponent,
+      ),
+  },
 ];

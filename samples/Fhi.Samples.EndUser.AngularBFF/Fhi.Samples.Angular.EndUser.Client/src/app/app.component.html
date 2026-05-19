@@ -1,9 +1,11 @@
-<nav>
-  <a routerLink="/" routerLinkActive="active-link">Home</a> |
-  <a routerLink="/health-records" routerLinkActive="active-link">Health records</a> |
-  <a routerLink="/tokens" routerLinkActive="active-link">User</a> |
-  <a href="/login">Log in</a> |
-  <a href="/logout">Log out</a>
-</nav>
-<router-outlet />
+<a class="skip-link" href="#main">Skip to main content</a>
 
+<app-header />
+
+<main id="main" class="app-main" tabindex="-1">
+  <div class="app-container">
+    <router-outlet />
+  </div>
+</main>
+
+<app-footer />

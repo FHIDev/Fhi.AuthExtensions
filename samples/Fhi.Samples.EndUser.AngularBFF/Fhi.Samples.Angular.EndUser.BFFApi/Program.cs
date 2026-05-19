@@ -108,6 +108,9 @@ builder.Services.AddUserAccessTokenHttpClient(
     configureClient: (provider, client) =>
     {
         client.BaseAddress = new Uri("https://localhost:7150");
+        // Short timeout so a missing downstream WebApi surfaces quickly in dev
+        // instead of hanging for the 100s HttpClient default.
+        client.Timeout = TimeSpan.FromSeconds(10);
     });
 builder.Services.AddTransient<IHealthRecordService, HealthRecordService>();
 

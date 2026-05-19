@@ -1,0 +1,38 @@
+<header class="header" role="banner">
+  <div class="header__inner">
+    <a routerLink="/" class="header__brand" aria-label="FHI — Sample BFF Home">
+      <img
+        class="header__logo"
+        src="/logos/fhi-logo-black.svg"
+        alt=""
+        width="80"
+        height="32"
+      />
+      <span class="header__brand-name">Sample BFF</span>
+    </a>
+
+    <nav class="header__nav" aria-label="Primary">
+      <a
+        routerLink="/"
+        routerLinkActive="is-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        >Home</a
+      >
+      <a routerLink="/health-records" routerLinkActive="is-active"
+        >Health records</a
+      >
+      <a routerLink="/tokens" routerLinkActive="is-active">User</a>
+    </nav>
+
+    <div class="header__actions">
+      <!--
+        TODO (learning-mode task — see chat):
+        Replace the static links with session-aware actions.
+        Show "Log in" when unauthenticated, "Log out" + user name when authenticated.
+        ~5-10 lines, use inject(AuthenticationService) + a signal.
+      -->
+      <a class="header__link" href="/login">Log in</a>
+      <a class="header__link" href="/logout">Log out</a>
+    </div>
+  </div>
+</header>

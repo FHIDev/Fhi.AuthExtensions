@@ -1,8 +1,16 @@
 <Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.784122">
   <PropertyGroup>
-    <StartupCommand>npm start</StartupCommand>
-    <JavaScriptTestFramework>Jasmine</JavaScriptTestFramework>
+    <StartupCommand>pnpm start</StartupCommand>
+    <!-- The JS SDK defaults BuildCommand to `npm run build` (Sdk.targets line 282). We override to pnpm so `dotnet publish` invokes the right package manager. -->
+    <BuildCommand>pnpm run build</BuildCommand>
+    <!-- JavaScriptTestFramework disabled since we have no tests yet, and enabling it makes the testrunner in Visual Studio very slow -->
+    <!--<JavaScriptTestFramework>Jasmine</JavaScriptTestFramework>-->
+    <!-- Allows the build (or compile) script located on package.json to run on Build -->
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <!-- The JS SDK has no InstallCommand property — `npm install` is hardcoded in its RunNpmInstall target (Sdk.targets:251). Disabled here; pnpm install is a developer/CI prerequisite. -->
+    <ShouldRunNpmInstall>false</ShouldRunNpmInstall>
     <!-- Folder where production build objects will be placed -->
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist\Angular.Client\browser\</BuildOutputFolder>
+    <!-- Must be set to clear out TargetFramework in directory.build.props which triggers a .NET Framework warning -->
   </PropertyGroup>
 </Project>
