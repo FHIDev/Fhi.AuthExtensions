@@ -76,11 +76,13 @@ builder.Services.AddAuthentication(options =>
 
     /*********************************************************************************************
      * The code below is claims and scope handling that will vary from application to application.
+     * Scopes come from Authentication:Scopes in appsettings (space-separated, OAuth wire format).
      *********************************************************************************************/
     options.Scope.Clear();
-    options.Scope.Add("openid");
-    options.Scope.Add("offline_access");
-    options.Scope.Add("fhi:authextensions.samples/access");
+    foreach (var scope in authenticationSettings.Scopes.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+    {
+        options.Scope.Add(scope);
+    }
 });
 builder.Services.AddOpenIdConnectCookieOptions();
 builder.Services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>, DefaultOpenIdConnectOptions>();
@@ -166,9 +168,14 @@ app.MapGet("/session", [AllowAnonymous] (HttpContext context) =>
 {
     if (context.User?.Identity?.IsAuthenticated == true)
     {
-        return Results.Ok(new { isAuthenticated = true });
+        // Read the "name" claim directly. We don't use User.Identity.Name because the Fhi
+        // OIDC defaults point NameClaimType at "sub" (a stable, non-PII correlation id) —
+        // good for audit logs, not for display. See DefaultOpenIdConnectOptions in the
+        // Fhi.Authentication.Extensions library.
+        var displayName = context.User.FindFirst("name")?.Value;
+        return Results.Ok(new { isAuthenticated = true, name = displayName });
     }
-    return Results.Ok(new { isAuthenticated = false });
+    return Results.Ok(new { isAuthenticated = false, name = (string?)null });
 });
 
 /************************************************************************************************

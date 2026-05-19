@@ -85,6 +85,13 @@
     var(--fhi-motion-ease-default);
 }
 
+.header__user {
+  color: var(--fhi-color-neutral-text-subtle);
+  font-size: var(--fhi-typography-label-medium-font-size);
+  font-weight: var(--fhi-font-weight-medium);
+  padding-inline-end: var(--fhi-spacing-100);
+}
+
 .header__link:hover {
   background-color: var(--fhi-color-neutral-surface-hover);
 }

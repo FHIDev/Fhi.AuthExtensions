@@ -25,14 +25,16 @@
     </nav>
 
     <div class="header__actions">
-      <!--
-        TODO (learning-mode task — see chat):
-        Replace the static links with session-aware actions.
-        Show "Log in" when unauthenticated, "Log out" + user name when authenticated.
-        ~5-10 lines, use inject(AuthenticationService) + a signal.
-      -->
-      <a class="header__link" href="/login">Log in</a>
-      <a class="header__link" href="/logout">Log out</a>
+      @if (session(); as s) {
+        @if (s.isAuthenticated) {
+          @if (s.name) {
+            <span class="header__user" aria-label="Signed in user">{{ s.name }}</span>
+          }
+          <a class="header__link" href="/logout">Log out</a>
+        } @else {
+          <a class="header__link" href="/login">Log in</a>
+        }
+      }
     </div>
   </div>
 </header>
