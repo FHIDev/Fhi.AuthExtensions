@@ -7,14 +7,14 @@ using Microsoft.Extensions.Options;
 
 namespace Fhi.Samples.Angular.BFFApi
 {
-    public class ClientAssertionService(IOptions<UserTokenManagementOptions> Options) : IClientAssertionService
+    internal class ClientAssertionService(IOptions<UserTokenManagementOptions> Options, IOptions<AuthenticationSettings> AuthOptions) : IClientAssertionService
     {
 
         public Task<ClientAssertion?> GetClientAssertionAsync(ClientCredentialsClientName? clientName = null, TokenRequestParameters? parameters = null, CancellationToken ct = default)
         {
             var clientAssertion = ClientAssertionTokenHandler.CreateJwtToken(
-               "https://localhost:5001",
-               "interactive",
+               AuthOptions.Value.Authority,
+               AuthOptions.Value.ClientId,
                Options.Value.DPoPJsonWebKey!);
 
             return Task.FromResult<ClientAssertion?>(new ClientAssertion { Type = OidcConstants.ClientAssertionTypes.JwtBearer, Value = clientAssertion });
