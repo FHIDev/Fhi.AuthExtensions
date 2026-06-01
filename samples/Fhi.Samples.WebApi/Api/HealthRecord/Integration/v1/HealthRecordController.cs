@@ -13,14 +13,6 @@ namespace WebApi.Api.HealthRecord.Integration.v1
     {
         private readonly IHealthRecordService _healthRecordService = healthRecordService;
 
-        [HttpGet("helseid-bearer")]
-        [Scope("fhi:authextensions.samples/access")]
-        [Authorize(AuthenticationSchemes = AuthenticationSchemes.HelseIdBearer, Policy = Policies.IntegrationPolicy)]
-        public IEnumerable<HealthRecordDto> GetWithHelseIdBearerToken()
-        {
-            return _healthRecordService.GetHealthRecords().Select(r => new HealthRecordDto(r.Name, r.Description, r.CreatedAt));
-        }
-
         [HttpGet("helseid-dpop")]
         [Scope("fhi:authextensions.samples/access")]
         [Authorize(AuthenticationSchemes = AuthenticationSchemes.HelseIdDPoP, Policy = Policies.IntegrationPolicy)]

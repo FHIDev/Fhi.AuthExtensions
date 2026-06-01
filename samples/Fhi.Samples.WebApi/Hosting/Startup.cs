@@ -20,20 +20,7 @@ namespace Api.WebApi.Hosting
             ********************************************************************************************************/
             var authenticationBuilder = builder.Services.AddAuthentication();
 
-            var helseIdSection = builder.Configuration.GetSection($"AuthenticationSchemes:{AuthenticationSchemes.HelseIdBearer}");
-            var helseIdOptions = helseIdSection.Get<AuthenticationSettings>() ?? new AuthenticationSettings();
-            authenticationBuilder
-                .AddJwtBearer(AuthenticationSchemes.HelseIdBearer, options =>
-                {
-                    options.Audience = helseIdOptions.Audience;
-                    options.Authority = helseIdOptions.Authority;
-                    options.Events = new JwtBearerEvents()
-                    {
-                        OnChallenge = OnChallenge(AuthenticationSchemes.HelseIdBearer)
-                    };
-
-                });
-
+            //TODO: DPoP bibliotek støtter ikke claim mapper og bruker nameidentifier i stede for sub.
             var helseIdDpopSection = builder.Configuration.GetSection($"AuthenticationSchemes:{AuthenticationSchemes.HelseIdDPoP}");
             var helseIdDpopOptions = helseIdDpopSection.Get<AuthenticationSettings>() ?? new AuthenticationSettings();
             authenticationBuilder
@@ -85,8 +72,7 @@ namespace Api.WebApi.Hosting
                             .Build())
                 .AddPolicy(Policies.EndUserPolicy, policy =>
                 {
-                    policy.RequireClaim(JwtClaimTypes.Subject);
-                    //Ensure the end-user "sub" claim is present
+                    //Ensure the end-user "sub" claim is present.
                     policy.RequireClaim(JwtClaimTypes.Subject);
                     policy.RequireAuthenticatedUser();
                 })

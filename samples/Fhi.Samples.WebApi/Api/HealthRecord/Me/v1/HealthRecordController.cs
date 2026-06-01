@@ -14,15 +14,11 @@ namespace WebApi.Api.HealthRecord.Me.v1
     {
         private readonly IHealthRecordService _healthRecordService = healthRecordService;
 
-
         [HttpGet]
-        [Authorize(AuthenticationSchemes = AuthenticationSchemes.HelseIdDPoP, Policy = Policies.EndUserPolicy)]
-        public ActionResult<UserDto> GetMe()
+        [Authorize(AuthenticationSchemes = $"{AuthenticationSchemes.HelseIdDPoP},{AuthenticationSchemes.Duende}", Policy = Policies.EndUserPolicy)]
+        public IEnumerable<HealthRecordPersonDto> GetWithHelseIdBearer()
         {
-            return Ok(new UserDto(
-                User.Identity?.Name,
-                User.Claims.Select(c => new ClaimDto(c.Type, c.Value)).ToList(),
-                User.Identity?.AuthenticationType ?? string.Empty));
+            return _healthRecordService.GetHealthRecords().Select(r => new HealthRecordPersonDto(r.Pid, r.Name, r.Description, r.CreatedAt));
         }
     }
 }
