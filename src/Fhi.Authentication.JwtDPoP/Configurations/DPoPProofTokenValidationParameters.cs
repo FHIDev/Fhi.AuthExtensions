@@ -41,7 +41,10 @@ namespace Fhi.Authentication.JwtDPoP
                         SecurityAlgorithms.RsaSsaPssSha256,
                         SecurityAlgorithms.EcdsaSha256,
                         SecurityAlgorithms.EcdsaSha384,
-                        SecurityAlgorithms.EcdsaSha512
+                        SecurityAlgorithms.EcdsaSha512,
+                        SecurityAlgorithms.RsaSsaPssSha256,
+                        SecurityAlgorithms.RsaSsaPssSha384,
+                        SecurityAlgorithms.RsaSsaPssSha512
                     };
 
         /// <summary>
