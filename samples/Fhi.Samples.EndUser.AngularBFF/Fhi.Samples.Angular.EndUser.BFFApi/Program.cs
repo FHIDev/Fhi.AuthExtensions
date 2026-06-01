@@ -1,8 +1,10 @@
 using AngularBFF.Net8.Api.HealthRecords;
+using Duende.AccessTokenManagement;
 using Duende.AccessTokenManagement.DPoP;
 using Duende.AccessTokenManagement.OpenIdConnect;
 using Fhi.Authentication;
 using Fhi.Authentication.OpenIdConnect;
+using Fhi.Samples.Angular.BFFApi;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -84,6 +86,7 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add(scope);
     }
 });
+builder.Services.AddTransient<IClientAssertionService, ClientAssertionService>();
 builder.Services.AddOpenIdConnectCookieOptions();
 builder.Services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>, DefaultOpenIdConnectOptions>();
 

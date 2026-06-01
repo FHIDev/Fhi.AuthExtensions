@@ -1,6 +1,7 @@
 ﻿using Duende.AccessTokenManagement;
 using Duende.AccessTokenManagement.OpenIdConnect;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Fhi.Authentication.OpenIdConnect
 {
@@ -23,12 +24,19 @@ namespace Fhi.Authentication.OpenIdConnect
         Task<TokenResponse> RefreshAccessTokenAsync(string refreshToken);
     }
 
-    internal class DefaultTokenService(IOpenIdConnectUserTokenEndpoint UserTokenEndpointService, ILogger<DefaultTokenService> Logger) : ITokenService
+    internal class DefaultTokenService(
+        IOpenIdConnectUserTokenEndpoint UserTokenEndpointService,
+        IOptions<UserTokenManagementOptions> Options,
+        ILogger<DefaultTokenService> Logger) : ITokenService
     {
         public async Task<TokenResponse> RefreshAccessTokenAsync(string refreshToken)
         {
-            var userToken = await UserTokenEndpointService.RefreshAccessTokenAsync(new UserRefreshToken(RefreshToken.Parse(refreshToken), null), new UserTokenRequestParameters());
-            
+            var dPoPKey = Options.Value.DPoPJsonWebKey;
+
+            var userToken = await UserTokenEndpointService.RefreshAccessTokenAsync(
+                new UserRefreshToken(RefreshToken.Parse(refreshToken), dPoPKey),
+                new UserTokenRequestParameters());
+
             if (userToken.FailedResult is not null)
             {
                 Logger.LogError(message: userToken.FailedResult.Error);

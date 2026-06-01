@@ -23,9 +23,12 @@ namespace AngularBFF.Net8.Api.HealthRecords.V1
       catch (UnauthorizedAccessException ex)
       {
         logger.LogWarning(ex, "Downstream WebApi at {Url} returned 401 (token rejected or refresh failed)", DownstreamUrl);
+        var detail = string.IsNullOrWhiteSpace(ex.Message)
+            ? $"The downstream WebApi at {DownstreamUrl} returned 401."
+            : $"The downstream WebApi at {DownstreamUrl} returned 401. WWW-Authenticate: {ex.Message}";
         return Problem(
             title: "Downstream WebApi rejected the access token",
-            detail: $"The downstream WebApi at {DownstreamUrl} returned 401.",
+            detail: detail,
             statusCode: StatusCodes.Status502BadGateway);
       }
       catch (TaskCanceledException ex) when (!HttpContext.RequestAborted.IsCancellationRequested)

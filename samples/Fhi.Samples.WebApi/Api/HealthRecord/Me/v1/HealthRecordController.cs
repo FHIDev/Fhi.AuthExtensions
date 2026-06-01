@@ -14,16 +14,9 @@ namespace WebApi.Api.HealthRecord.Me.v1
     {
         private readonly IHealthRecordService _healthRecordService = healthRecordService;
 
-        [HttpGet("helseid-bearer")]
-        [Authorize(AuthenticationSchemes = AuthenticationSchemes.HelseIdBearer, Policy = Policies.EndUserPolicy)]
-        public IEnumerable<HealthRecordPersonDto> GetWithHelseIdBearer()
-        {
-            Task.Delay(1000).Wait();
-            return _healthRecordService.GetHealthRecords().Select(r => new HealthRecordPersonDto(r.Pid, r.Name, r.Description, r.CreatedAt));
-        }
 
         [HttpGet]
-        [Authorize(AuthenticationSchemes = AuthenticationSchemes.HelseIdBearer, Policy = Policies.EndUserPolicy)]
+        [Authorize(AuthenticationSchemes = AuthenticationSchemes.HelseIdDPoP, Policy = Policies.EndUserPolicy)]
         public ActionResult<UserDto> GetMe()
         {
             return Ok(new UserDto(
