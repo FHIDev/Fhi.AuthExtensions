@@ -1,4 +1,5 @@
 ﻿using Duende.AccessTokenManagement;
+using Duende.AccessTokenManagement.DPoP;
 using Fhi.Auth.IntegrationTests.Setup;
 using Fhi.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -37,9 +38,8 @@ namespace Fhi.Auth.EndToEndTests.Authentication
                        authority!,
                        configuration.GetValue<string>("HelseIdClient:ClientId")!,
                        PrivateJwk.ParseFromJson(privateJwk!),
-                       configuration.GetValue<string>("HelseIdClient:Scope")!)
-                   // With DPoP support
-                   ////DPoPProofKey.ParseOrDefault(PrivateJwk.ParseFromJson(privateJwk!)))
+                       configuration.GetValue<string>("HelseIdClient:Scope")!,
+                       DPoPProofKey.ParseOrDefault(PrivateJwk.ParseFromJson(privateJwk!)))
                    .AddClientCredentialsHttpClient(client =>
                    {
                        client.BaseAddress = new Uri("http://localhost:8888");
@@ -69,7 +69,7 @@ namespace Fhi.Auth.EndToEndTests.Authentication
             var response = await clientApp.Services.GetRequiredService<MyService>().Get();
             var content = await response.Content.ReadAsStringAsync();
             Assert.That(response.IsSuccessStatusCode, Is.True);
-            Assert.That(content, Does.StartWith("Bearer "));
+            Assert.That(content, Does.StartWith("DPoP "));
 
             await clientApp.StopAsync();
             await apiApp.StopAsync();
