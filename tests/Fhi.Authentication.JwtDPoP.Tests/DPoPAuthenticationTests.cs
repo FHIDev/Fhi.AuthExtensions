@@ -282,6 +282,47 @@ namespace Fhi.Auth.IntegrationTests
             response.AssertWWWAuthenticate("error=\"invalid_dpop_proof\", error_description=\"Disallowed algorithm\"");
         }
 
+        // Ensure this matches actual list
+        private static readonly string[] DefaultValidAlgorithms =
+        {
+            SecurityAlgorithms.RsaSha256,
+            SecurityAlgorithms.RsaSha384,
+            SecurityAlgorithms.RsaSha512,
+            //SecurityAlgorithms.EcdsaSha256,
+            //SecurityAlgorithms.EcdsaSha384,
+            //SecurityAlgorithms.EcdsaSha512,
+            SecurityAlgorithms.RsaSsaPssSha256,
+            SecurityAlgorithms.RsaSsaPssSha384,
+            SecurityAlgorithms.RsaSsaPssSha512
+        };
+
+        /// <summary>
+        /// 5. The alg JOSE Header Parameter indicates a registered asymmetric digital signature algorithm
+        /// </summary>
+        /// <returns></returns>
+        [TestCaseSource(nameof(DefaultValidAlgorithms))]
+        public async Task GIVEN_default_config_WHEN_using_default_valid_algorithms_THEN_returns_200(string algorithm)
+        {
+            var client = new DPoPTestServerBuilder()
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+               {
+                   ValidIssuer = "http://authority",
+                   ValidAudience = "api_audience",
+                   IssuerSigningKey = FakeDPoPTokenBuilder.SecurityKey,
+               }))
+                .AppPipeline(app => app.MapGet("/api/dpopEndpoint", [Authorize(AuthenticationSchemes = "DPoP")] () => "OK"))
+                .Start();
+
+            var token = FakeDPoPTokenBuilder.CreateDPoPToken("http://authority", "api_audience");
+            var proof = FakeDPoPTokenBuilder.CreateDPoPProof("http://localhost/api/dpopEndpoint", "GET", token, alg: algorithm);
+
+            client.AddDPoPAuthorizationHeader(token).AddDPoPHeader(proof);
+
+            var response = await client.GetAsync("/api/dpopEndpoint");
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
         /// <summary>
         /// 6. The JWT signature verifies with the public key contained in the jwk JOSE Header Parameter
         /// </summary>
