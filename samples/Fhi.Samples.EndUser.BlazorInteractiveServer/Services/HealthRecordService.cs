@@ -21,7 +21,7 @@ namespace EndUser.BlazorInteractiveServer.Services
             return await ExecuteWithErrorHandling<IEnumerable<HealthRecord>>(async () =>
             {
                 var client = _factory.CreateClient("WebApi");
-                return await client.GetAsync("/api/v1/me/health-records/helseid-bearer");
+                return await client.GetAsync("/api/v1/me/health-records");
             });
         }
 

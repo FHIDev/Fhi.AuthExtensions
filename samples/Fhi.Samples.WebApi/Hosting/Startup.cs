@@ -1,5 +1,4 @@
-﻿using Api.WebApi.Hosting.Authorization;
-using Duende.IdentityModel;
+﻿using Duende.IdentityModel;
 using Fhi.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -64,7 +63,7 @@ namespace Api.WebApi.Hosting
              * Authorization
              ********************************************************************************************************/
             builder.Services.AddSingleton<IAuthorizationHandler, ScopeHandler>();
-            builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, DefaultAccessControlMiddleware>();
+            //builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, DefaultAccessControlMiddleware>();
 
             builder.Services.AddAuthorizationBuilder()
                 .SetFallbackPolicy(new AuthorizationPolicyBuilder()

@@ -11,7 +11,7 @@ namespace BlazorInteractiveServer.Hosting.Authentication
     /// TODO: handle multiple downstream clients e.g. clientCredentials and token exchange
     /// </summary>
     public class ClientAssertionService(
-        IOptionsSnapshot<AuthenticationSettings> Options,
+        IOptions<AuthenticationSettings> Options,
         IDiscoveryCache DiscoveryCache) : IClientAssertionService
     {
         public async Task<ClientAssertion?> GetClientAssertionAsync(ClientCredentialsClientName? clientName = null, TokenRequestParameters? parameters = null, CancellationToken ct = default)
@@ -25,11 +25,11 @@ namespace BlazorInteractiveServer.Hosting.Authentication
 
             // Optional: Pass custom expiration time (e.g., 30 seconds from now, default is 10)
             var expiration = DateTime.UtcNow.AddSeconds(30);
-            
+
             var clientAssertion = ClientAssertionTokenHandler.CreateJwtToken(
-                discoveryDocument.Issuer!, 
-                Options.Value.ClientId, 
-                Options.Value.ClientSecret, 
+                discoveryDocument.Issuer!,
+                Options.Value.ClientId,
+                Options.Value.ClientSecret,
                 expiration);
 
             return new ClientAssertion { Type = OidcConstants.ClientAssertionTypes.JwtBearer, Value = clientAssertion };

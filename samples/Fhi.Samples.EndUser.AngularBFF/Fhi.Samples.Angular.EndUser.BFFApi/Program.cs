@@ -116,7 +116,9 @@ builder.Services.AddUserAccessTokenHttpClient(
         // Short timeout so a missing downstream WebApi surfaces quickly in dev
         // instead of hanging for the 100s HttpClient default.
         client.Timeout = TimeSpan.FromSeconds(10);
-    });
+    })
+    .AddTypedClient<IHealthRecordService, HealthRecordService>();
+
 builder.Services.AddTransient<IHealthRecordService, HealthRecordService>();
 
 /************************************************************************************
