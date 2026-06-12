@@ -27,7 +27,8 @@ namespace AngularBFF.Net8.Api.HealthRecords
             var response = await client.GetAsync("api/v1/me/health-records");
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                throw new UnauthorizedAccessException();
+                var wwwAuthenticate = response.Headers.WwwAuthenticate.ToString();
+                throw new UnauthorizedAccessException(wwwAuthenticate);
             }
             response.EnsureSuccessStatusCode();
 

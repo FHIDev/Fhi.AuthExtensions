@@ -9,11 +9,9 @@
 
     internal class AuthenticationSchemes
     {
-        public const string HelseIdBearer = "HelseIdBearer";
         public const string HelseIdDPoP = "HelseIdDPoP";
         public const string Duende = "Duende";
         public const string MaskinPorten = "MaskinPorten";
-        public const string IdPorten = "ID-Porten";
     }
 
     internal class Policies
