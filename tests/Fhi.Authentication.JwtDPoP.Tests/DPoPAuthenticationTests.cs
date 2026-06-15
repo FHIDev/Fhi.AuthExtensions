@@ -299,7 +299,7 @@ namespace Fhi.Auth.IntegrationTests
         /// </summary>
         /// <returns></returns>
         [TestCaseSource(nameof(RsaAndPssAlgorithms))]
-        public async Task GIVEN_default_config_WHEN_using_default_rsa_algorithms_THEN_returns_200(string algorithm)
+        public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_using_default_rsa_algorithms_THEN_returns_200(string algorithm)
         {
             FakeDPoPTokenBuilder.UseKey(FakeDPoPTokenBuilder.FakeDPoPKeys.CreateRsa());
 
@@ -336,7 +336,7 @@ namespace Fhi.Auth.IntegrationTests
         /// </summary>
         /// <returns></returns>
         [TestCaseSource(nameof(EcAlgorithms))]
-        public async Task GIVEN_default_config_WHEN_using_default_ec_algorithms_THEN_returns_200(string algorithm)
+        public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_using_default_ec_algorithms_THEN_returns_200(string algorithm)
         {
             // 1. Select key first
             if (algorithm == SecurityAlgorithms.EcdsaSha256)
@@ -393,7 +393,6 @@ namespace Fhi.Auth.IntegrationTests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
             response.AssertWWWAuthenticate("DPoP error=\"invalid_dpop_proof\", error_description=\"Invalid DPoP proof signature.\"");
         }
-
 
         /// <summary>
         /// 7. The jwk JOSE Header Parameter does not contain a private key
