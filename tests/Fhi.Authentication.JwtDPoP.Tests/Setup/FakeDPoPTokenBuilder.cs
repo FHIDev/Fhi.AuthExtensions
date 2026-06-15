@@ -7,35 +7,97 @@ namespace Fhi.Authentication.JwtDPoP.Tests.Setup
 {
     public static class FakeDPoPTokenBuilder
     {
-        private static readonly RsaSecurityKey _rsaKey;
-        private static readonly Dictionary<string, string> _publicKeyParams;
-        private static readonly string _jwkThumbprint;
-
-        public static RsaSecurityKey SecurityKey => _rsaKey;
-        public static string JwkThumbprint => _jwkThumbprint;
-
-        static FakeDPoPTokenBuilder()
+        public class FakeDpopKeyPair
         {
-            var rsa = RSA.Create(2048);
-            _rsaKey = new RsaSecurityKey(rsa);
+            public SecurityKey? PrivateKey { get; init; }
+            public IDictionary<string, string>? PublicJwk { get; init; }
+            public string? JwkThumbprint { get; init; }
+        }
 
-            var parameters = rsa.ExportParameters(false);
-            _publicKeyParams = new Dictionary<string, string>
-            {
-                ["kid"] = "kid",
-                ["kty"] = "RSA",
-                ["n"] = Base64UrlEncoder.Encode(parameters.Modulus!),
-                ["e"] = Base64UrlEncoder.Encode(parameters.Exponent!),
-            };
+        public static SecurityKey SecurityKey => _keyPair.PrivateKey!;
 
-            var jwk = new JsonWebKey
+        public static string JwkThumbprint => _keyPair.JwkThumbprint!;
+
+        public static class FakeDPoPKeys
+        {
+            public static FakeDpopKeyPair CreateRsa()
             {
-                Kid = "kid",
-                Kty = "RSA",
-                N = _publicKeyParams["n"],
-                E = _publicKeyParams["e"],
-            };
-            _jwkThumbprint = Base64UrlEncoder.Encode(jwk.ComputeJwkThumbprint());
+                var rsa = RSA.Create(2048);
+                var key = new RsaSecurityKey(rsa);
+
+                var p = rsa.ExportParameters(false);
+
+                var jwk = new Dictionary<string, string>
+                {
+                    ["kty"] = "RSA",
+                    ["kid"] = "kid",
+                    ["n"] = Base64UrlEncoder.Encode(p.Modulus!),
+                    ["e"] = Base64UrlEncoder.Encode(p.Exponent!)
+                };
+
+                var thumb = new JsonWebKey
+                {
+                    Kty = "RSA",
+                    Kid = "kid",
+                    N = jwk["n"],
+                    E = jwk["e"]
+                }.ComputeJwkThumbprint();
+
+                return new FakeDpopKeyPair
+                {
+                    PrivateKey = key,
+                    PublicJwk = jwk,
+                    JwkThumbprint = Base64UrlEncoder.Encode(thumb)
+                };
+            }
+
+            public static FakeDpopKeyPair CreateEc(ECCurve curve, string kty)
+            {
+                var ec = ECDsa.Create(curve);
+                var key = new ECDsaSecurityKey(ec);
+
+                var p = ec.ExportParameters(false);
+
+                string crv = curve.Oid.FriendlyName switch
+                {
+                    "nistP256" => "P-256",
+                    "nistP384" => "P-384",
+                    "nistP521" => "P-521",
+                    _ => throw new NotSupportedException($"Unsupported curve: {curve.Oid.FriendlyName}")
+                };
+
+                var jwk = new Dictionary<string, string>
+                {
+                    ["kty"] = kty,
+                    ["kid"] = "kid",
+                    ["crv"] = crv,
+                    ["x"] = Base64UrlEncoder.Encode(p.Q.X!),
+                    ["y"] = Base64UrlEncoder.Encode(p.Q.Y!)
+                };
+
+                var thumb = new JsonWebKey
+                {
+                    Kty = kty,
+                    Kid = "kid",
+                    Crv = crv,
+                    X = jwk["x"],
+                    Y = jwk["y"]
+                }.ComputeJwkThumbprint();
+
+                return new FakeDpopKeyPair
+                {
+                    PrivateKey = key,
+                    PublicJwk = jwk,
+                    JwkThumbprint = Base64UrlEncoder.Encode(thumb)
+                };
+            }
+        }
+
+        private static FakeDpopKeyPair _keyPair = FakeDPoPKeys.CreateRsa();
+
+        public static void UseKey(FakeDpopKeyPair pair)
+        {
+            _keyPair = pair;
         }
 
         public static string CreateDPoPToken(
@@ -59,7 +121,7 @@ namespace Fhi.Authentication.JwtDPoP.Tests.Setup
             string jkt,
             string alg = SecurityAlgorithms.RsaSha256)
         {
-            var signingCredentials = new SigningCredentials(_rsaKey, alg);
+            var signingCredentials = new SigningCredentials(_keyPair.PrivateKey, alg);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -108,12 +170,12 @@ namespace Fhi.Authentication.JwtDPoP.Tests.Setup
             SigningCredentials? signingCredentials = null,
             string alg = SecurityAlgorithms.RsaSha256)
         {
-            signingCredentials ??= new SigningCredentials(_rsaKey, alg);
+            signingCredentials ??= new SigningCredentials(_keyPair.PrivateKey, alg);
 
             var header = new JwtHeader(signingCredentials)
             {
                 ["typ"] = typ,
-                ["jwk"] = jwk ?? _publicKeyParams,
+                ["jwk"] = jwk ?? _keyPair.PublicJwk
             };
 
             var payload = new JwtPayload();
@@ -141,17 +203,41 @@ namespace Fhi.Authentication.JwtDPoP.Tests.Setup
         /// </summary>
         public static string CreateDPoPProofWithPrivateKey(string url, string httpMethod, string accessToken)
         {
-            var privateParams = _rsaKey.Rsa.ExportParameters(true);
-            var jwkWithPrivateKey = new Dictionary<string, string>
+            if (_keyPair.PrivateKey is not RsaSecurityKey rsaKey)
+                throw new InvalidOperationException("Current key is not RSA");
+
+            var p = rsaKey.Rsa.ExportParameters(true);
+
+            var jwkWithPrivate = new Dictionary<string, string>
             {
                 ["kty"] = "RSA",
-                ["n"] = Base64UrlEncoder.Encode(privateParams.Modulus!),
-                ["e"] = Base64UrlEncoder.Encode(privateParams.Exponent!),
-                ["d"] = Base64UrlEncoder.Encode(privateParams.D!),
-                ["p"] = Base64UrlEncoder.Encode(privateParams.P!),
-                ["q"] = Base64UrlEncoder.Encode(privateParams.Q!),
+                ["n"] = Base64UrlEncoder.Encode(p.Modulus!),
+                ["e"] = Base64UrlEncoder.Encode(p.Exponent!),
+                ["d"] = Base64UrlEncoder.Encode(p.D!),
+                ["p"] = Base64UrlEncoder.Encode(p.P!),
+                ["q"] = Base64UrlEncoder.Encode(p.Q!)
             };
-            return CreateDPoPProof(url, httpMethod, accessToken, jwk: jwkWithPrivateKey);
+
+            return CreateDPoPProof(url, httpMethod, accessToken, jwk: jwkWithPrivate);
+        }
+
+        public static string CreateDPoPProofWithPrivateEcKey(string url, string httpMethod, string accessToken)
+        {
+            if (_keyPair.PrivateKey is not ECDsaSecurityKey ecKey)
+                throw new InvalidOperationException("Current key is not EC");
+
+            var p = ecKey.ECDsa.ExportParameters(true);
+
+            var jwkWithPrivate = new Dictionary<string, string>
+            {
+                ["kty"] = "EC",
+                ["crv"] = ecKey.ECDsa.ExportParameters(false).Curve.Oid.FriendlyName!,
+                ["x"] = Base64UrlEncoder.Encode(p.Q.X!),
+                ["y"] = Base64UrlEncoder.Encode(p.Q.Y!),
+                ["d"] = Base64UrlEncoder.Encode(p.D!)
+            };
+
+            return CreateDPoPProof(url, httpMethod, accessToken, jwk: jwkWithPrivate);
         }
 
         /// <summary>

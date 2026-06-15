@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace Fhi.Auth.IntegrationTests
@@ -282,6 +283,91 @@ namespace Fhi.Auth.IntegrationTests
             response.AssertWWWAuthenticate("error=\"invalid_dpop_proof\", error_description=\"Disallowed algorithm\"");
         }
 
+        // Ensure this matches actual list
+        private static readonly string[] RsaAndPssAlgorithms =
+        {
+            SecurityAlgorithms.RsaSha256,
+            SecurityAlgorithms.RsaSha384,
+            SecurityAlgorithms.RsaSha512,
+            SecurityAlgorithms.RsaSsaPssSha256,
+            SecurityAlgorithms.RsaSsaPssSha384,
+            SecurityAlgorithms.RsaSsaPssSha512
+        };
+
+        /// <summary>
+        /// Tests that default RSA algorithms works as aspected
+        /// </summary>
+        /// <returns></returns>
+        [TestCaseSource(nameof(RsaAndPssAlgorithms))]
+        public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_using_default_rsa_algorithms_THEN_returns_200(string algorithm)
+        {
+            FakeDPoPTokenBuilder.UseKey(FakeDPoPTokenBuilder.FakeDPoPKeys.CreateRsa());
+
+            var client = new DPoPTestServerBuilder()
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = "http://authority",
+                    ValidAudience = "api_audience",
+                    IssuerSigningKey = FakeDPoPTokenBuilder.SecurityKey,
+                }))
+                .AppPipeline(app => app.MapGet("/api/dpopEndpoint", [Authorize(AuthenticationSchemes = "DPoP")] () => "OK"))
+                .Start();
+
+            var token = FakeDPoPTokenBuilder.CreateDPoPToken("http://authority", "api_audience", alg: algorithm);
+            var proof = FakeDPoPTokenBuilder.CreateDPoPProof("http://localhost/api/dpopEndpoint", "GET", token, alg: algorithm);
+
+            client.AddDPoPAuthorizationHeader(token).AddDPoPHeader(proof);
+
+            var response = await client.GetAsync("/api/dpopEndpoint");
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
+        // Ensure this matches actual list
+        private static readonly string[] EcAlgorithms =
+        {
+            SecurityAlgorithms.EcdsaSha256,
+            SecurityAlgorithms.EcdsaSha384,
+            SecurityAlgorithms.EcdsaSha512
+        };
+
+        /// <summary>
+        /// Tests that default EC algorithms works as aspected
+        /// </summary>
+        /// <returns></returns>
+        [TestCaseSource(nameof(EcAlgorithms))]
+        public async Task GIVEN_accessing_DPoPprotected_endpoint_WHEN_using_default_ec_algorithms_THEN_returns_200(string algorithm)
+        {
+            // 1. Select key first
+            if (algorithm == SecurityAlgorithms.EcdsaSha256)
+                FakeDPoPTokenBuilder.UseKey(FakeDPoPTokenBuilder.FakeDPoPKeys.CreateEc(ECCurve.NamedCurves.nistP256, "EC"));
+            else if (algorithm == SecurityAlgorithms.EcdsaSha384)
+                FakeDPoPTokenBuilder.UseKey(FakeDPoPTokenBuilder.FakeDPoPKeys.CreateEc(ECCurve.NamedCurves.nistP384, "EC"));
+            else if (algorithm == SecurityAlgorithms.EcdsaSha512)
+                FakeDPoPTokenBuilder.UseKey(FakeDPoPTokenBuilder.FakeDPoPKeys.CreateEc(ECCurve.NamedCurves.nistP521, "EC"));
+
+            // 2. Now build server with the chosen key
+            var client = new DPoPTestServerBuilder()
+                .AddServiceConfiguration(services => services.AddAuthentication().AddJwtDpop(configure: options => options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = "http://authority",
+                    ValidAudience = "api_audience",
+                    IssuerSigningKey = FakeDPoPTokenBuilder.SecurityKey,
+                }))
+                .AppPipeline(app => app.MapGet("/api/dpopEndpoint", [Authorize(AuthenticationSchemes = "DPoP")] () => "OK"))
+                .Start();
+
+            // 3. Use matching alg for token + proof
+            var token = FakeDPoPTokenBuilder.CreateDPoPToken("http://authority", "api_audience", alg: algorithm);
+            var proof = FakeDPoPTokenBuilder.CreateDPoPProof("http://localhost/api/dpopEndpoint", "GET", token, alg: algorithm);
+
+            client.AddDPoPAuthorizationHeader(token).AddDPoPHeader(proof);
+
+            var response = await client.GetAsync("/api/dpopEndpoint");
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
         /// <summary>
         /// 6. The JWT signature verifies with the public key contained in the jwk JOSE Header Parameter
         /// </summary>
@@ -307,7 +393,6 @@ namespace Fhi.Auth.IntegrationTests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
             response.AssertWWWAuthenticate("DPoP error=\"invalid_dpop_proof\", error_description=\"Invalid DPoP proof signature.\"");
         }
-
 
         /// <summary>
         /// 7. The jwk JOSE Header Parameter does not contain a private key
