@@ -15,7 +15,7 @@ namespace WebApi.Api.HealthRecord.Me.v1
         private readonly IHealthRecordService _healthRecordService = healthRecordService;
 
         [HttpGet]
-        [Authorize(AuthenticationSchemes = $"{AuthenticationSchemes.HelseIdDPoP},{AuthenticationSchemes.Duende}", Policy = Policies.EndUserPolicy)]
+        [Authorize(AuthenticationSchemes = $"{AuthenticationSchemes.Duende}")]
         public IEnumerable<HealthRecordPersonDto> GetHealthRecords()
         {
             return _healthRecordService.GetHealthRecords().Select(r => new HealthRecordPersonDto(r.Pid, r.Name, r.Description, r.CreatedAt));

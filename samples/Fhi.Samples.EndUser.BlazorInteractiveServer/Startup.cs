@@ -1,4 +1,5 @@
 ﻿using BlazorInteractiveServer.Hosting.Authentication;
+using Microsoft.Extensions.Logging;
 using Duende.AccessTokenManagement;
 using Duende.AccessTokenManagement.DPoP;
 using Duende.AccessTokenManagement.OpenIdConnect;
@@ -49,17 +50,38 @@ internal static partial class Startup
             {
                 if (context != null)
                 {
-                    await context.HttpContext.RequestServices
-                    .GetRequiredService<IUserTokenStore>()
-                    .StoreTokenAsync(context.Principal!, new UserToken
+                    var logger = context.HttpContext.RequestServices
+                        .GetRequiredService<ILoggerFactory>()
+                        .CreateLogger("BlazorInteractiveServer.OnTokenValidated");
+                    try
                     {
-                        ClientId = ClientId.Parse(authenticationSettings?.ClientId ?? string.Empty),
-                        AccessToken = AccessToken.Parse(context.TokenEndpointResponse?.AccessToken ?? string.Empty),
-                        AccessTokenType = AccessTokenType.ParseOrDefault(context.TokenEndpointResponse?.TokenType),
-                        Expiration = context.TokenEndpointResponse != null ? DateTimeOffset.UtcNow.AddSeconds(double.Parse(context.TokenEndpointResponse.ExpiresIn)) : default,
-                        RefreshToken = RefreshToken.Parse(context.TokenEndpointResponse?.RefreshToken ?? string.Empty),
-                        Scope = Scope.ParseOrDefault(context.TokenEndpointResponse?.Scope)
-                    });
+                        var accessToken = context.TokenEndpointResponse?.AccessToken;
+                        var refreshToken = context.TokenEndpointResponse?.RefreshToken;
+                        logger.LogInformation("OnTokenValidated fired: sub={Sub}, hasAccessToken={HasAT}, hasRefreshToken={HasRT}, tokenType={Type}",
+                            context.Principal?.FindFirst("sub")?.Value ?? "NULL",
+                            !string.IsNullOrEmpty(accessToken),
+                            !string.IsNullOrEmpty(refreshToken),
+                            context.TokenEndpointResponse?.TokenType);
+
+                        await context.HttpContext.RequestServices
+                        .GetRequiredService<IUserTokenStore>()
+                        .StoreTokenAsync(context.Principal!, new UserToken
+                        {
+                            ClientId = ClientId.Parse(authenticationSettings?.ClientId ?? string.Empty),
+                            AccessToken = AccessToken.Parse(accessToken ?? string.Empty),
+                            AccessTokenType = AccessTokenType.ParseOrDefault(context.TokenEndpointResponse?.TokenType),
+                            Expiration = context.TokenEndpointResponse != null ? DateTimeOffset.UtcNow.AddSeconds(double.Parse(context.TokenEndpointResponse.ExpiresIn)) : default,
+                            RefreshToken = string.IsNullOrEmpty(refreshToken)
+                                ? null
+                                : RefreshToken.Parse(refreshToken),
+                            Scope = Scope.ParseOrDefault(context.TokenEndpointResponse?.Scope),
+                            DPoPJsonWebKey = DPoPProofKey.ParseOrDefault(authenticationSettings?.ClientSecret)
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "OnTokenValidated: exception while storing token — token NOT stored in IUserTokenStore");
+                    }
                 }
             };
             options.MapInboundClaims = false;

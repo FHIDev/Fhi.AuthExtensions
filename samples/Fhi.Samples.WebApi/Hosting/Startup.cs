@@ -1,5 +1,4 @@
-﻿using Duende.IdentityModel;
-using Fhi.Authorization;
+﻿using Fhi.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using WebApi.Services;
@@ -33,14 +32,18 @@ namespace Api.WebApi.Hosting
             var duendeSection = builder.Configuration.GetSection($"AuthenticationSchemes:{AuthenticationSchemes.Duende}");
             var duendeOptions = duendeSection.Get<AuthenticationSettings>() ?? new AuthenticationSettings();
             authenticationBuilder
-                .AddJwtBearer(AuthenticationSchemes.Duende, options =>
+                .AddJwtDpop(AuthenticationSchemes.Duende, options =>
                 {
                     options.Audience = duendeOptions.Audience;
                     options.Authority = duendeOptions.Authority;
-                    options.Events = new JwtBearerEvents()
-                    {
-                        OnChallenge = OnChallenge(AuthenticationSchemes.Duende)
-                    };
+                    //options.Events = new JwtBearerEvents()
+                    //{
+                    //    OnChallenge = OnChallenge(AuthenticationSchemes.Duende),
+                    //    OnAuthenticationFailed = context =>
+                    //    {
+                    //        return Task.CompletedTask;
+                    //    }
+                    //};
                 });
 
             var maskinportenSection = builder.Configuration.GetSection($"AuthenticationSchemes:{AuthenticationSchemes.MaskinPorten}");
@@ -50,6 +53,8 @@ namespace Api.WebApi.Hosting
                 {
                     options.Audience = maskinportenOptions.Audience;
                     options.MetadataAddress = maskinportenOptions.Authority;
+                    options.MapInboundClaims = false;
+                    options.TokenValidationParameters.NameClaimType = "sub";
                     options.Events = new JwtBearerEvents()
                     {
                         OnChallenge = OnChallenge(AuthenticationSchemes.MaskinPorten),
@@ -69,12 +74,12 @@ namespace Api.WebApi.Hosting
                 .SetFallbackPolicy(new AuthorizationPolicyBuilder()
                             .RequireAuthenticatedUser()
                             .Build())
-                .AddPolicy(Policies.EndUserPolicy, policy =>
-                {
-                    //Ensure the end-user "sub" claim is present.
-                    policy.RequireClaim(JwtClaimTypes.Subject);
-                    policy.RequireAuthenticatedUser();
-                })
+                //.AddPolicy(Policies.EndUserPolicy, policy =>
+                //{
+                //    //Ensure the end-user "sub" claim is present.
+                //    //policy.RequireClaim(JwtClaimTypes.Subject);
+                //    //policy.RequireAuthenticatedUser();
+                //})
                 .AddPolicy(Policies.IntegrationPolicy, policy =>
                  {
                      policy.RequireAuthenticatedUser();

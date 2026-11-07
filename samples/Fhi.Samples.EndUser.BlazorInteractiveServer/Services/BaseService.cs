@@ -50,25 +50,10 @@ namespace EndUser.BlazorInteractiveServer.Services
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        return new ServiceResult<T> { IsError = true, ShouldNavigate = true, NavigateTo = "/", Raw = response };
+                        return new ServiceResult<T> { IsError = true, ShouldNavigate = true, NavigateTo = "/", ErrorMessage = $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}", Raw = response };
                     }
-                    //else if (reason == "Forbidden")
-                    // {
-                    //     // Redirect to forbidden page
-                    //     NavigationService.RedirectToForbidden();
-                    // }
-                    // else if (reason == "NotFound")
-                    // {
-                    //     // Redirect to not found page
-                    //     NavigationService.RedirectToNotFound();
-                    // }
-                    // else
-                    // {
-                    //     // Handle other errors
-                    //     NavigationService.RedirectToErrorPage();
-                    // })
 
-                    return new ServiceResult<T> { IsError = true, ShouldNavigate = true, NavigateTo = "/error", Raw = response };
+                    return new ServiceResult<T> { IsError = true, ErrorMessage = $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}: {content}", Raw = response };
                 }
             }
             catch (Exception)

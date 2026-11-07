@@ -15,8 +15,7 @@ Stream rendering sample
 {
     <p><em>Loading...</em></p>
 }
-
-@if (Records != null)
+else if (Records != null)
 {
     <table class="table">
         <thead>
@@ -38,10 +37,18 @@ Stream rendering sample
         </tbody>
     </table>
 }
+else if (isError)
+{
+    <div class="alert alert-danger">
+        <p>@errorMessage</p>
+    </div>
+}
 
 @code {
     private IEnumerable<HealthRecord>? Records;
     private bool isLoading = false;
+    private bool isError = false;
+    private string? errorMessage;
     private ServiceResult<IEnumerable<HealthRecord>>? _result;
 
     protected override async Task OnInitializedAsync()
@@ -50,13 +57,21 @@ Stream rendering sample
         {
             isLoading = true;
             _result = await HealthRecordService.GetHealthrecords();
-            Records = _result?.Data;
+            if (_result?.IsError == true)
+            {
+                isError = true;
+                errorMessage = _result.ErrorMessage;
+            }
+            else
+            {
+                Records = _result?.Data;
+            }
             isLoading = false;
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-        }        
+        }
     }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
