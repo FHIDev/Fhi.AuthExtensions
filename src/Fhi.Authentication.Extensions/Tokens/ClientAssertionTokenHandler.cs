@@ -34,7 +34,7 @@ namespace Fhi.Authentication.Tokens
                 throw new ArgumentException($"Expiration ({expires:O}) must be after the current time ({utcNow.UtcDateTime:O}).", nameof(expiration));
 
             if (string.IsNullOrEmpty(securityKey.Alg))
-                securityKey.Alg = SecurityAlgorithms.RsaSha256;
+                securityKey.Alg = SecurityAlgorithms.RsaSsaPssSha512;
             securityKey.KeyId = kid ?? securityKey.Kid;
 
             var descriptor = new SecurityTokenDescriptor
