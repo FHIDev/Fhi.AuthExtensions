@@ -52,7 +52,20 @@ namespace Fhi.Authentication.ClientCredentials
         public Task<ClientAssertion?> GetClientAssertionAsync(ClientCredentialsClientName? clientName = null, TokenRequestParameters? parameters = null, CancellationToken ct = default)
         {
             var client = _clientCredentialsClient.Get(clientName);
-            if (client != null && client.ClientSecret == null)
+
+            // IOptionsMonitor<T>.Get() returns a default instance for unregistered names,
+            // never null. Check ClientId to determine if this client was actually configured.
+            // This happens when Duende's OpenIdConnectUserTokenEndpoint calls this service
+            // during OIDC token refresh with a scheme-derived client name (e.g.
+            // "Duende.TokenManagement.SchemeBasedClient:HelseId"). Returning null lets
+            // Duende fall back to the OIDC scheme's own client credentials.
+            if (client.ClientId == null)
+            {
+                _logger.LogDebug("No client credentials configured for {clientName}, skipping assertion", clientName);
+                return Task.FromResult<ClientAssertion?>(null);
+            }
+
+            if (client.ClientSecret == null)
             {
                 var clientAssertionOptions = _clientAssertionOptions.Get(clientName);
                 if (string.IsNullOrEmpty(clientAssertionOptions.Issuer))
@@ -72,7 +85,6 @@ namespace Fhi.Authentication.ClientCredentials
                 });
             }
 
-            if (client is null) _logger.LogError("Could not resolve options for client {clientName}", clientName);
             return Task.FromResult<ClientAssertion?>(null);
         }
     }
